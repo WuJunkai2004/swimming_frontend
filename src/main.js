@@ -8,6 +8,9 @@ import Aura          from '@primeuix/themes/aura';
 import 'primeflex/primeflex.css';
 import './styles/main.css'
 
+import ConfirmationService from 'primevue/confirmationservice'
+import ConfirmDialog from 'primevue/confirmdialog';
+
 const app = createApp(App)
 
 app.use(router);
@@ -16,5 +19,8 @@ app.use(PrimeVue, {
         preset: Aura
     }
 });
+app.use(ConfirmationService);
+
+app.component('ConfirmDialog', ConfirmDialog);
 
 app.mount('#app');
