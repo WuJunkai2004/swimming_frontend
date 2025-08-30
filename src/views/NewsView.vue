@@ -42,42 +42,20 @@ const isLastPage = ref(false); // 是否是最后一页
 };*/
 
 const fetchNews = async () => {
+  const fake_news = {
+    "title": "活动1",
+    "id": "1",
+    "publishTime": "2021-01-01",
+    "view": "10086"
+  };
   const debug_data = {
     "statusCode": 200,
     "message" : "获取新闻成功",
-    "data" : [
-      {
-        "title": "活动1",
-        "id": "1",
-        "publishTime": "2021-01-01",
-        "view": "10086"
-      },
-      {
-        "title": "活动2",
-        "id": "2",
-        "publishTime": "2021-01-02",
-        "view": "8888"
-      },
-      {
-        "title": "活动3",
-        "id": "3",
-        "publishTime": "2021-01-03",
-        "view": "6666"
-      },
-      {
-        "title": "活动4",
-        "id": "4",
-        "publishTime": "2021-01-04",
-        "view": "1234"
-      },
-      {
-        "title": "活动5",
-        "id": "5",
-        "publishTime": "2021-01-05",
-        "view": "4321"
-      }
-    ]
+    "data" : []
   };
+  for(let i = 0; i < 20; i++){
+    debug_data.data.push({ ...fake_news, id: (i + 1).toString(), title: `活动${i + 1}` });
+  }
   isLastPage.value = false;
   news.value = debug_data.data;
   loading.value = false;
