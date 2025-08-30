@@ -1,0 +1,168 @@
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+// 使用 ref 创建响应式数据，用于绑定表单输入
+const username = ref('');
+const password = ref('');
+
+// 获取 router 实例，用于登录成功后的跳转
+const router = useRouter();
+
+// 移动端顶部菜单栏的模型数据
+const menuItems = ref([
+  {
+    label: '主页',
+    icon: 'pi pi-home',
+    command: () => router.push('/') // 点击后跳转到主页
+  },
+  {
+    label: '关于',
+    icon: 'pi pi-info-circle',
+    command: () => router.push('/about') // 点击后跳转到关于页面
+  },
+  {
+    label: '新闻',
+    icon: 'pi pi-globe',
+    command: () => router.push('/news')
+  }
+]);
+
+// 登录按钮的点击事件处理函数
+const handleLogin = () => {
+  if (username.value && password.value) {
+    console.log('登录信息:', {
+      username: username.value,
+      password: password.value,
+    });
+    alert(`登录成功！欢迎, ${username.value}`);
+    // 在实际应用中，这里会调用 API 进行验证，然后根据结果进行跳转
+    // router.push('/');
+  } else {
+    alert('请输入用户名和密码');
+  }
+};
+</script>
+
+<template>
+  <div class="login-container">
+    <Menubar :model="menuItems" class="md:hidden border-noround" />
+
+    <div class="flex h-full">
+      <div class="w-7 hidden md:flex align-items-center justify-content-center p-5 text-white image-panel">
+        <div class="text-center">
+          <h1 class="font-bold text-6xl mb-4">欢迎使用本系统</h1>
+          <p class="text-2xl line-height-3">一个现代化、响应式的管理平台，由 Vue 和 PrimeVue 强力驱动。</p>
+        </div>
+      </div>
+
+      <div class="w-full md:w-5 flex align-items-center justify-content-center p-4">
+        <Card class="login-card w-full">
+          <template #title>
+            <h2 class="text-center text-3xl">用户登录</h2>
+          </template>
+          <template #content>
+            <div class="flex flex-column gap-4">
+              <div class="p-float-label">
+                <InputText id="username" v-model="username" class="w-full" />
+                <label for="username">用户名</label>
+              </div>
+
+              <div class="p-float-label">
+                <Password 
+                  id="password" 
+                  v-model="password" 
+                  class="w-full"
+                  :feedback="false" 
+                  toggleMask 
+                />
+                <label for="password">密码</label>
+              </div>
+
+              <Button 
+                label="登 录" 
+                icon="pi pi-sign-in" 
+                class="w-full mt-3" 
+                @click="handleLogin" 
+              />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+/* 容器全屏，并移除默认的边距 */
+.login-container {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  background-color: var(--surface-ground); /* 使用主题的背景色 */
+  overflow: hidden; /* 防止出现滚动条 */
+}
+
+/* 确保 flex 容器在 Menubar 下方时也能占满剩余高度 */
+.flex.h-full {
+  height: 100%;
+}
+@media (max-width: 767px) {
+  /* 在移动端，MenuBar会占用一部分高度，所以需要计算剩余高度 */
+  .flex.h-full {
+    height: calc(100% - 50px); /* 假设 Menubar 高度约 50px */
+  }
+}
+
+/* 左侧图片面板样式 */
+.image-panel {
+  position: relative;
+  /* 请将图片 URL 替换为您自己的图片 */
+  background: url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+  background-size: cover;
+}
+
+/* 为图片面板添加一个半透明的遮罩层，让文字更清晰 */
+.image-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+/* 让文字内容在遮罩层之上 */
+.image-panel > div {
+  position: relative;
+  z-index: 2;
+}
+
+/* 为图片实现羽化过渡效果 */
+.image-panel {
+  /* 使用 mask-image 和线性渐变来实现上下边缘的羽化（淡出到透明）
+    这是一种现代的 CSS 技术，比图片处理更灵活
+  */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%, /* 从 10% 的位置开始完全显示 */
+    black 90%, /* 到 90% 的位置结束完全显示 */
+    transparent 100%
+  );
+}
+
+
+/* 登录卡片的最大宽度，防止在超大屏幕上过于拉伸 */
+.login-card {
+  max-width: 450px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* 添加一点阴影使其更突出 */
+}
+
+/* 针对 Password 组件的样式微调，使其与 InputText 高度一致 */
+:deep(.p-password-input) {
+  width: 100%;
+}
+</style>
