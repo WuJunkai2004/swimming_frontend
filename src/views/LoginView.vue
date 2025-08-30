@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue';
-import MobileMenuBar from '@/components/MobileMenuBar.vue';
 import { useConfirm } from 'primevue/useconfirm';
 
 const confirm = useConfirm();
