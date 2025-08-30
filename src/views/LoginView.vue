@@ -5,20 +5,54 @@ import MobileMenuBar from '@/components/MobileMenuBar.vue';
 // 使用 ref 创建响应式数据，用于绑定表单输入
 const username = ref('');
 const password = ref('');
+const is_loginning = ref(false);
+
+async function SHA256(str) {
+  const message    = new TextEncoder().encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', message);
+  const hashArray  = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 // 登录按钮的点击事件处理函数
 const handleLogin = () => {
-  if (username.value && password.value) {
-    console.log('登录信息:', {
-      username: username.value,
-      password: password.value,
-    });
-    alert(`登录成功！欢迎, ${username.value}`);
-    // 在实际应用中，这里会调用 API 进行验证，然后根据结果进行跳转
-    // router.push('/');
-  } else {
-    alert('请输入用户名和密码');
+  if(!username.value) {
+    alert('请输入用户名');
+    return;
   }
+  if(!password.value || password.value.length < 8){
+    alert('密码长度不能少于8位');
+  }
+  
+  (async function login(){
+    is_loginning.value = true;
+    let pw_sha = await SHA256(password.value);
+    let url = '/admin/login'
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: pw_sha
+      })
+    }).then(response => {
+      is_loginning.value = false;
+      return response.json()
+    }).then(data => {
+      if(data.code === 200){
+        alert('登录成功，欢迎 ' + data.username);
+        localStorage.token = data.data.token;
+        window.location.href = '/manage';
+      } else {
+        alert('登录失败: ' + data.message);
+      }
+    }).catch(error =>{
+      console.error('Error:', error);
+      alert('登录请求失败，请稍后重试');
+    });
+  })()
 };
 </script>
 
@@ -42,7 +76,11 @@ const handleLogin = () => {
           <template #content>
             <div class="flex flex-column gap-4">
               <div class="p-float-label">
-                <InputText id="username" v-model="username" class="w-full" />
+                <InputText 
+                  id="username" 
+                  v-model="username" 
+                  class="w-full" 
+                  :disabled="is_loginning"/>
                 <label for="username">用户名</label>
               </div>
 
@@ -52,15 +90,17 @@ const handleLogin = () => {
                   v-model="password" 
                   class="w-full"
                   :feedback="false" 
+                  :disable="is_loginning"
                   toggleMask 
                 />
                 <label for="password">密码</label>
               </div>
 
               <Button 
-                label="登 录" 
+                label="登录" 
                 icon="pi pi-sign-in" 
                 class="w-full mt-3" 
+                :class="{ 'p-disabled': password.length < 8 || is_loginning}" 
                 @click="handleLogin" 
               />
             </div>
