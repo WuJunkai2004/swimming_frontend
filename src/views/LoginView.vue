@@ -1,32 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import MobileMenuBar from '@/components/MobileMenuBar.vue';
 
 // 使用 ref 创建响应式数据，用于绑定表单输入
 const username = ref('');
 const password = ref('');
-
-// 获取 router 实例，用于登录成功后的跳转
-const router = useRouter();
-
-// 移动端顶部菜单栏的模型数据
-const menuItems = ref([
-  {
-    label: '主页',
-    icon: 'pi pi-home',
-    command: () => router.push('/') // 点击后跳转到主页
-  },
-  {
-    label: '关于',
-    icon: 'pi pi-info-circle',
-    command: () => router.push('/about') // 点击后跳转到关于页面
-  },
-  {
-    label: '新闻',
-    icon: 'pi pi-globe',
-    command: () => router.push('/news')
-  }
-]);
 
 // 登录按钮的点击事件处理函数
 const handleLogin = () => {
@@ -46,7 +24,7 @@ const handleLogin = () => {
 
 <template>
   <div class="login-container">
-    <Menubar :model="menuItems" class="md:hidden border-noround" />
+    <MobileMenuBar />
 
     <div class="flex h-full">
       <div class="w-7 hidden md:flex align-items-center justify-content-center p-5 text-white image-panel">
@@ -119,7 +97,7 @@ const handleLogin = () => {
 .image-panel {
   position: relative;
   /* 请将图片 URL 替换为您自己的图片 */
-  background: url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+  background: url('https://imags.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
   background-size: cover;
 }
 
