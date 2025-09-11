@@ -4,67 +4,12 @@ import { useConfirm } from 'primevue/useconfirm';
 import MobileMenuBar from '@/components/MobileMenuBar.vue';
 import ComputerMenuBar from '@/components/ComputerMenuBar.vue';
 
+import { swimLevels } from '@/composables/swimmingLevel';
+
 const confirm = useConfirm();
 // 1. 状态管理：定义所有需要的数据
 // ========================================================================
-const levelData = ref({
-  "50mPools": [
-    {
-      "project": "50米自由泳",
-      "manLevel": [
-        { "levelName": "三级运动员", "marks": 32 },
-        { "levelName": "二级运动员", "marks": 27.5 },
-        { "levelName": "一级运动员", "marks": 24.5 },
-        { "levelName": "运动健将", "marks": 23.28 },
-        { "levelName": "国际级运动健将", "marks": 21.96 }
-      ],
-      "womanLevel": [
-        { "levelName": "三级运动员", "marks": 36 },
-        { "levelName": "二级运动员", "marks": 31.5 },
-        { "levelName": "一级运动员", "marks": 27.2 },
-        { "levelName": "运动健将", "marks": 25.85 },
-        { "levelName": "国际级运动健将", "marks": 24.72 }
-      ]
-    },
-    {
-      "project": "100米自由泳",
-      "manLevel": [
-        { "levelName": "三级运动员", "marks": 75 },
-        { "levelName": "二级运动员", "marks": 63 },
-        { "levelName": "一级运动员", "marks": 55.5 },
-        { "levelName": "运动健将", "marks": 51.94 },
-        { "levelName": "国际级运动健将", "marks": 48.74 }
-      ],
-      "womanLevel": [
-        { "levelName": "三级运动员", "marks": 85 },
-        { "levelName": "二级运动员", "marks": 73 },
-        { "levelName": "一级运动员", "marks": 61.5 },
-        { "levelName": "运动健将", "marks": 56.34 },
-        { "levelName": "国际级运动健将", "marks": 53.84 }
-      ]
-    }
-    // ... 此处添加更多项目
-  ],
-  "25mPools": [
-    {
-      "project": "50米自由泳",
-      "manLevel": [
-        { "levelName": "三级运动员", "marks": 31 },
-        { "levelName": "二级运动员", "marks": 26.5 },
-        { "levelName": "一级运动员", "marks": 23.7 },
-        { "levelName": "运动健将", "marks": 22.56 },
-        { "levelName": "国际级运动健将", "marks": 21.32 }
-      ],
-      "womanLevel": [
-        { "levelName": "三级运动员", "marks": 35 },
-        { "levelName": "二级运动员", "marks": 30.5 },
-        { "levelName": "一级运动员", "marks": 26.4 },
-        { "levelName": "运动健将", "marks": 25.12 },
-        { "levelName": "国际级运动健将", "marks": 24.00 }
-      ]
-    }
-  ]
-});
+const levelData = ref(swimLevels());
 
 // 用户输入和选择的状态
 const selectedPoolType = ref('50mPools');
@@ -180,7 +125,7 @@ const resetFollowingSteps = (step) => {
             <div class="flex flex-column gap-5">
 
               <div class="step">
-                <label class="step-label">第一步：选择泳池类型</label>
+                <label class="step-label">泳池类型</label>
                 <SelectButton
                   v-model="selectedPoolType"
                   :options="poolOptions"
@@ -192,7 +137,7 @@ const resetFollowingSteps = (step) => {
 
               <transition name="fade">
                 <div v-if="selectedPoolType" class="step">
-                  <label class="step-label">第二步：选择竞赛项目</label>
+                  <label class="step-label">选择竞赛项目</label>
                   <Dropdown
                     v-model="selectedProjectName"
                     :options="projectOptions"
@@ -207,7 +152,7 @@ const resetFollowingSteps = (step) => {
 
               <transition name="fade">
                 <div v-if="selectedProjectName" class="step">
-                  <label class="step-label">第三步：选择性别</label>
+                  <label class="step-label">选择性别</label>
                   <SelectButton
                     v-model="selectedGender"
                     :options="genderOptions"
@@ -220,7 +165,7 @@ const resetFollowingSteps = (step) => {
 
               <transition name="fade">
                 <div v-if="selectedGender" class="step">
-                  <label class="step-label">第四步：最好成绩</label>
+                  <label class="step-label">最好成绩</label>
                   <InputGroup>
                     <InputNumber v-model="inputMinutes" placeholder="分" :min="0" />
                     <InputGroupAddon>:</InputGroupAddon>
@@ -254,6 +199,16 @@ const resetFollowingSteps = (step) => {
   min-height: 250px;
   background: url('https://images.unsplash.com/photo') no-repeat center center;
   background-size: cover;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.4);
+  z-index: 1;
 }
 .hero-overlay {
   position: absolute;

@@ -157,7 +157,6 @@ const handleLogin = () => {
 /* 左侧图片面板样式 */
 .image-panel {
   position: relative;
-  /* 请将图片 URL 替换为您自己的图片 */
   background: url('https://imags.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
   background-size: cover;
 }
