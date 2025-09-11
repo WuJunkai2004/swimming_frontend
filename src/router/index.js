@@ -17,7 +17,7 @@ const routes = [
     component: () => import('../views/AboutView.vue')
   },
   {
-    path: '/level-query',   // 访问 /level-query 路径时
+    path: '/swimlevel',   // 访问 /swimlevel 路径时
     name: 'LevelQuery',
     component: () => import('../views/LevelQuery.vue')
   },
@@ -30,7 +30,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('../views/LoginView.vue')
-  }
+  },
+  {
+    path: '/manage',
+    name: 'Manage',
+    component: () => import('../views/AdminManageView.vue')
+  },
 ]
 
 const router = createRouter({

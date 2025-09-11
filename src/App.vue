@@ -2,7 +2,8 @@
 </script>
 
 <template>
-  <router-view></router-view>
+  <router-view/>
+  <ConfirmDialog/>
 </template>
 
 <style scoped></style>

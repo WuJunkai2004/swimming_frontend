@@ -77,7 +77,6 @@ const handleLogin = () => {
 <template>
   <div class="login-container">
     <MobileMenuBar />
-    <ConfirmDialog></ConfirmDialog>
     <div class="flex h-full">
       <div class="w-7 hidden md:flex align-items-center justify-content-center p-5 text-white image-panel">
         <div class="text-center">

@@ -5,8 +5,8 @@ import router        from './router'
 
 import PrimeVue      from 'primevue/config';
 import Aura          from '@primeuix/themes/aura';
-import 'primeflex/primeflex.css';
 import './styles/main.css'
+import 'primeflex/primeflex.css';
 
 import ConfirmationService from 'primevue/confirmationservice'
 import ConfirmDialog from 'primevue/confirmdialog';
