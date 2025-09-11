@@ -138,7 +138,7 @@ const resetFollowingSteps = (step) => {
               <transition name="fade">
                 <div v-if="selectedPoolType" class="step">
                   <label class="step-label">选择竞赛项目</label>
-                  <Dropdown
+                  <Select
                     v-model="selectedProjectName"
                     :options="projectOptions"
                     optionLabel="label"

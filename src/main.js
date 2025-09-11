@@ -9,7 +9,6 @@ import './styles/main.css'
 import 'primeflex/primeflex.css';
 
 import ConfirmationService from 'primevue/confirmationservice'
-import ConfirmDialog from 'primevue/confirmdialog';
 
 const app = createApp(App)
 
@@ -20,7 +19,5 @@ app.use(PrimeVue, {
     }
 });
 app.use(ConfirmationService);
-
-app.component('ConfirmDialog', ConfirmDialog);
 
 app.mount('#app');
