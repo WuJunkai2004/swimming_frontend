@@ -27,6 +27,11 @@ const routes = [
     component: () => import('@/views/NewsView.vue')
   },
   {
+    path: '/news/:id',      // 访问 /news/:id 路径时, :id 是动态参数
+    name: 'NewsDetail',
+    component: () => import('@/views/NewsDetail.vue')
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/LoginView.vue')
