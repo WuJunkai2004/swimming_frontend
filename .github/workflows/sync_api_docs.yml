@@ -40,12 +40,25 @@ jobs:
           fi
           echo "文档已成功生成。"
 
-      # 5. 克隆 Gitee 仓库（使用 PAT）
-      - name: 克隆 Gitee 文档仓库
+      # 5. 加载 Gitee 部署私钥
+      # 使用 SSH-Agent Action 来安全地加载我们存储在 Secrets 中的私钥
+      - name: 加载 Gitee SSH 部署密钥
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.GITEE_DEPLOY_PRIVATE_KEY }}
+
+      # 6. 克隆 Gitee 仓库 (已更新为 SSH 方式)
+      - name: 克隆 Gitee 文档仓库 (使用 SSH)
         run: |
-          git clone https://${{ secrets.GITEE_USERNAME }}:${{ secrets.GITEE_PAT }}@gitee.com/murphy_955/fzu_swim_association_web.git gitee_docs_repo
+          # SSH 需要严格的主机密钥检查，Gitee的主机密钥需要被接受
+          # 我们在 action runner 中添加 gitee.com 到 known_hosts
+          mkdir -p ~/.ssh/
+          ssh-keyscan gitee.com >> ~/.ssh/known_hosts
+          
+          # 使用 SSH URL 克隆
+          git clone git@gitee.com:murphy_955/fzu_swim_association_web.git gitee_docs_repo
       
-      # 6. 将新文档复制到 Gitee 仓库的 docs 文件夹
+      # 7. 将新文档复制到 Gitee 仓库的 docs 文件夹
       - name: 复制并准备提交
         run: |
           echo "正在复制文档..."
@@ -55,7 +68,7 @@ jobs:
           cp -f dist/接口文档.auto.md gitee_docs_repo/docs/接口文档.auto.md
           echo "复制完成。"
 
-      # 7. 提交并推送到 Gitee
+      # 8. 提交并推送到 Gitee
       - name: 提交并推送到 Gitee
         run: |
           cd gitee_docs_repo
