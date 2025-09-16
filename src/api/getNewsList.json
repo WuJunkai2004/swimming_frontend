@@ -1,0 +1,26 @@
+{
+    "url": "/activity/getNewsList",
+    "description": "获取新闻",
+    "param": {
+        "page": "当前页数",
+        "limit": "每页显示的数量"
+    },
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取新闻成功",
+        "data": [
+            {
+            "tittle": "活动1",
+            "id": "1",
+            "publishTime": "2021-01-01",
+            "view": "10086"
+            }
+        ]
+    },
+    "fail": {
+        "statusCode": 420,
+        "message": "获取新闻失败",
+        "data": null
+    }
+}
