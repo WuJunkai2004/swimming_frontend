@@ -1,0 +1,31 @@
+{
+    "url": "/player/excellentAthletesList",
+    "description": "获取优秀运动员列表",
+    "param": {},
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取优秀运动员列表成功",
+        "data": [
+            {
+                "name": "张三",
+                "id": "1",
+                "imgUrl": "",
+                "age": "10086",
+                "grade": "大一"
+            },
+            {
+                "name": "李四",
+                "id": "2",
+                "imgUrl": "",
+                "age": "10010",
+                "grade": "大二"
+            }
+        ]
+    },
+    "fail": {
+        "statusCode": 420,
+        "message": "获取优秀运动员列表失败",
+        "data": null
+    }
+}

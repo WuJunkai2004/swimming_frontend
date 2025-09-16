@@ -1,0 +1,25 @@
+{
+    "url": "/player/excellentAthleteDetail",
+    "description": "获取优秀运动员详情",
+    "param": {
+        "id": "优秀运动员ID"
+    },
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取优秀运动员详情成功",
+        "data": {
+            "name": "张三",
+            "id": "1",
+            "img_url": "",
+            "age": "10086",
+            "grade": "大一",
+            "introduction": "张三是一个好同志"
+        }
+    },
+    "fail": {
+        "statusCode": 421,
+        "message": "获取优秀运动员详情失败",
+        "data": null
+    }
+}

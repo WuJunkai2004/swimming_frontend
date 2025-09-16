@@ -1,0 +1,31 @@
+{
+    "url": "/leader/getLeaderList",
+    "description": "相关领导列表",
+    "param": {},
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取相关领导成功",
+        "data": [
+            {
+                "position": "教师",
+                "name": "张三",
+                "id": "1",
+                "imgUrl": "",
+                "age": "26"
+            },
+            {
+                "position": "教练",
+                "name": "李四",
+                "id": "2",
+                "imgUrl": "",
+                "age": "30"
+            }
+        ]
+    },
+    "fail": {
+        "statusCode": 421,
+        "message": "获取相关领导失败",
+        "data": null
+    }
+}

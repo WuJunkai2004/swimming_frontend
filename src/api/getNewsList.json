@@ -11,10 +11,10 @@
         "message": "获取新闻成功",
         "data": [
             {
-            "tittle": "活动1",
-            "id": "1",
-            "publishTime": "2021-01-01",
-            "view": "10086"
+                "tittle": "活动1",
+                "id": "1",
+                "publishTime": "2021-01-01",
+                "view": "10086"
             }
         ]
     },

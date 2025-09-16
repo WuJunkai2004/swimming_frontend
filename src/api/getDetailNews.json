@@ -1,0 +1,39 @@
+{
+    "url": "/activity/getDetialNews",
+    "description": "获取新闻详情",
+    "param": {
+        "id": "新闻的ID"
+    },
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取新闻详情成功",
+        "data": {
+            "tittle": "活动1",
+            "id": 1,
+            "publishTime": "2021-01-01",
+            "contentVo": [
+                {
+                    "type": "text",
+                    "data": "活动<a href='url'>优秀运动员</a>内容1",
+                    "view": "10086"
+                },
+                {
+                    "type": "image",
+                    "url": "http://xxx.jpg"
+                },
+                {
+                    "type": "video",
+                    "url": "http://xxx.mp4",
+                    "preview": "http://xxx.jpg",
+                    "view": "10086"
+                }
+            ]
+        }
+    },
+    "fail": {
+        "statusCode": 421,
+        "message": "获取新闻详情失败",
+        "data": []
+    }
+}

@@ -35,7 +35,9 @@ export function vueApiPlugin() {
       server.middlewares.use((req, res, next) => {
         for (const apiPath in apiConfig) {
           const apiUrl = apiConfig[apiPath].url || apiPath;
-          if (req.url === apiUrl || req.url === `${apiUrl}/`) {
+          if (req.url === apiUrl ||
+              req.url.startsWith(apiUrl + '?') ||
+              req.url.startsWith(apiUrl + '/')) {
             const api = apiConfig[apiPath];
             if (api.method && !api.method.includes(req.method)) {
               res.statusCode = 405; // Method Not Allowed

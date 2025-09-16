@@ -1,0 +1,21 @@
+{
+    "url": "/admin/login",
+    "description": "管理员登录",
+    "param": {
+        "username": "名为用户名",
+        "password": "MD5加密后的密码"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "登录成功",
+        "data": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        }
+    },
+    "fail": {
+        "statusCode": 424,
+        "message": "登录失败",
+        "data": null
+    }
+}
