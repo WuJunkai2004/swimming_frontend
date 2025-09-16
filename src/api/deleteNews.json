@@ -1,0 +1,17 @@
+{
+    "url": "/admin/deleteNews",
+    "description": "管理员删除新闻, 原api为`/admin/deleteNewsVo`",
+    "params": {
+        "id": "新闻ID",
+        "token": "鉴权token"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "已删除，不再展示"
+    },
+    "fail": {
+        "statusCode": 425,
+        "message": "删除失败"
+    }
+}

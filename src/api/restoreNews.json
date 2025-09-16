@@ -1,0 +1,17 @@
+{
+    "url": "/admin/restoreNews",
+    "description": "管理员恢复已删除的新闻, 原api为`/admin/withdrawDeletionNews`",
+    "params": {
+        "token": "鉴权token",
+        "id": "新闻ID"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "成功"
+    },
+    "fail": {
+        "statusCode": 426,
+        "message": "恢复失败"
+    }
+}

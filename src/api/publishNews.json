@@ -2,8 +2,8 @@
     "url": "/admin/publishNews",
     "description": "管理员发布新闻",
     "params": {
-        "token": "登录成功返回的token",
-        "tittle": "新闻标题",
+        "token": "鉴权token",
+        "title": "新闻标题",
         "content": [
             {
                 "type": "text",
@@ -22,14 +22,12 @@
     "method": ["POST"],
     "response": {
         "statusCode": 200,
-        "message": "登录成功",
-        "data": {
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-        }
+        "message": "成功",
+        "id": "新闻ID"
     },
     "fail": {
-        "statusCode": 424,
-        "message": "登录失败",
-        "data": null
+        "statusCode": 425,
+        "message": "发布失败",
+        "id": null
     }
 }

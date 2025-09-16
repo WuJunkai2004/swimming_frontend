@@ -1,0 +1,17 @@
+{
+    "url": "/admin/deleteLeader",
+    "description": "删除领导/相关负责人",
+    "params": {
+  "id": "领导的id",
+  "token": "登录成功返回的鉴权token"
+},
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "成功"
+    },
+    "fail": {
+        "statusCode": 426,
+        "message": "删除失败"
+    }
+}
