@@ -1,0 +1,20 @@
+{
+    "url": "/sport/register",
+    "description": "运动员报名接口",
+    "params": {
+        "name": "李华",
+        "academicNumber": "学号102301121",
+        "sportType": "FREESTYLES_100M",
+        "college": "SCHOOL_OF_MATHEMATICS_AND_STATISTICS",
+        "gameId": "比赛ID"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "报名成功"
+    },
+    "fail": {
+        "statusCode": 400,
+        "message": "报名项目数量超过个人限制||该项目报名人数已满||报名项目不在允许报名范围内||该学号不存在..."
+    }
+}

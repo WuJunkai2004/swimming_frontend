@@ -1,0 +1,17 @@
+{
+    "url": "/admin/deleteExcellentAthlete",
+    "description": "删除优秀运动员",
+    "params": {
+        "id": "运动员的id",
+        "token": "登录成功返回的鉴权token"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "成功"
+    },
+    "fail": {
+        "statusCode": 430,
+        "message": "删除失败"
+    }
+}
