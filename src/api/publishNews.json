@@ -11,11 +11,11 @@
             },
             {
                 "type": "image",
-                "data": "图片二进制数据"
+                "data": "图片链接，需要可以直接展示的url"
             },
             {
-                "type": "image",
-                "data": "图片二进制数据"
+                "type": "video",
+                "data": "视频链接，需要可以直接展示的url"
             }
         ]
     },

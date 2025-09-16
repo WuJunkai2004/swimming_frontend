@@ -17,3 +17,11 @@
   }
 }
 ```
+
+### 文档生成器说明
+文档生成器需要在主目录下运行
+```bash
+src/api/generate_api_doc.py
+```
+
+生成的文件会放置在 `dist/接口文档.auto.md` 中
