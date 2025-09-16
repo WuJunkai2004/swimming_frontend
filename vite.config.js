@@ -8,11 +8,14 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import Components from 'unplugin-vue-components/vite'
 import { PrimeVueResolver } from '@primevue/auto-import-resolver'
 
+import { vueApiPlugin } from './src/api/api.js'
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+    vueApiPlugin(),
     Components({
       resolvers: [
         PrimeVueResolver()
