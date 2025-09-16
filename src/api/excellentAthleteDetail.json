@@ -1,7 +1,7 @@
 {
     "url": "/player/excellentAthleteDetail",
     "description": "获取优秀运动员详情",
-    "param": {
+    "params": {
         "id": "优秀运动员ID"
     },
     "method": ["GET"],

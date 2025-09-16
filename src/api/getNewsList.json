@@ -1,7 +1,7 @@
 {
     "url": "/activity/getNewsList",
     "description": "获取新闻",
-    "param": {
+    "params": {
         "page": "当前页数",
         "limit": "每页显示的数量"
     },

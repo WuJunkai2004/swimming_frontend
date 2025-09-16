@@ -1,0 +1,25 @@
+{
+    "url": "/leader/getLeaderDetail",
+    "description": "相关领导详情",
+    "params": {
+        "id": "领导的id"
+    },
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取相关领导详情成功",
+        "data": {
+            "position": "教师",
+            "name": "张三",
+            "id": "1",
+            "imgUrl": "",
+            "introduction": "...",
+            "age": "10086"
+        }
+    },
+    "fail": {
+        "statusCode": 422,
+        "message": "获取相关领导详情失败",
+        "data": null
+    }
+}

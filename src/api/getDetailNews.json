@@ -1,7 +1,7 @@
 {
     "url": "/activity/getDetialNews",
     "description": "获取新闻详情",
-    "param": {
+    "params": {
         "id": "新闻的ID"
     },
     "method": ["GET"],

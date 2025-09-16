@@ -1,7 +1,7 @@
 {
     "url": "/leader/getLeaderList",
     "description": "相关领导列表",
-    "param": {},
+    "params": {},
     "method": ["GET"],
     "response": {
         "statusCode": 200,

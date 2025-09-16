@@ -1,7 +1,7 @@
 {
     "url": "/player/excellentAthletesList",
     "description": "获取优秀运动员列表",
-    "param": {},
+    "params": {},
     "method": ["GET"],
     "response": {
         "statusCode": 200,
