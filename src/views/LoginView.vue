@@ -2,6 +2,9 @@
 import { ref } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
 
+import sha256 from 'crypto-js/sha256';
+import encHex from 'crypto-js/enc-hex'; 
+
 const confirm = useConfirm();
 
 const showAlert = (message) => {
@@ -22,10 +25,9 @@ const passwordInputRef = ref(null)
 const is_loginning = ref(false);
 
 async function SHA256(str) {
-  const message    = new TextEncoder().encode(str);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', message);
-  const hashArray  = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const message = new TextEncoder().encode(str);
+  const hash    = sha256(message);
+  return hash.toString(encHex);
 }
 
 const focusPasswordInput = () => {
@@ -59,8 +61,8 @@ const handleLogin = () => {
       is_loginning.value = false;
       return response.json()
     }).then(data => {
-      if(data.code === 200){
-        showAlert('登录成功，欢迎 ' + data.username);
+      if(data.statusCode === 200){
+        showAlert('登录成功，正在跳转');
         localStorage.token = data.data.token;
         window.location.href = '/manage';
       } else {

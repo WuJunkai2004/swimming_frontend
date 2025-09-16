@@ -9,7 +9,7 @@
         "statusCode": 200,
         "message": "获取新闻详情成功",
         "data": {
-            "tittle": "活动1",
+            "title": "活动1",
             "id": 1,
             "publishTime": "2021-01-01",
             "contentVo": [

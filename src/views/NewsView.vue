@@ -15,7 +15,7 @@ const limit = ref(20);
 const isLastPage = ref(false); // 是否是最后一页
 
 // 核心数据获取函数
-/*const fetchNews = async () => {
+const fetchNews = async () => {
   loading.value = true;
   error.value = null;
   try {
@@ -39,27 +39,7 @@ const isLastPage = ref(false); // 是否是最后一页
   } finally {
     loading.value = false;
   }
-};*/
-
-const fetchNews = async () => {
-  const fake_news = {
-    "title": "活动1",
-    "id": "1",
-    "publishTime": "2021-01-01",
-    "view": "10086"
-  };
-  const debug_data = {
-    "statusCode": 200,
-    "message" : "获取新闻成功",
-    "data" : []
-  };
-  for(let i = 0; i < 20; i++){
-    debug_data.data.push({ ...fake_news, id: (i + 1).toString(), title: `活动${i + 1}` });
-  }
-  isLastPage.value = false;
-  news.value = debug_data.data;
-  loading.value = false;
-}
+};
 
 // 页面切换函数
 const changePage = (newPage) => {
