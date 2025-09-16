@@ -1,0 +1,79 @@
+name: 自动生成并同步API文档
+
+on:
+  push:
+    branches:
+      - main  # 假设您的主分支是 main，如果是 master，请修改这里
+    paths:
+      - 'src/api/**.json' # 仅当 src/api/ 目录下的 json 文件发生变化时触发
+
+jobs:
+  build-and-sync-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出（Checkout）当前仓库的代码
+      - name: 检出当前仓库
+        uses: actions/checkout@v4
+
+      # 2. 设置 Python 3 环境
+      # generate_api_doc.py 脚本需要 Python 3
+      - name: 设置 Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # 您可以使用 3.x
+
+      # 3. 运行 Python 脚本生成 API 文档
+      # 该脚本会检查项目根目录的 vite.config.js 文件，必须在根目录运行
+      # 脚本会将文档输出到 dist/接口文档.auto.md
+      - name: 运行 API 文档生成器
+        run: python src/api/generate_api_doc.py
+
+      # 4. 验证生成的文档是否存在
+      - name: 检查生成的文件
+        run: |
+          echo "检查 'dist' 目录内容..."
+          ls -l ./dist/
+          if [ ! -f "dist/接口文档.auto.md" ]; then
+            echo "错误: 文档 'dist/接口文档.auto.md' 未能成功生成。"
+            exit 1
+          fi
+          echo "文档已成功生成。"
+
+      # 5. 克隆 Gitee 仓库（使用 PAT）
+      - name: 克隆 Gitee 文档仓库
+        run: |
+          git clone https://${{ secrets.GITEE_USERNAME }}:${{ secrets.GITEE_PAT }}@gitee.com/murphy_955/fzu_swim_association_web.git gitee_docs_repo
+      
+      # 6. 将新文档复制到 Gitee 仓库的 docs 文件夹
+      - name: 复制并准备提交
+        run: |
+          echo "正在复制文档..."
+          # 确保目标仓库的 docs 目录存在
+          mkdir -p gitee_docs_repo/docs/
+          # 复制文件，覆盖旧文件
+          cp -f dist/接口文档.auto.md gitee_docs_repo/docs/接口文档.auto.md
+          echo "复制完成。"
+
+      # 7. 提交并推送到 Gitee
+      - name: 提交并推送到 Gitee
+        run: |
+          cd gitee_docs_repo
+          
+          # 配置 Git 用户信息
+          git config user.name "GitHub Action Bot"
+          git config user.email "action-bot@github.com"
+          
+          # 添加更改并检查是否有实际变动
+          git add docs/接口文档.auto.md
+          
+          # 检查是否有文件被暂存（即有变动）
+          if git diff --staged --quiet; then
+            echo "API文档没有变化，无需推送。"
+          else
+            CURRENT_TIME=$(TZ='Asia/Shanghai' date +'%d日%m月%H时%M分')
+            echo "检测到API文档更新，正在提交并推送..."
+            git commit -m "docs(api): 自动更新API接口文档于 ${CURRENT_TIME}"
+            git push
+            echo "已成功推送到 Gitee。"
+          fi
