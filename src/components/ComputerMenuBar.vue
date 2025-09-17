@@ -7,8 +7,7 @@ const { menuItems } = useMenu();
   <Menubar :model="menuItems" class="hidden md:block">
     <template #start>
       <div class="flex align-items-center mr-5">
-        <img alt="logo" src="/logo_origin.jpg" height="100" class="mr-2 logo-round" hidden/>
-        <img alt="logo" src="/logo_embossed.png" height="100" class="mr-2"/>
+        <img alt="logo" src="/logo_origin.jpg" height="100" class="mr-2 logo-round"/>
         <div>
           <span class="font-bold text-xl block">福州大学学生游泳学会</span>
           <span class="text-sm text-color-secondary block text-center">fzu swimming association</span>
