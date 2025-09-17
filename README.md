@@ -20,8 +20,9 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 前端共有以下页面：
 | 页面名称 | 说明 | 状态 | uri |
 | --- | --- | --- | --- |
-| 首页 | 展示首页信息 | wip | / |
-| 新闻页 | 展示新闻信息 | finished | /news |
-| 后端登录页 | 后端管理员登录 | finished | /login 
-| 管理页 | 后端管理员管理信息 | wip | /manage |
-| 等级查询页 | 查询游泳等级信息 | wip | /swimlevel |
+| 首页 | 展示首页信息 | - | / |
+| 新闻页 | 新闻列表 | √ | /news |
+| 新闻详情页 | 展示新闻详情 | √ | /news/:id |
+| 后端登录页 | 后端管理员登录 | √ | /login |
+| 管理页 | 后端管理员管理信息 | - | /manage |
+| 等级查询页 | 查询游泳等级信息 | - | /swimlevel |

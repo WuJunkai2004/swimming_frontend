@@ -84,9 +84,9 @@ jobs:
           if git diff --staged --quiet; then
             echo "API文档没有变化，无需推送。"
           else
-            CURRENT_TIME=$(TZ='Asia/Shanghai' date +'%d日%m月%H时%M分')
+            CURRENT_TIME=$(TZ='Asia/Shanghai' date +'%m月%d日%H时%M分')
             echo "检测到API文档更新，正在提交并推送..."
-            git commit -m "docs(api): 自动更新API接口文档于 ${CURRENT_TIME}"
+            git commit -m "docs: 自动更新API接口文档于${CURRENT_TIME}"
             git push
             echo "已成功推送到 Gitee。"
           fi
