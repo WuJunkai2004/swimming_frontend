@@ -1,5 +1,5 @@
 {
-    "url": "/admin/publishNews",
+    "url": "/admin/uploadNews",
     "description": "管理员发布新闻",
     "params": {
         "token": "鉴权token",

@@ -1,5 +1,5 @@
 {
-    "url": "/admin/restoreNews",
+    "url": "/admin/deleteNews",
     "description": "管理员恢复已删除的新闻, 原api为`/admin/withdrawDeletionNews`",
     "params": {
         "token": "鉴权token",
