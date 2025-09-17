@@ -41,6 +41,11 @@ const routes = [
     name: 'Manage',
     component: () => import('@/views/AdminManageView.vue')
   },
+  {
+    path: "/leaders",
+    name: "Leaders",
+    component: () => import('@/views/LeadersView.vue')
+  },
 ]
 
 const router = createRouter({

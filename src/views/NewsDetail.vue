@@ -1,4 +1,5 @@
 <script setup>
+import router from '@/router';
 import { ref, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -32,6 +33,10 @@ const fetchNewsDetail = async (id) => {
   });
 };
 
+const goBack = () => {
+  router.go(-1);
+};
+
 // --- 3. 监听路由参数变化 ---
 // 使用 watch 监听 route.params.id 的变化
 // 当从 /news/1 跳转到 /news/2 时，这个监听器会被触发
@@ -57,6 +62,15 @@ onMounted(() => {
   <div>
     <MobileMenuBar />
     <ComputerMenuBar />
+
+  <div class="page-content-container">
+
+    <Button 
+      label="返回" 
+      icon="pi pi-arrow-left" 
+      @click="goBack" 
+      class="p-button-text p-button-secondary mt-4 mb-3" 
+    />
 
     <div v-if="loading" class="news-content-skeleton">
       <Skeleton width="60%" height="2.5rem" class="mb-3"></Skeleton>
@@ -102,6 +116,8 @@ onMounted(() => {
         </template>
       </div>
     </article>
+  
+  </div>
   </div>
 </template>
 
