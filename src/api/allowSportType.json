@@ -1,0 +1,27 @@
+{
+    "url": "/sport/allowSportType",
+    "description": "获取该比赛允许的运动类型",
+    "params": {
+        "game": "比赛的uuid"
+    },
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取允许报名的项目成功",
+        "data": [
+            {
+                "name": "一百自由泳",
+                "enum": "FREESTYLES_100M"
+            },
+            {
+                "name": "二百自由泳",
+                "enum": "FREESTYLES_200M"
+            }
+        ]
+    },
+    "fail": {
+        "statusCode": 440,
+        "message": "获取允许报名的项目失败",
+        "data": null
+    }
+}
