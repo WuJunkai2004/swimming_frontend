@@ -1,5 +1,5 @@
 {
-    "url": "/activity/getDetialNews",
+    "url": "/activity/getDetailNews",
     "description": "获取新闻详情",
     "params": {
         "id": "新闻的ID"
@@ -12,11 +12,11 @@
             "title": "活动1",
             "id": 1,
             "publishTime": "2021-01-01",
-            "contentVo": [
+            "view": "10086",
+            "content": [
                 {
                     "type": "text",
-                    "data": "活动<a href='url'>优秀运动员</a>内容1",
-                    "view": "10086"
+                    "data": "活动<a href='url'>优秀运动员</a>内容1"
                 },
                 {
                     "type": "image",
@@ -25,8 +25,7 @@
                 {
                     "type": "video",
                     "url": "http://xxx.mp4",
-                    "preview": "http://xxx.jpg",
-                    "view": "10086"
+                    "preview": "http://xxx.jpg"
                 }
             ]
         }
