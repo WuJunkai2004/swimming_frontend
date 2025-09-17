@@ -16,7 +16,7 @@ export function useMenu() {
       command: () => router.push('/about')
     },
     {
-      label: '新闻',
+      label: '资讯',
       icon: 'pi pi-globe',
       command: () => router.push('/news')
     },
