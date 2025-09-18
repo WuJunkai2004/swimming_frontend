@@ -9,8 +9,8 @@ const { menuItems } = useMenu();
       <div class="flex align-items-center mr-5">
         <img alt="logo" src="/logo_origin.jpg" height="100" class="mr-2 logo-round"/>
         <div>
-          <span class="font-bold text-xl block">福州大学学生游泳学会</span>
-          <span class="text-sm text-color-secondary block text-center">fzu swimming association</span>
+          <span class="font-bold text-xl block text-center">福州大学学生游泳协会</span>
+          <span class="text-sm text-color-secondary block text-center">Fuzhou University Student Swimming Club</span>
         </div>
       </div>
     </template>

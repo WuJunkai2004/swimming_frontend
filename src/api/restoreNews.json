@@ -1,6 +1,6 @@
 {
-    "url": "/admin/deleteNews",
-    "description": "管理员恢复已删除的新闻, 原api为`/admin/withdrawDeletionNews`",
+    "url": "/admin/withdrawDeletionNews",
+    "description": "管理员恢复已删除的新闻",
     "params": {
         "token": "鉴权token",
         "id": "新闻ID"
