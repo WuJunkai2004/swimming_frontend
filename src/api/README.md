@@ -8,16 +8,18 @@
   "params": {
     "gameId": "比赛ID，用于获取指定比赛的预览数据"
   },
-  "method": ["GET", "POST"],
+  "method": [
+    "GET",
+    "POST"
+  ],
   "response": {
     //The response data
   },
-  "fail" : {
+  "fail": {
     //The fail response data
   }
 }
 ```
-
 ### 文档生成器说明
 文档生成器需要在主目录下运行
 ```bash

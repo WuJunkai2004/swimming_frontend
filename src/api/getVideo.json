@@ -1,0 +1,20 @@
+{
+  "url": "activity/getVideo",
+  "description": "获取视频",
+  "params": {
+    "uuid": "视频ID"
+  },
+  "method": [
+    "GET"
+  ],
+  "response": {
+    "statusCode": 200,
+    "message": "成功",
+    "data": null
+  },
+  "fail": {
+    "statusCode": 427,
+    "message": "获取失败",
+    "data": null
+  }
+}
