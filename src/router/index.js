@@ -39,8 +39,23 @@ const routes = [
   {
     path: '/manage',
     name: 'Manage',
-    component: () => import('@/views/AdminManageView.vue')
+    component: () => import('@/views/manage/ManageView.vue')
   },
+  {
+    path: "/leaders",
+    name: "Leaders",
+    component: () => import('@/views/LeadersView.vue')
+  },
+  {
+    path: "/register/:gameid",  // 访问 /register/:gameid 路径时, :gameid 是动态参数，代表比赛ID
+    name: "Register",
+    component: () => import('@/views/RegisterView.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFoundView.vue')
+  }
 ]
 
 const router = createRouter({

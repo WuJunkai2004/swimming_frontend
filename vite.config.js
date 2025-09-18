@@ -15,7 +15,7 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    vueApiPlugin(),
+    ...(process.env.release ? [] : [vueApiPlugin()]),
     Components({
       resolvers: [
         PrimeVueResolver()

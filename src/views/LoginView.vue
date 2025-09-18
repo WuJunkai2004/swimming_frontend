@@ -4,6 +4,7 @@ import { useConfirm } from 'primevue/useconfirm';
 
 import sha256 from 'crypto-js/sha256';
 import encHex from 'crypto-js/enc-hex'; 
+import Cookies from 'js-cookie';
 
 const confirm = useConfirm();
 
@@ -63,7 +64,7 @@ const handleLogin = () => {
     }).then(data => {
       if(data.statusCode === 200){
         showAlert('登录成功，正在跳转');
-        localStorage.token = data.data.token;
+        Cookies.set('token', data.data.token, { expires: 1, path: '/' }); // 1天后过期
         window.location.href = '/manage';
       } else {
         showAlert('登录失败: ' + data.message);

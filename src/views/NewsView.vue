@@ -47,6 +47,11 @@ const changePage = (newPage) => {
   router.push({ query: { page: newPage, limit: limit.value } });
 };
 
+// 点击卡片时导航到详情页
+const goToDetail = (id) => {
+  router.push(`/news/${id}`);
+};
+
 // 组件挂载时，初始化参数并获取数据
 onMounted(() => {
   // 从 URL 初始化 page 和 limit
@@ -92,7 +97,7 @@ fetchNews();
 
         <div v-else>
           <div class="news-list p-3">
-            <Card v-for="item in news" :key="item.id" class="mb-3 news-item">
+            <Card v-for="item in news" :key="item.id" class="mb-3 news-item" @click="goToDetail(item.id)">
               <template #title>
                 <a :href="`/news/${item.id}`" class="news-title-link">{{ item.title }}</a>
               </template>

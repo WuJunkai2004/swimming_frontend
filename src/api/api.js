@@ -26,9 +26,10 @@ function loadApiConfig() {
   return apiConfigs;
 }
 
-const apiConfig = loadApiConfig();
+
 
 export function vueApiPlugin() {
+  const apiConfig = loadApiConfig();
   return {
     name: 'vue-api-plugin',
     configureServer(server) {
@@ -41,7 +42,7 @@ export function vueApiPlugin() {
             const api = apiConfig[apiPath];
             if (api.method && !api.method.includes(req.method)) {
               res.statusCode = 405; // Method Not Allowed
-              res.end(`Method ${req.method} not allowed for ${apiPath}`);
+              res.end(JSON.stringify(api.fail || { message: 'Method Not Allowed' }));
               return;
             }
             res.setHeader('Content-Type', 'application/json');

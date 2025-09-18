@@ -1,0 +1,53 @@
+{
+    "url": "/sport/preview",
+    "description": "管理员在网页上查看比赛数据",
+    "params": {
+        "token": "登录成功返回的鉴权token",
+        "gameid": "比赛编号"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "data": {
+            "competitionName": "2025年福州大学振奋杯",
+            "alhleteDetail": [
+                {
+                    "athleteName": "李泽聿",
+                    "athleteId": "102301237",
+                    "college": "DEPARTMENT_OF_PHYSICAL_EDUCATION_AND_RESEARCH",
+                    "registerEvents": [
+                        "FREESTYLES_100M",
+                        "MAN_BREASTSTROKE_100M"
+                    ]
+                },
+                {
+                    "athleteName": "吴君凯",
+                    "athleteId": "102301238",
+                    "college": "SCHOOL_OF_MATHEMATICS_AND_STATISTICS",
+                    "registerEvents": [
+                        "FREESTYLES_100M"
+                    ]
+                }
+            ],
+            "endTime": "2025-11-24T16:00:00.000Z",
+            "allowedEvents": [
+                "FREESTYLES_100M",
+                "MAN_BREASTSTROKE_100M"
+            ],
+            "allowedCollege": [
+                "DEPARTMENT_OF_PHYSICAL_EDUCATION_AND_RESEARCH",
+                "SCHOOL_OF_MATHEMATICS_AND_STATISTICS"
+            ],
+            "collegeActivityLimit": 2,
+            "athleteActivityLimit": 2,
+            "sameActivityMaxLimit": 2,
+            "leaderPhone": "13800138000"
+        },
+        "message": "成功"
+    },
+    "fail": {
+        "statusCode": 424,
+        "message": "预览失败，可能是token无效或比赛不存在",
+        "data": null
+    }
+}

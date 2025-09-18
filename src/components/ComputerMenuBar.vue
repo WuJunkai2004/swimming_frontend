@@ -7,12 +7,12 @@ const { menuItems } = useMenu();
   <Menubar :model="menuItems" class="hidden md:block">
     <template #start>
       <div class="flex align-items-center mr-5">
-        <img alt="logo" src="/favicon.ico" height="40" class="mr-2" />
-        <span class="font-bold text-xl">Swimming</span>
+        <img alt="logo" src="/logo_origin.jpg" height="100" class="mr-2 logo-round"/>
+        <div>
+          <span class="font-bold text-xl block">福州大学学生游泳学会</span>
+          <span class="text-sm text-color-secondary block text-center">fzu swimming association</span>
+        </div>
       </div>
-    </template>
-    <template #end>
-      <Button icon="pi pi-user" severity="secondary" text rounded aria-label="User Profile" />
     </template>
   </Menubar>
 </template>
@@ -22,5 +22,11 @@ const { menuItems } = useMenu();
   border-radius: 0;
   border-left: 0;
   border-right: 0;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.logo-round {
+  border-radius: 80%;
+  object-fit: cover;
 }
 </style>
