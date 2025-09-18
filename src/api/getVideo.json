@@ -1,5 +1,5 @@
 {
-  "url": "activity/getVideo",
+  "url": "/activity/getVideo",
   "description": "获取视频",
   "params": {
     "uuid": "视频ID"

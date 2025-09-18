@@ -1,22 +1,17 @@
 {
-  "url": "/admin/uploadVideo",
-  "description": "管理员发布视频",
-  "params": {
-    "token": "鉴权token",
-    "title": "视频标题",
-    "content": [
-      "视频数据"
-    ]
-  },
-  "method": ["POST"],
-  "response": {
-    "statusCode": 200,
-    "message": "成功",
-    "data": "url"
-  },
-  "fail": {
-    "statusCode": 434,
-    "message": "发布失败",
-    "data": null
-  }
+    "url": "/admin/withdrawDeletionNews",
+    "description": "管理员恢复已删除的新闻",
+    "params": {
+        "token": "鉴权token",
+        "id": "新闻ID"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "成功"
+    },
+    "fail": {
+        "statusCode": 426,
+        "message": "恢复失败"
+    }
 }

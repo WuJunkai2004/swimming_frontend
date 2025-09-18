@@ -1,5 +1,5 @@
 {
-  "url": "/admin/uploadNews",
+  "url": "/admin/uploadVideo",
   "description": "管理员发布视频",
   "params": {
     "token": "鉴权token",

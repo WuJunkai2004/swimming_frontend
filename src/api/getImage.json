@@ -1,5 +1,5 @@
 {
-  "url": "activity/getImage",
+  "url": "/activity/getImage",
   "description": "获取新闻图片",
   "params": {
       "uuid": "图片id"

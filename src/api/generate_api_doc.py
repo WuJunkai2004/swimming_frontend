@@ -23,7 +23,6 @@ def PrevLevel(url):
         '/player': '3',
         '/admin': '4',
         '/sport': '5',
-        '/files': '6',
     }
     for k, v in prev.items():
         url = url.replace(k, v)
