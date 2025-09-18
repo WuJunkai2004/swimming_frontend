@@ -1,0 +1,14 @@
+{
+  "url": "activity/getVideo",
+  "description": "获取视频",
+  "params": {
+    "uuid": "视频ID"
+  },
+  "method": ["GET"],
+  "response": {
+    "note": "二进制文件无json数据"
+  },
+  "fail": {
+    "note": "二进制文件无json数据"
+  }
+}
