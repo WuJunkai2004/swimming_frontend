@@ -39,7 +39,7 @@ const routes = [
   {
     path: '/manage',
     name: 'Manage',
-    component: () => import('@/views/AdminManageView.vue')
+    component: () => import('@/views/manage/ManageView.vue')
   },
   {
     path: "/leaders",
