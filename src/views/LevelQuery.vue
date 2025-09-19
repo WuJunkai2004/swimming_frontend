@@ -234,7 +234,7 @@ const resetFollowingSteps = (step) => {
   padding-bottom: 4rem;
 }
 .query-panel {
-  background-color: var(--surface-card);
+  background-color: var(--p-surface-card);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
@@ -248,7 +248,7 @@ const resetFollowingSteps = (step) => {
   display: block;
   margin-bottom: 1rem;
   font-size: 1.1rem;
-  color: var(--text-color-secondary);
+  color: var(--p-text-color-secondary);
 }
 
 /* 过渡动画 */

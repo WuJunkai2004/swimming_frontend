@@ -157,18 +157,18 @@ fetchNews();
 
 .news-title-link {
   text-decoration: none;
-  color: var(--text-color);
+  color: var(--p-text-color);
   transition: color 0.2s;
 }
 
 .news-title-link:hover {
-  color: var(--primary-color);
+  color: var(--p-primary-color);
 }
 
 .pagination-controls {
   position: sticky;
   bottom: 0;
-  background-color: var(--surface-card);
-  border-top: 1px solid var(--surface-border);
+  background-color: var(--p-surface-card);
+  border-top: 1px solid var(--p-surface-border);
 }
 </style>

@@ -142,7 +142,7 @@ const handleLogin = () => {
   width: 100vw;
   margin: 0;
   padding: 0;
-  background-color: var(--surface-ground); /* 使用主题的背景色 */
+  background-color: var(--p-surface-ground); /* 使用主题的背景色 */
   overflow: hidden; /* 防止出现滚动条 */
 }
 

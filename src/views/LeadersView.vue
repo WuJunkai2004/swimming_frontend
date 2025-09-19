@@ -169,7 +169,7 @@ onMounted(() => {
 <style scoped>
 /* 页面标题 */
 .page-header h1 {
-  color: var(--text-color);
+  color: var(--p-text-color);
 }
 
 /* 领导卡片样式 */
@@ -187,7 +187,7 @@ onMounted(() => {
 /* 卡片图片容器 */
 .card-image-wrapper {
   height: 250px;
-  background-color: var(--surface-200);
+  background-color: var(--p-surface-200);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -210,7 +210,7 @@ onMounted(() => {
   height: 150px;
   border-radius: 50%; /* 圆形头像 */
   object-fit: cover;
-  border: 4px solid var(--surface-border);
+  border: 4px solid var(--p-surface-border);
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .detail-avatar {
@@ -221,7 +221,7 @@ onMounted(() => {
 .introduction {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: var(--text-color-secondary);
+  color: var(--p-text-color-secondary);
 }
 
 /* 主面板 */

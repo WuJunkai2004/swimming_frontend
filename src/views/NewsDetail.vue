@@ -69,7 +69,7 @@ onMounted(() => {
       label="返回" 
       icon="pi pi-arrow-left" 
       @click="goBack" 
-      class="p-button-text p-button-secondary mt-4 mb-3" 
+      class="p-button-text p-button-secondary mt-4 mb-3 md:hidden" 
     />
 
     <div v-if="loading" class="news-content-skeleton">
@@ -140,15 +140,15 @@ onMounted(() => {
   max-width: 800px;
   margin: 2rem auto;
   padding: 2rem;
-  background-color: var(--surface-card); /* 使用 PrimeVue 变量，使其在深色模式下也能正常显示 */
-  border: 1px solid var(--surface-border);
+  background-color: var(--p-surface-card); /* 使用 PrimeVue 变量，使其在深色模式下也能正常显示 */
+  border: 1px solid var(--p-surface-border);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* 元数据 (meta) 样式 */
 .meta {
-  color: var(--text-color-secondary); /* 使用主题变量 */
+  color: var(--p-text-color-secondary); /* 使用主题变量 */
   font-size: 0.9rem;
 }
 
@@ -157,7 +157,7 @@ onMounted(() => {
   margin-top: 1.5rem;
   line-height: 1.8;
   font-size: 1.1rem; /* 稍微增大正文字体大小，提高可读性 */
-  color: var(--text-color);
+  color: var(--p-text-color);
 }
 
 /* 使用 :deep() 穿透 Scoped CSS，
@@ -172,12 +172,12 @@ onMounted(() => {
   color: var(--primary-color);
   text-decoration: none;
   font-weight: 600;
-  border-bottom: 1px solid var(--primary-200);
+  border-bottom: 1px solid var(--p-primary-200);
   transition: background-color 0.2s;
 }
 
 .content-body :deep(.news-text a:hover) {
-  background-color: var(--primary-50);
+  background-color: var(--p-primary-50);
 }
 
 /* 响应式图片和影片 */
