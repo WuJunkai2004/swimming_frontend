@@ -7,3 +7,4 @@
 --p-content-border-color
 --p-card-color
 --p-surface-100
+--p-surface-50
