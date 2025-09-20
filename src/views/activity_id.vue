@@ -139,15 +139,15 @@ onMounted(() => {
   max-width: 800px;
   margin: 2rem auto;
   padding: 2rem;
-  background-color: var(--p-surface-card); /* 使用 PrimeVue 变量，使其在深色模式下也能正常显示 */
-  border: 1px solid var(--p-surface-border);
+  background-color: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* 元数据 (meta) 样式 */
 .meta {
-  color: var(--p-text-color-secondary); /* 使用主题变量 */
+  color: var(--p-text-color); /* 使用主题变量 */
   font-size: 0.9rem;
 }
 
@@ -168,7 +168,7 @@ onMounted(() => {
 
 /* 美化 v-html 中的链接 */
 .content-body :deep(.news-text a) {
-  color: var(--primary-color);
+  color: var(--p-primary-color);
   text-decoration: none;
   font-weight: 600;
   border-bottom: 1px solid var(--p-primary-200);

@@ -210,7 +210,7 @@ onMounted(() => {
   height: 150px;
   border-radius: 50%; /* 圆形头像 */
   object-fit: cover;
-  border: 4px solid var(--p-surface-border);
+  border: 4px solid var(--p-content-border-color);
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .detail-avatar {
@@ -221,7 +221,7 @@ onMounted(() => {
 .introduction {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: var(--p-text-color-secondary);
+  color: var(--p-text-color);
 }
 
 /* 主面板 */

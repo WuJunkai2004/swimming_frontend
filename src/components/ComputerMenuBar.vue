@@ -22,7 +22,7 @@ const { menuItems } = useMenu();
   border-radius: 0;
   border-left: 0;
   border-right: 0;
-  border-bottom: 2px solid var(--primary-color);
+  border-bottom: 2px solid var(--p-primary-color);
 }
 
 .logo-round {

@@ -168,7 +168,7 @@ fetchNews();
 .pagination-controls {
   position: sticky;
   bottom: 0;
-  background-color: var(--p-surface-card);
-  border-top: 1px solid var(--p-surface-border);
+  background-color: var(--p-content-background);
+  border-top: 1px solid var(--p-content-border-color);
 }
 </style>

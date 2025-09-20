@@ -3,6 +3,28 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import Cookies from 'js-cookie';
 
+// 切换主题至Nora
+import Nora from '@primeuix/themes/nora'
+import { usePreset, definePreset } from '@primeuix/themes';
+const Blue = definePreset(Nora, {
+    semantic: {
+        primary: {
+            50: '{blue.50}',
+            100: '{blue.100}',
+            200: '{blue.200}',
+            300: '{blue.300}',
+            400: '{blue.400}',
+            500: '{blue.500}',
+            600: '{blue.600}',
+            700: '{blue.700}',
+            800: '{blue.800}',
+            900: '{blue.900}',
+            950: '{blue.950}'
+        }
+    }
+});
+usePreset(Blue);
+
 // --- 1. 导入子页面（操作窗口） ---
 import ManageHome from '@/views/manage/Home.vue';
 import ManageGames from '@/views/manage/ManageGames.vue';
@@ -168,13 +190,13 @@ const currentView = computed(() => {
   flex-direction: column;
   height: 100vh; /* 占满整个视口高度 */
   overflow: hidden; /* 防止根页面滚动 */
-  background-color: var(--p-surface-ground); /* 设置一个浅灰色背景 */
+  background-color: var(--p-content-background); /* 设置一个浅灰色背景 */
 }
 
 /* 顶部工具栏样式 */
 .top-toolbar {
   flex-shrink: 0; /* 防止工具栏在 flex 布局中被压缩 */
-  border-bottom: 2px solid var(--p-primary-color);
+  border-bottom: 0px solid var(--p-primary-color);
   background-color: #c8f0ff7e;
   border-radius: 0%;
 }
@@ -195,7 +217,7 @@ const currentView = computed(() => {
   width: 18rem; /* 固定宽度 */
   flex-shrink: 0; /* 防止被压缩 */
   background-color: var(--p-surface-100);
-  border-right: 1px solid var(--p-surface-border);
+  border-right: 1px solid var(--p-content-border-color);
   overflow-y: auto; /* 当菜单很长时，侧边栏自己滚动 */
 }
 
@@ -204,16 +226,5 @@ const currentView = computed(() => {
   flex-grow: 1; /* 占据所有剩余的水平空间 */
   overflow-y: auto; /* 【关键】让内容窗口自己滚动 */
   padding: 1.5rem;
-}
-
-/* 美化 PanelMenu 和 Menu 的 URL 链接
-  我们使用 :deep() 来穿透组件内部样式
-*/
-:deep(.p-menuitem-link[href^="#"]) {
-  text-decoration: none !important;
-  color: var(--p-text-color) !important;
-}
-:deep(.p-menuitem-link[href^="#"]:hover) {
-  background-color: var(--p-surface-hover) !important;
 }
 </style>
