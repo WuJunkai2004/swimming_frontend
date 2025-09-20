@@ -4,9 +4,6 @@ import { useRouter } from 'vue-router';
 import Cookies from 'js-cookie';
 
 // --- 1. 导入子页面（操作窗口） ---
-// 我们将在这里定义所有子路由对应的组件
-// 为保持示例简洁，我们先创建几个占位组件
-// 您需要自己创建这些 .vue 文件
 import ManageHome from '@/views/manage/Home.vue';
 import ManageGames from '@/views/manage/ManageGames.vue';
 import PublishGame from '@/views/manage/PublishGame.vue';
@@ -17,18 +14,17 @@ import ManageNotFound from '@/views/manage/NotFound.vue';
 const router = useRouter();
 
 /**
- * 需求 4: 页面加载时检查 Token
+ * 页面加载时检查 Token
  */
 onMounted(() => {
   const token = Cookies.get('token');
   if (!token) {
-    // 如果没有 token，立即跳转回登录页
     router.push('/login');
   }
 });
 
 /**
- * 需求 2.1: 退出登录
+ * 退出登录
  */
 const handleLogout = () => {
   Cookies.remove('token');
@@ -43,45 +39,38 @@ const isMobileSidebarVisible = ref(false);
 // 我们使用 PanelMenu 的数据格式来创建带分组的菜单
 const menuModel = ref([
   {
-    label: '发布比赛',
-    icon: 'pi pi-plus',
-    to: '#/publish-game'
+    key: 'games',
+    label: '比赛管理',
+    icon: 'pi pi-calendar',
+    items: [
+      { label: '发布比赛', icon: 'pi pi-plus', url: '#/publish-game' },
+      { label: '管理比赛', icon: 'pi pi-list', url: '#/manage-games' },
+    ]
   },
   {
-    label: '管理比赛',
-    icon: 'pi pi-list',
-    to: '#/manage-games'
+    separator: true
   },
   {
-    separator: true // 需求 4: 添加分割线
+    key: 'news',
+    label: '新闻管理',
+    icon: 'pi pi-book',
+    items: [
+      { label: '发布新闻', icon: 'pi pi-plus', url: '#/publish-news' },
+      { label: '管理新闻', icon: 'pi pi-list', url: '#/manage-news' },
+    ]
   },
   {
-    label: '发布新闻',
-    icon: 'pi pi-file-edit',
-    to: '#/publish-news'
+    separator: true
   },
   {
-    label: '管理新闻',
-    icon: 'pi pi-inbox',
-    to: '#/manage-news'
-  },
-  {
-    separator: true // 需求 4: 添加分割线
-  },
-  {
-    label: '优秀运动员列表',
+    key: 'users',
+    label: '人员管理',
     icon: 'pi pi-users',
-    to: '#/manage-athletes'
-  },
-  {
-    label: '负责人列表',
-    icon: 'pi pi-user-edit',
-    to: '#/manage-leaders'
-  },
-  {
-    label: '管理员列表',
-    icon: 'pi pi-shield',
-    to: '#/manage-admins'
+    items: [
+      { label: '优秀运动员', icon: 'pi pi-user',      url: '#/manage-athletes' },
+      { label: '负责人管理', icon: 'pi pi-user-edit', url: '#/manage-leaders' },
+      { label: '管理员管理', icon: 'pi pi-shield',    url: '#/manage-admins' },
+    ]
   },
 ]);
 
@@ -114,7 +103,7 @@ onBeforeUnmount(() => {
 
 // 计算当前应该显示的组件
 const currentView = computed(() => {
-  // slice(1) 移除开头的 '#'
+  // 移除开头的 '#'
   const path = currentPath.value.slice(1) || '/';
   return routes[path] || ManageNotFound;
 });
@@ -174,15 +163,13 @@ const currentView = computed(() => {
 </template>
 
 <style scoped>
-/* 使用 Flex 布局实现全屏框架
-  这和我们修复 404 页面的逻辑一致
-*/
 .manage-view-wrapper {
   display: flex;
   flex-direction: column;
   height: 100vh; /* 占满整个视口高度 */
   overflow: hidden; /* 防止根页面滚动 */
   background-color: var(--p-surface-ground); /* 设置一个浅灰色背景 */
+}
 
 /* 顶部工具栏样式 */
 .top-toolbar {
@@ -190,7 +177,6 @@ const currentView = computed(() => {
   border-bottom: 2px solid var(--p-primary-color);
   background-color: #c8f0ff7e;
   border-radius: 0%;
-}
 }
 
 /* 下方主内容区 */
