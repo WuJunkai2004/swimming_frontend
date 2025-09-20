@@ -1,8 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
-import MobileMenuBar from '@/components/MobileMenuBar.vue';
-import ComputerMenuBar from '@/components/ComputerMenuBar.vue';
 
 import { swimLevels } from '@/composables/swimmingLevel';
 

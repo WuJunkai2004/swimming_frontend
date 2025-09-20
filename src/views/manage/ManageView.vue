@@ -8,7 +8,7 @@ import ManageHome from '@/views/manage/Home.vue';
 import ManageGames from '@/views/manage/ManageGames.vue';
 import PublishGame from '@/views/manage/PublishGame.vue';
 import ManageNews from '@/views/manage/ManageNews.vue';
-import ManageNotFound from '@/views/manage/NotFound.vue';
+import no_page from '@/views/manage/no-page.vue';
 
 // --- 2. 鉴权与导航 ---
 const router = useRouter();
@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
 const currentView = computed(() => {
   // 移除开头的 '#'
   const path = currentPath.value.slice(1) || '/';
-  return routes[path] || ManageNotFound;
+  return routes[path] || no_page;
 });
 </script>
 
