@@ -39,7 +39,6 @@ const goBack = () => {
 
 // --- 3. 监听路由参数变化 ---
 // 使用 watch 监听 route.params.id 的变化
-// 当从 /news/1 跳转到 /news/2 时，这个监听器会被触发
 watch(
   () => route.params.id,
   (newId) => {

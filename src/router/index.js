@@ -4,57 +4,57 @@ const routes = [
   {
     path: '/',              // 访问根路径 / 时
     name: 'Home',
-    component: () => import('@/views/HomeView.vue') 
+    component: () => import('@/views/index.vue') 
   },
   {
     path: '/index.html',    // 访问 /index.html 路径时, 与根路径相同
     name: 'Index',
-    component: () => import('@/views/HomeView.vue')
+    component: () => import('@/views/index.vue')
   },
   {
-    path: '/about',         // 访问 /about 路径时
-    name: 'About',
-    component: () => import('@/views/AboutView.vue')
+    path: '/introduction',  // 访问 /introduction 路径时
+    name: 'Introduction',
+    component: () => import('@/views/introduction.vue')
   },
   {
     path: '/swimlevel',   // 访问 /swimlevel 路径时
     name: 'LevelQuery',
-    component: () => import('@/views/LevelQuery.vue')
+    component: () => import('@/views/swimlevel.vue')
   },
   {
-    path: '/news',          // 访问 /news 路径时
-    name: 'News',
-    component: () => import('@/views/NewsView.vue')
+    path: '/activity',          // 访问 /activity 路径时
+    name: 'Activity',
+    component: () => import('@/views/activity.vue')
   },
   {
-    path: '/news/:id',      // 访问 /news/:id 路径时, :id 是动态参数
-    name: 'NewsDetail',
-    component: () => import('@/views/NewsDetail.vue')
+    path: '/activity/:id',      // 访问 /activity/:id 路径时, :id 是动态参数
+    name: 'ActivityDetail',
+    component: () => import('@/views/activity_id.vue')
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/LoginView.vue')
+    component: () => import('@/views/login.vue')
   },
   {
     path: '/manage',
     name: 'Manage',
-    component: () => import('@/views/manage/ManageView.vue')
+    component: () => import('@/views/manage/index.vue')
   },
   {
     path: "/leaders",
     name: "Leaders",
-    component: () => import('@/views/LeadersView.vue')
+    component: () => import('@/views/leaders.vue')
   },
   {
     path: "/register/:gameid",  // 访问 /register/:gameid 路径时, :gameid 是动态参数，代表比赛ID
     name: "Register",
-    component: () => import('@/views/RegisterView.vue')
+    component: () => import('@/views/register_gameid.vue')
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/NotFoundView.vue')
+    component: () => import('@/views/error.vue')
   }
 ]
 

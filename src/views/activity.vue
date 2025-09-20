@@ -49,7 +49,7 @@ const changePage = (newPage) => {
 
 // 点击卡片时导航到详情页
 const goToDetail = (id) => {
-  router.push(`/news/${id}`);
+  router.push(`/activity/${id}`);
 };
 
 // 组件挂载时，初始化参数并获取数据
@@ -99,7 +99,7 @@ fetchNews();
           <div class="news-list p-3">
             <Card v-for="item in news" :key="item.id" class="mb-3 news-item" @click="goToDetail(item.id)">
               <template #title>
-                <a :href="`/news/${item.id}`" class="news-title-link">{{ item.title }}</a>
+                <a class="news-title-link">{{ item.title }}</a>
               </template>
               <template #content>
                 <div class="flex justify-content-between align-items-center text-sm text-gray-500">

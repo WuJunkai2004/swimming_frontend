@@ -13,12 +13,12 @@ export function useMenu() {
     {
       label: '关于',
       icon: 'pi pi-info-circle',
-      command: () => router.push('/about')
+      command: () => router.push('/introduction')
     },
     {
       label: '资讯',
       icon: 'pi pi-globe',
-      command: () => router.push('/news')
+      command: () => router.push('/activity')
     },
     {
       label: '登录',
