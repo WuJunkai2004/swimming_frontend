@@ -1,0 +1,31 @@
+{
+    "url": "/sport/getGameInfo",
+    "description": "获取该比赛的信息",
+    "params": {
+        "game": "比赛的uuid"
+    },
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取比赛信息成功",
+        "data": {
+            "name": "冬奥游泳比赛",
+            "endTime": "2024-12-31 23:59:59",
+            "events": [
+                {
+                    "name": "一百自由泳",
+                    "enum": "FREESTYLES_100M"
+                },
+                {
+                    "name": "二百自由泳",
+                    "enum": "FREESTYLES_200M"
+                }
+            ]
+        }
+    },
+    "fail": {
+        "statusCode": 440,
+        "message": "获取比赛信息失败",
+        "data": null
+    }
+}

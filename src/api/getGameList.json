@@ -1,0 +1,25 @@
+{
+    "url": "/sport/getGameList",
+    "description": "获取比赛名称和uuid",
+    "params": {},
+    "method": ["GET"],
+    "response": {
+        "statusCode": 200,
+        "message": "成功",
+        "data": [
+            {
+                "Name": "2025年冬奥会",
+                "uuid": "b9bad5922889491ca868ec570bed48fc"
+            },
+            {
+                "Name": "2025年冬奥会",
+                "uuid": "b9bad5922889491ca868ec570bed48fc"
+            }
+        ]
+    },
+    "fail": {
+        "statusCode": 420,
+        "message": "获取比赛名称和uuid失败",
+        "data": null
+    }
+}

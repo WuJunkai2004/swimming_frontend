@@ -1,5 +1,5 @@
 {
-    "url": "/activity/getDetailNews",
+    "url": "/activity/getNewsDetail",
     "description": "获取新闻详情",
     "params": {
         "id": "新闻的ID"
