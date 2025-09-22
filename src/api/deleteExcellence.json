@@ -1,5 +1,5 @@
 {
-    "url": "/admin/deleteExcellentAthlete",
+    "url": "/admin/deleteExcellence",
     "description": "删除优秀运动员",
     "params": {
         "id": "运动员的id",

@@ -1,5 +1,5 @@
 {
-    "url": "/admin/withdrawDeletionNews",
+    "url": "/admin/withdrawNews",
     "description": "管理员恢复已删除的新闻",
     "params": {
         "token": "鉴权token",

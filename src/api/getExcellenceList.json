@@ -1,5 +1,5 @@
 {
-    "url": "/player/excellentAthletesList",
+    "url": "/player/getExcellenceList",
     "description": "获取优秀运动员列表",
     "params": {},
     "method": ["GET"],

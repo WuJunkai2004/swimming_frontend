@@ -1,5 +1,5 @@
 {
-    "url": "/player/excellentAthleteDetail",
+    "url": "/player/getExcellenceDetail",
     "description": "获取优秀运动员详情",
     "params": {
         "id": "优秀运动员ID"

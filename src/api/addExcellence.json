@@ -1,5 +1,5 @@
 {
-    "url": "/admin/addExcellentAthlete",
+    "url": "/admin/addExcellence",
     "description": "新增优秀运动员",
     "params": {
         "token": "鉴权token",
