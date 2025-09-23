@@ -15,7 +15,7 @@ const fetchNewsDetail = async (id) => {
   loading.value = true;
   error.value = null;
   newsDetail.value = null;
-  fetch(`/activity/getDetailNews?id=${id}`)
+  fetch(`/activity/getNewsDetail?id=${id}`)
   .then(response => response.json())
   .then(data => {
     if(data && data.statusCode === 200){
