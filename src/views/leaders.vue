@@ -73,11 +73,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="page-wrapper">
     <MobileMenuBar />
     <ComputerMenuBar />
 
-    <div class="grid justify-content-center mt-4 main-plane">
+    <div class="grid justify-content-center mt-4">
       <div class="col-12 lg:col-10 xl:col-8">
         
         <div class="page-header px-3 mb-4">
@@ -167,6 +167,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.page-wrapper {
+  width: 100%; 
+  overflow-x: hidden;
+}
+
 /* 页面标题 */
 .page-header h1 {
   color: var(--p-text-color);
@@ -222,10 +227,5 @@ onMounted(() => {
   font-size: 1.1rem;
   line-height: 1.8;
   color: var(--p-text-color);
-}
-
-/* 主面板 */
-.main-plane{
-    width: 100%;    
 }
 </style>

@@ -11,7 +11,7 @@
         "data": {
             "name": "张三",
             "id": "1",
-            "img_url": "",
+            "imgUrl": "",
             "age": "10086",
             "grade": "大一",
             "introduction": "张三是一个好同志"

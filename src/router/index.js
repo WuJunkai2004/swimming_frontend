@@ -47,6 +47,11 @@ const routes = [
     component: () => import('@/views/leaders.vue')
   },
   {
+    path: "/excellence",        // 访问 /excellence 路径时，优秀运动员展示
+    name: "Excellence",
+    component: () => import('@/views/excellence.vue')
+  },
+  {
     path: "/register/:gameid",  // 访问 /register/:gameid 路径时, :gameid 是动态参数，代表比赛ID
     name: "Register",
     component: () => import('@/views/register_gameid.vue')
