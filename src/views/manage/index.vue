@@ -74,6 +74,28 @@ const menuModel = ref([
   },
 ]);
 
+const computedMenuModel = computed(() => {
+  const processItems = (items) => {
+    return items.map(item => {
+      if (item.separator) {
+        return item;
+      }
+      // 创建一个当前项的副本以进行修改
+      const newItem = { ...item };
+      // 检查当前项的 url 是否与 URL hash 匹配
+      if (newItem.url === currentPath.value) {
+        newItem.class = 'active-menu-item';
+      }
+      // 如果当前项还包含子菜单 (items)，则递归处理
+      if (newItem.items && newItem.items.length > 0) {
+        newItem.items = processItems(newItem.items);
+      }
+      return newItem;
+    });
+  };
+  return processItems(menuModel.value);
+});
+
 // --- 5. 子路由系统 (需求 2.3) ---
 // 完全按照您提供的示例，使用 hash 路由
 const routes = {
@@ -151,7 +173,7 @@ const currentView = computed(() => {
       </Drawer>
 
       <div class="desktop-sidebar hidden md:block">
-        <Menu :model="menuModel" class="w-full" />
+        <Menu :model="computedMenuModel" class="w-full" />
       </div>
 
       <div class="content-window">
@@ -204,5 +226,11 @@ const currentView = computed(() => {
   flex-grow: 1; /* 占据所有剩余的水平空间 */
   overflow-y: auto; /* 【关键】让内容窗口自己滚动 */
   padding: 1.5rem;
+}
+
+/* 选中的侧边菜单 */
+:deep(.active-menu-item > .p-menu-item-content) {
+  background-color: var(--p-primary-300) !important;
+  color: var(--p-primary-text-color) !important;
 }
 </style>
