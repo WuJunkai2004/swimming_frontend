@@ -16,6 +16,7 @@
     "crypto-js": "^4.2.0",
     "js-cookie": "^3.0.5",
     "primeflex": "^4.0.0",
+    "primeicons": "^7.0.0",
     "primevue": "^4.3.7",
     "vue": "^3.5.20",
     "vue-router": "^4.5.1"
