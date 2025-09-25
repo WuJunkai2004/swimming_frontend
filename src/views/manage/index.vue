@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
-import { getToken, removeToken } from '@/composables/useToken'
+import { useToken } from '@/composables/useToken'
 
 // --- 1. 导入子页面（操作窗口） ---
 import ManageHome from '@/views/manage/Home.vue';
@@ -12,6 +12,7 @@ import no_page from '@/views/manage/no-page.vue';
 
 // --- 2. 鉴权与导航 ---
 const router = useRouter();
+const { getToken, removeToken } = useToken();
 
 /**
  * 页面加载时检查 Token

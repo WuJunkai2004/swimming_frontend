@@ -1,12 +1,13 @@
 <script setup>
 import { ref } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
-import { setToken } from '@/composables/useToken';
+import { useToken } from '@/composables/useToken';
 
 import sha256 from 'crypto-js/sha256';
 import encHex from 'crypto-js/enc-hex';
 
 const confirm = useConfirm();
+const { setToken } = useToken();
 
 const showAlert = (message) => {
   console.log(`message ${message}`)
