@@ -79,7 +79,7 @@ onMounted(() => {
 
       <div class="grid justify-content-center mt-4">
         <div class="col-12 lg:col-10 xl:col-8">
-          
+
           <div class="page-header px-3 mb-4">
             <h1 class="text-3xl font-light">优秀运动员表彰</h1>
             <Divider />
@@ -148,7 +148,7 @@ onMounted(() => {
           <div class="flex flex-column align-items-center md:flex-row align-items-start gap-4">
             <Avatar v-if="!selectedPlayerDetail.imgUrl" :label="selectedPlayerDetail.name.charAt(0)" size="xlarge" shape="circle" class="detail-avatar" />
             <img v-else :src="selectedPlayerDetail.imgUrl" :alt="selectedPlayerDetail.name" class="detail-image" />
-            
+
             <div class="flex-1 text-center md:text-left">
               <h2 class="text-3xl font-bold mb-2">{{ selectedPlayerDetail.name }}</h2>
               <Tag :value="selectedPlayerDetail.grade" severity="info" class="mr-2"></Tag>

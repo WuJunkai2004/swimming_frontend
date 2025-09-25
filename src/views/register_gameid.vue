@@ -152,13 +152,13 @@ const handleSubmit = async () => {
               <ProgressSpinner />
               <p class="mt-2">正在加载赛事信息...</p>
             </div>
-            
+
             <div v-else-if="error">
               <Message severity="error" :closable="false">{{ error }}</Message>
             </div>
 
             <div v-else class="flex flex-column gap-5">
-              
+
               <div class="step p-float-label">
                 <label for="name" class="step-label">姓名</label>
                 <InputText id="name" v-model="name" class="w-full" />

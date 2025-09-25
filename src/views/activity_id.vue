@@ -80,14 +80,14 @@ onMounted(() => {
       <Skeleton height="15rem" class="mb-3"></Skeleton>
       <Skeleton height="1rem"></Skeleton>
     </div>
-    
+
     <div v-else-if="error" class="error-state p-3">
        <Message severity="error" :closable="false">{{ error }}</Message>
     </div>
-    
+
     <article v-else-if="newsDetail" class="news-content">
       <h1 class="mb-3">{{ newsDetail.title }}</h1>
-      
+
       <div class="meta flex align-items-center gap-4 text-sm text-gray-500">
         <span class="flex align-items-center">
           <i class="pi pi-calendar mr-2"></i>
@@ -101,9 +101,9 @@ onMounted(() => {
 
       <hr class="my-4" /> <div class="content-body">
         <template v-for="(item, idx) in newsDetail.content" :key="idx">
-          
+
           <div v-if="item.type === 'text'" v-html="item.data" class="news-text"></div>
-          
+
           <div v-else-if="item.type === 'image'" class="flex justify-content-center my-4">
             <Image :src="item.url" class="news-image" alt="新闻图片" preview />
           </div>
@@ -115,7 +115,7 @@ onMounted(() => {
         </template>
       </div>
     </article>
-  
+
   </div>
   </div>
 </template>

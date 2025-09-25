@@ -79,7 +79,7 @@ onMounted(() => {
 
     <div class="grid justify-content-center mt-4">
       <div class="col-12 lg:col-10 xl:col-8">
-        
+
         <div class="page-header px-3 mb-4">
           <h1 class="text-3xl font-light">团队介绍</h1>
           <Divider />
@@ -148,7 +148,7 @@ onMounted(() => {
           <div class="flex flex-column align-items-center md:flex-row align-items-start gap-4">
             <Avatar v-if="!selectedLeaderDetail.imgUrl" :label="selectedLeaderDetail.name.charAt(0)" size="xlarge" shape="circle" class="detail-avatar" />
             <img v-else :src="selectedLeaderDetail.imgUrl" :alt="selectedLeaderDetail.name" class="detail-image" />
-            
+
             <div class="flex-1 text-center md:text-left">
               <h2 class="text-3xl font-bold mb-2">{{ selectedLeaderDetail.name }}</h2>
               <Tag :value="selectedLeaderDetail.position" severity="info" class="mr-2"></Tag>

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
-import Cookies from 'js-cookie';
+import { getToken, removeToken } from '@/composables/useToken'
 
 // --- 1. 导入子页面（操作窗口） ---
 import ManageHome from '@/views/manage/Home.vue';
@@ -17,18 +17,14 @@ const router = useRouter();
  * 页面加载时检查 Token
  */
 onMounted(() => {
-  const token = Cookies.get('token');
-  if (!token) {
-    router.push('/login');
-  }
+  getToken();
 });
 
 /**
  * 退出登录
  */
 const handleLogout = () => {
-  Cookies.remove('token');
-  router.push('/login');
+  removeToken(true);
 };
 
 // --- 3. 响应式布局状态 ---
@@ -155,7 +151,7 @@ const currentView = computed(() => {
           class="md:hidden"
           @click="handleLogout"
           aria-label="退出登录" />
-        
+
         <Button
           label="退出登录"
           icon="pi pi-sign-out"

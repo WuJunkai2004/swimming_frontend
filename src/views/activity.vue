@@ -60,7 +60,7 @@ onMounted(() => {
 
   currentPage.value = !isNaN(pageFromUrl) && pageFromUrl > 0 ? pageFromUrl : 1;
   limit.value = !isNaN(limitFromUrl) && limitFromUrl > 0 ? limitFromUrl : 20;
-  
+
   fetchNews();
 });
 
@@ -85,7 +85,7 @@ fetchNews();
 
     <div class="grid justify-content-center">
       <div class="col-12 lg:col-8 xl:col-6">
-        
+
         <div v-if="loading" class="text-center p-5">
           <ProgressSpinner />
           <p>正在加载新闻...</p>
@@ -112,7 +112,7 @@ fetchNews();
               </template>
             </Card>
           </div>
-          
+
           <div v-if="news.length === 0" class="text-center p-5">
             <i class="pi pi-inbox" style="font-size: 2rem"></i>
             <p>暂无新闻内容</p>

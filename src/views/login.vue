@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
+import { setToken } from '@/composables/useToken';
 
 import sha256 from 'crypto-js/sha256';
-import encHex from 'crypto-js/enc-hex'; 
-import Cookies from 'js-cookie';
+import encHex from 'crypto-js/enc-hex';
 
 const confirm = useConfirm();
 
@@ -44,7 +44,7 @@ const handleLogin = () => {
   if(!password.value || password.value.length < 8){
     showAlert('密码长度不能少于8位');
   }
-  
+
   (async function login(){
     is_loginning.value = true;
     let pw_sha = await SHA256(password.value);
@@ -64,7 +64,7 @@ const handleLogin = () => {
     }).then(data => {
       if(data.statusCode === 200){
         showAlert('登录成功，正在跳转');
-        Cookies.set('token', data.data.token, { expires: 1, path: '/' }); // 1天后过期
+        setToken(data.data.token);
         window.location.href = '/manage';
       } else {
         showAlert('登录失败: ' + data.message);
