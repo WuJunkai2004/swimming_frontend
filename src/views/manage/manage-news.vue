@@ -239,11 +239,6 @@ onMounted(fetchNews);
 </template>
 
 <style scoped>
-/*
-  该页面大部分样式由 PrimeVue 组件和 PrimeFlex 工具类提供，
-  只需添加少量自定义样式来优化视觉效果。
-*/
-
 .news-list {
   /* 创建一个列表项之间的分割线 */
   display: flex;

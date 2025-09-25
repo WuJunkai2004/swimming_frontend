@@ -83,6 +83,11 @@ const computedMenuModel = computed(() => {
       if (newItem.url === currentPath.value) {
         newItem.class = 'active-menu-item';
       }
+      if (newItem.url){
+        newItem.command = () =>  {
+          isMobileSidebarVisible.value = false;
+        };
+      }
       // 如果当前项还包含子菜单 (items)，则递归处理
       if (newItem.items && newItem.items.length > 0) {
         newItem.items = processItems(newItem.items);
@@ -166,7 +171,7 @@ const currentView = computed(() => {
     <div class="main-content-area">
 
       <Drawer v-model:visible="isMobileSidebarVisible" header="导航菜单">
-        <Menu :model="menuModel" class="w-full" />
+        <Menu :model="computedMenuModel" class="w-full" />
       </Drawer>
 
       <div class="desktop-sidebar hidden md:block">
