@@ -248,7 +248,7 @@ onMounted(fetchNews);
 
 .news-item {
   /* 为每个列表项添加底部边框，除了最后一个 */
-  border-bottom: 1px solid var(--p-surface-border);
+  border-bottom: 1px solid var(--p-primary-100);
   transition: background-color 0.2s;
 }
 
@@ -257,7 +257,7 @@ onMounted(fetchNews);
 }
 
 .news-item:hover {
-  background-color: var(--p-surface-hover);
+  background-color: var(--p-content-hover-background);
 }
 
 /* 响应式设计：在移动端，让按钮组宽度适应内容，而不是拉伸 */

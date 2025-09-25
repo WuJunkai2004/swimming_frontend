@@ -9,3 +9,5 @@
 --p-surface-100
 --p-surface-50
 --p-primary-300
+--p-content-hover-background
+--p-primary-100

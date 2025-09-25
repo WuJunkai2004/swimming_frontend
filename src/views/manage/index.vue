@@ -1,13 +1,8 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch, shallowRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToken } from '@/composables/useToken'
 
-// --- 1. 导入子页面（操作窗口） ---
-import ManageHome from '@/views/manage/Home.vue';
-import ManageGames from '@/views/manage/ManageGames.vue';
-import PublishGame from '@/views/manage/PublishGame.vue';
-import ManageNews from '@/views/manage/manage-news.vue';
 import no_page from '@/views/manage/no-page.vue';
 
 // --- 2. 鉴权与导航 ---
@@ -101,21 +96,28 @@ const computedMenuModel = computed(() => {
 // --- 5. 子路由系统 (需求 2.3) ---
 // 完全按照您提供的示例，使用 hash 路由
 const routes = {
-  '/': ManageHome,
-  '/manage-games': ManageGames,
-  '/publish-game': PublishGame,
-  '/manage-news': ManageNews,
-  // '/publish-news': ...
-  // '/manage-athletes': ...
-  // '/manage-leaders': ...
-  // '/manage-admins': ...
+  '/': () => import('./ManageGames.vue'),
+  '/manage-games': () => import('./ManageGames.vue'),
+  '/publish-game': () => import('./PublishGame.vue'),
+  '/manage-news': () => import('./manage-news.vue'),
 };
 
 const currentPath = ref(window.location.hash);
+const loadedComponent = shallowRef(null)
 
 const updateCurrentPath = () => {
   currentPath.value = window.location.hash;
 };
+
+const loadComponent = async (path) => {
+  const page = routes[path];
+  if(page){
+    const component = await page();
+    return component.default;
+  } else {
+    return no_page;
+  }
+}
 
 // 监听 hash 变化
 window.addEventListener('hashchange', updateCurrentPath);
@@ -125,11 +127,15 @@ onBeforeUnmount(() => {
   window.removeEventListener('hashchange', updateCurrentPath);
 });
 
+// 监听 currentPath 变化
+watch(currentPath, async (newPath) => {
+  const path = newPath.slice(1) || '/';
+  loadedComponent.value = await loadComponent(path);
+}, { immediate: true });
+
 // 计算当前应该显示的组件
 const currentView = computed(() => {
-  // 移除开头的 '#'
-  const path = currentPath.value.slice(1) || '/';
-  return routes[path] || no_page;
+  return loadedComponent.value || no_page;
 });
 </script>
 
