@@ -8,3 +8,4 @@
 --p-card-color
 --p-surface-100
 --p-surface-50
+--p-primary-300

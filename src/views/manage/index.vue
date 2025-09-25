@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 import ManageHome from '@/views/manage/Home.vue';
 import ManageGames from '@/views/manage/ManageGames.vue';
 import PublishGame from '@/views/manage/PublishGame.vue';
-import ManageNews from '@/views/manage/ManageNews.vue';
+import ManageNews from '@/views/manage/manage-news.vue';
 import no_page from '@/views/manage/no-page.vue';
 
 // --- 2. 鉴权与导航 ---
@@ -231,6 +231,6 @@ const currentView = computed(() => {
 /* 选中的侧边菜单 */
 :deep(.active-menu-item > .p-menu-item-content) {
   background-color: var(--p-primary-300) !important;
-  color: var(--p-primary-text-color) !important;
+  color: var(--p-text-color) !important;
 }
 </style>
