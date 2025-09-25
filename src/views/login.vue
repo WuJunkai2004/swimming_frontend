@@ -2,12 +2,14 @@
 import { ref } from 'vue';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToken } from '@/composables/useToken';
+import { useRouter } from 'vue-router'
 
 import sha256 from 'crypto-js/sha256';
 import encHex from 'crypto-js/enc-hex';
 
 const confirm = useConfirm();
 const { setToken } = useToken();
+const router = useRouter();
 
 const showAlert = (message) => {
   console.log(`message ${message}`)
@@ -76,6 +78,10 @@ const handleLogin = () => {
     });
   })()
 };
+
+const goToHome = ()=>{
+  router.push('/');
+};
 </script>
 
 <template>
@@ -89,7 +95,13 @@ const handleLogin = () => {
         </div>
       </div>
 
-      <div class="w-full md:w-5 flex align-items-center justify-content-center p-4">
+      <div class="w-full md:w-5 flex align-items-center justify-content-center p-4 relative">
+        <Button 
+          label="返回主页" 
+          icon="pi pi-arrow-left" 
+          class="back-button p-button-secondary" 
+          @click="goToHome" 
+        />
         <Card class="login-card w-full">
           <template #title>
             <h2 class="text-center text-3xl">用户登录</h2>
@@ -156,6 +168,14 @@ const handleLogin = () => {
   .flex.h-full {
     height: calc(100% - 50px); /* 假设 Menubar 高度约 50px */
   }
+}
+
+/* 返回主页按钮样式 */
+.back-button {
+  position:absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10; /* 确保按钮位于最上层 */
 }
 
 /* 左侧图片面板样式 */
