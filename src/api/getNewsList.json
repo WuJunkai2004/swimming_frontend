@@ -3,9 +3,12 @@
     "description": "获取新闻",
     "params": {
         "page": "当前页数",
-        "limit": "每页显示的数量"
+        "limit": "每页显示的数量",
+        "deletion": "是否包含已删除的新闻，true-包含，false-不包含，默认false，默认不存在此项",
+        "token": "鉴权token。仅当deletion为true时需要传递，默认不存在此项",
+        "NOTE!!": "当存在deletion时，必须使用POST方法，并且携带token; 否则使用GET方法"
     },
-    "method": ["GET"],
+    "method": ["GET", "POST"],
     "response": {
         "statusCode": 200,
         "message": "获取新闻成功",
