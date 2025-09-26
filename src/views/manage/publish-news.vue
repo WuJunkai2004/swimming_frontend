@@ -5,26 +5,27 @@ import { useConfirm } from 'primevue/useconfirm'; // 保持使用 useConfirm
 
 // --- 2. 初始化 ---
 const confirm = useConfirm();
-const editorRef = ref(null); 
+const editorRef = ref(null);
 
 // --- 3. 状态定义 (保持不变) ---
-const title = ref('');     
-const content = ref('');     
-const isSaving = ref(false);     
-const isPublishing = ref(false); 
+const title = ref('');
+const content = ref('');
+const isSaving = ref(false);
+const isPublishing = ref(false);
 let autosaveInterval = null;
 const isImageDialogVisible = ref(false);
 const isVideoDialogVisible = ref(false);
-let cursorIndex = 0; 
+let cursorIndex = 0;
 
 // --- 4. 编辑器定制 (保持不变) ---
 const customImageHandler = () => {
-  const quill = editorRef.value.getQuill();
+  const quill = editorRef.value.quill;
   cursorIndex = quill.getSelection(true).index;
   isImageDialogVisible.value = true;
 };
+
 const customVideoHandler = () => {
-  const quill = editorRef.value.getQuill();
+  const quill = editorRef.value.quill;
   cursorIndex = quill.getSelection(true).index;
   isVideoDialogVisible.value = true;
 };
@@ -47,19 +48,30 @@ const showAlert = (title, message, icon = 'pi pi-info-circle') => {
 const handleImageUpload = (file) => {
   console.log('开始上传图片:', file);
   const imageUrl = 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg';
-  const quill = editorRef.value.getQuill();
-  quill.insertEmbed(cursorIndex, 'image', imageUrl);
+
+  // 获取 Quill 实例
+  let quill = null;
+  if (editorRef.value?.quill) {
+    quill = editorRef.value.quill;
+  } else if (editorRef.value?.$el?.querySelector('.ql-editor')) {
+    const editorEl = editorRef.value.$el.querySelector('.ql-editor');
+    quill = editorEl.__quill || window.Quill?.find(editorEl);
+  }
+
+  if (quill) {
+    quill.insertEmbed(cursorIndex, 'image', imageUrl);
+  }
   isImageDialogVisible.value = false;
-  showAlert('成功', '图片插入成功', 'pi pi-check-circle'); // 【修改】
+  showAlert('成功', '图片插入成功', 'pi pi-check-circle');
 };
 
 const handleVideoUpload = (videoFile, previewFile) => {
   console.log('开始上传视频:', videoFile, '预览图:', previewFile);
   const videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
-  const quill = editorRef.value.getQuill();
+  const quill = editorRef.value.quill;
   quill.insertEmbed(cursorIndex, 'video', videoUrl);
   isVideoDialogVisible.value = false;
-  showAlert('成功', '视频插入成功', 'pi pi-check-circle'); // 【修改】
+  showAlert('成功', '视频插入成功', 'pi pi-check-circle');
 };
 
 // 草稿管理
@@ -73,7 +85,7 @@ const saveDraft = () => {
   };
   localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
   // 自动保存的提示可以考虑移除，避免频繁打扰
-  console.log('草稿已自动保存'); 
+  console.log('草稿已自动保存');
   setTimeout(() => isSaving.value = false, 1000);
 };
 
@@ -131,11 +143,17 @@ const publishNews = async () => {
 onMounted(() => {
   loadDraft();
   autosaveInterval = setInterval(saveDraft, 3 * 60 * 1000);
-  console.log(editorRef.value);
-  //const quill = editorRef.value.getQuill;
-  //const toolbar = quill.getModule('toolbar');
-  //toolbar.addHandler('image', customImageHandler);
-  //toolbar.addHandler('video', customVideoHandler);
+
+  // 需要等待下一个tick，确保编辑器已经渲染完成
+  setTimeout(() => {
+    const quill = editorRef.value.quill;
+    const toolbar = quill.getModule('toolbar');
+    if (toolbar) {
+      toolbar.addHandler('image', customImageHandler);
+      toolbar.addHandler('video', customVideoHandler);
+      console.log('成功设置自定义处理器');
+    }
+  }, 500);
 });
 
 onBeforeUnmount(() => {
@@ -148,7 +166,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="p-4 surface-card shadow-2 border-round">
-    
+
     <div class="flex justify-content-between align-items-center mb-4">
       <h1 class="text-3xl font-bold m-0">新闻编辑</h1>
       <div class="flex gap-2">
@@ -192,7 +210,9 @@ onBeforeUnmount(() => {
         </span>
         <span class="ql-formats">
           <button class="ql-link"></button>
-          <button class="ql-image"></button> <button class="ql-video"></button> </span>
+          <button class="ql-image"></button>
+          <button class="ql-video"></button>
+        </span>
       </template>
     </Editor>
 
@@ -200,7 +220,7 @@ onBeforeUnmount(() => {
       <p>请选择要上传的图片：</p>
       <Button label="模拟上传并插入" @click="handleImageUpload('mock_file.jpg')" />
     </Dialog>
-    
+
     <Dialog v-model:visible="isVideoDialogVisible" modal header="插入视频">
       <p>请选择视频和预览图：</p>
       <Button label="模拟上传并插入" @click="handleVideoUpload('mock_video.mp4', 'mock_preview.jpg')" />
@@ -217,6 +237,7 @@ onBeforeUnmount(() => {
   box-shadow: none !important;
   font-weight: 600;
 }
+
 .title-input:focus {
   border-bottom-color: var(--p-primary-color);
 }
