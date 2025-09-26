@@ -225,11 +225,10 @@ const alerts = (title, msg, accept = 'hidden', reject = 'hidden') => {
     header: title,
     message: msg,
     icon: 'pi pi-info-circle',
-    acceptClass: 'p-button-primary',
     acceptLabel: accept,
     rejectLabel: reject,
-    acceptVisible: accept !== 'hidden',
-    rejectVisible: reject !== 'hidden'
+    acceptClass: accept === 'hidden' ? 'hidden' : 'p-button-primary',
+    rejectClass: reject === 'hidden' ? 'hidden' : 'p-button-secondary',
   });
 };
 
@@ -287,22 +286,23 @@ onMounted(fetchAthletesList);
       
       <div v-else class="grid formgrid p-fluid">
         <div class="col-12 md:col-4 flex flex-column align-items-center">
-          <<Avatar 
-              :image="formImgUrl" 
-              shape="circle" 
-              class="mb-3" 
-              style="width: 150px; height: 150px; font-size: 4rem;" 
+          <Avatar 
+            :image="formImgUrl" 
+            :label="formImgUrl ? '' : '头像'"
+            shape="square" 
+            class="mb-3 rounded-avatar keep-width" 
+            style="width: 150px; height: 150px; font-size: 4rem;" 
           />
 
           <FileUpload 
-              mode="basic" 
-              name="avatar"
-              accept="image/*" 
-              :maxFileSize="1000000" 
-              :customUpload="true" 
-              @uploader="handleAvatarUpload" 
-              chooseLabel="上传头像" 
-              auto
+            mode="basic" 
+            name="avatar"
+            accept="image/*" 
+            :maxFileSize="1000000" 
+            :customUpload="true" 
+            @uploader="handleAvatarUpload" 
+            chooseLabel="上传头像" 
+            auto
           />
           <small class="text-color-secondary mt-2">支持图片格式, 小于1MB</small>
         </div>
@@ -345,5 +345,21 @@ onMounted(fetchAthletesList);
 :deep(.p-datatable-tbody > tr > td) {
   /* 优化表格单元格的垂直对齐 */
   vertical-align: middle;
+}
+
+/* 添加圆角样式给Avatar */
+:deep(.rounded-avatar > img) {
+  border-radius: 12px;
+}
+
+/* 保持宽度固定，高度按原图比例 */
+:deep(.keep-width) {
+  height: auto !important;
+}
+
+:deep(.keep-width > img) {
+  height: auto !important;
+  object-fit: contain !important;
+  max-height: 200px; /* 设置最大高度避免过高 */
 }
 </style>
