@@ -23,6 +23,7 @@ const showAlert = (message) => {
   });
 };
 
+const login_type = ref('ACCOUNT_SECRET_LOGIN')
 const username = ref('');
 const password = ref('');
 const passwordInputRef = ref(null)
@@ -58,6 +59,7 @@ const handleLogin = () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        loginType: login_type.value,
         username: username.value,
         password: pw_sha
       })
