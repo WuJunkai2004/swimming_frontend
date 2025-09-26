@@ -6,7 +6,8 @@
         "name": "姓名（张三）",
         "age": "年龄（10086）",
         "grade": "年段（大一）",
-        "introduction": "介绍（...）"
+        "introduction": "介绍（...）",
+        "imgUrl": "图片链接"
     },
     "method": ["POST"],
     "response": {
