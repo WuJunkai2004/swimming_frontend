@@ -97,8 +97,9 @@ const computedMenuModel = computed(() => {
 // 完全按照您提供的示例，使用 hash 路由
 const routes = {
   '/': () => import('./ManageGames.vue'),
-  '/manage-games': () => import('./ManageGames.vue'),
   '/publish-game': () => import('./PublishGame.vue'),
+  '/manage-games': () => import('./ManageGames.vue'),
+  '/publish-news': () => import('./publish-news.vue'),
   '/manage-news': () => import('./manage-news.vue'),
   '/manage-athletes': () => import('./manage-athletes.vue'),
   '/manage-leaders': () => import('./manage-leaders.vue'),

@@ -81,7 +81,7 @@ onMounted(() => {
         <div class="col-12 lg:col-10 xl:col-8">
 
           <div class="page-header px-3 mb-4">
-            <h1 class="text-3xl font-light">优秀运动员表彰</h1>
+            <h1 class="text-3xl font-bold">优秀运动员表彰</h1>
             <Divider />
           </div>
 

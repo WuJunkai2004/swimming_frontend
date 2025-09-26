@@ -266,7 +266,7 @@ onMounted(fetchAthletesList);
   <div class="p-4 surface-card shadow-2 border-round">
     
     <div class="flex justify-content-between align-items-center mb-4">
-      <h1 class="text-3xl font-light m-0">优秀运动员管理</h1>
+      <h1 class="text-3xl font-bold m-0">优秀运动员管理</h1>
       <Button label="新增运动员" icon="pi pi-plus" @click="openAddDialog" />
     </div>
 

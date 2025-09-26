@@ -81,7 +81,7 @@ onMounted(() => {
       <div class="col-12 lg:col-10 xl:col-8">
 
         <div class="page-header px-3 mb-4">
-          <h1 class="text-3xl font-light">团队介绍</h1>
+          <h1 class="text-3xl font-bold">团队介绍</h1>
           <Divider />
         </div>
 
