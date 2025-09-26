@@ -101,6 +101,7 @@ const routes = {
   '/publish-game': () => import('./PublishGame.vue'),
   '/manage-news': () => import('./manage-news.vue'),
   '/manage-athletes': () => import('./manage-athletes.vue'),
+  '/manage-leaders': () => import('./manage-leaders.vue'),
 };
 
 const currentPath = ref(window.location.hash);

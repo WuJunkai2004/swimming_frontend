@@ -6,7 +6,7 @@ import { useToken } from '@/composables/useToken'; // 导入我们之前创建�
 const confirm = useConfirm(); // 确认弹窗服务
 const { getToken } = useToken(); // 获取 Token 的函数
 
-const athletesList = ref([]);
+const leadersList = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 
@@ -14,12 +14,12 @@ const error = ref(null);
 const isDialogVisible = ref(false);
 const dialogMode = ref('add'); // 'add' 或 'edit'
 const isDialogLoading = ref(false); // 用于弹窗内部的操作（获取详情、提交）
-const editingAthleteId = ref(null); // 存储正在编辑的运动员ID
+const editingLeaderId = ref(null); // 存储正在编辑的领导ID
 
 // 表单数据状态
 const formName = ref('');
 const formAge = ref(null);
-const formGrade = ref('');
+const formPosition = ref('');
 const formIntroduction = ref('');
 const formImgUrl = ref(''); // 用于头像展示
 
@@ -29,15 +29,15 @@ const allRequiredField = computed(() => {
 
 // --- 4. API 调用逻辑 ---
 
-// 获取运动员列表
-const fetchAthletesList = async () => {
+// 获取领导列表
+const fetchLeadersList = async () => {
   isLoading.value = true;
   error.value = null;
-  fetch('/player/getExcellenceList')
+  fetch('/leader/getLeaderList')
   .then(response => response.json())
   .then(data => {
     if(data.statusCode === 200){
-      athletesList.value = data.data;
+      leadersList.value = data.data;
     } else {
       error.value = data.message;
     }
@@ -82,17 +82,17 @@ const handleAvatarUpload = async (event) => {
   })
 };
 
-// 获取运动员详情 (用于修改时预填表单)
-const fetchAthleteDetail = async (id) => {
+// 获取领导详情 (用于修改时预填表单)
+const fetchLeaderDetail = async (id) => {
   isDialogLoading.value = true;
-  fetch(`/player/getExcellenceDetail?id=${id}`)
+  fetch(`/leader/getLeaderDetail?id=${id}`)
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
       const detail = result.data;
       formName.value = detail.name;
       formAge.value = parseInt(detail.age, 10);
-      formGrade.value = detail.grade;
+      formPosition.value = detail.position;
       formIntroduction.value = detail.introduction;
       formImgUrl.value = detail.imgUrl;
     } else {
@@ -104,13 +104,13 @@ const fetchAthleteDetail = async (id) => {
   });
 };
 
-// 新增运动员
-const addExcellence = async () => {
+// 新增领导
+const addLeader = async () => {
   const token = getToken();
   if (!token){
     return false;
   }
-  const response = await fetch('/admin/addExcellence', {
+  const response = await fetch('/admin/addLeader', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -119,27 +119,27 @@ const addExcellence = async () => {
       token: token,
       name: formName.value,
       age: formAge.value,
-      grade: formGrade.value,
+      position: formPosition.value,
       introduction: formIntroduction.value,
       imgUrl: formImgUrl.value,
     }),
   });
   const result = await response.json();
   if(result.statusCode === 200){
-    fetchAthletesList(); // 成功后刷新列表
+    fetchLeadersList(); // 成功后刷新列表
     return true;
   }
   alerts("错误", result.message, '确定');
   return false;
 };
 
-// 删除运动员
-const deleteExcellence = async (id) => {
+// 删除领导
+const deleteLeader = async (id) => {
   const token = getToken();
   if (!token){
     return false;
   }
-  const response = await fetch('/admin/deleteExcellence', {
+  const response = await fetch('/admin/deleteLeader', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ const deleteExcellence = async (id) => {
   });
   const result = await response.json();
   if(result.statusCode === 200){
-    fetchAthletesList();
+    fetchLeadersList();
     return true;
   }
   alerts("错误", result.message, '确定');
@@ -164,10 +164,10 @@ const deleteExcellence = async (id) => {
 const resetForm = () => {
   formName.value = '';
   formAge.value = null;
-  formGrade.value = '';
+  formPosition.value = '';
   formIntroduction.value = '';
   formImgUrl.value = '';
-  editingAthleteId.value = null;
+  editingLeaderId.value = null;
 };
 
 // 需求 1 & 2: 打开新增弹窗
@@ -178,12 +178,12 @@ const openAddDialog = () => {
 };
 
 // 需求 4: 打开修改弹窗
-const openEditDialog = (athlete) => {
+const openEditDialog = (leader) => {
   resetForm();
   dialogMode.value = 'edit';
-  editingAthleteId.value = athlete.id;
+  editingLeaderId.value = leader.id;
   isDialogVisible.value = true;
-  fetchAthleteDetail(athlete.id);
+  fetchLeaderDetail(leader.id);
 };
 
 // 处理弹窗提交
@@ -192,17 +192,17 @@ const handleSubmit = async () => {
     isDialogLoading.value = true;
     let success = false;
     if (dialogMode.value === 'add') {
-      success = await addExcellence();
+      success = await addLeader();
     } else if (dialogMode.value === 'edit') {
       // 需求 4: 执行“先删除后新增”的修改逻辑
-      const deleteSuccess = await deleteExcellence(editingAthleteId.value);
+      const deleteSuccess = await deleteLeader(editingLeaderId.value);
       if (deleteSuccess) {
-        success = await addExcellence();
+        success = await addLeader();
       }
     }
     if (success) {
       isDialogVisible.value = false;
-      fetchAthletesList(); // 成功后刷新列表
+      fetchLeadersList(); // 成功后刷新列表
     }
   }
 
@@ -227,18 +227,18 @@ const handleSubmit = async () => {
 };
 
 // 处理删除按钮点击
-const handleDelete = (athlete) => {
+const handleDelete = (leader) => {
   confirm.require({
     header: '确认删除',
-    message: `您确定要删除运动员 "${athlete.name}" 吗？`,
+    message: `您确定要删除领导/负责人 "${leader.name}" 吗？`,
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
     acceptLabel: '确认删除',
     rejectLabel: '取消',
     accept: async () => {
-      const success = await deleteExcellence(athlete.id);
+      const success = await deleteLeader(leader.id);
       if (success) {
-        fetchAthletesList(); // 成功后刷新列表
+        fetchLeadersList(); // 成功后刷新列表
       }
     },
   });
@@ -258,7 +258,7 @@ const alerts = (title, msg, accept = 'hidden', reject = 'hidden') => {
 };
 
 // --- 6. 生命周期钩子 ---
-onMounted(fetchAthletesList);
+onMounted(fetchLeadersList);
 
 </script>
 
@@ -266,8 +266,8 @@ onMounted(fetchAthletesList);
   <div class="p-4 surface-card shadow-2 border-round">
     
     <div class="flex justify-content-between align-items-center mb-4">
-      <h1 class="text-3xl font-light m-0">优秀运动员管理</h1>
-      <Button label="新增运动员" icon="pi pi-plus" @click="openAddDialog" />
+      <h1 class="text-3xl font-light m-0">领导/负责人管理</h1>
+      <Button label="新增领导/负责人" icon="pi pi-plus" @click="openAddDialog" />
     </div>
 
     <Divider />
@@ -284,7 +284,7 @@ onMounted(fetchAthletesList);
         <Message severity="error" :closable="false">{{ error }}</Message>
       </div>
       
-      <DataTable v-else :value="athletesList" responsiveLayout="scroll">
+      <DataTable v-else :value="leadersList" responsiveLayout="scroll">
         <Column field="name" header="姓名"></Column>
         <Column header="操作" style="width: 10rem">
           <template #body="slotProps">
@@ -301,7 +301,7 @@ onMounted(fetchAthletesList);
     <Dialog 
       v-model:visible="isDialogVisible" 
       modal 
-      :header="dialogMode === 'add' ? '新增优秀运动员' : '修改运动员信息'" 
+      :header="dialogMode === 'add' ? '新增领导/负责人' : '修改领导/负责人信息'" 
       :style="{ width: '90vw', maxWidth: '800px' }"
       :dismissableMask="true"
     >
@@ -341,8 +341,8 @@ onMounted(fetchAthletesList);
             <InputNumber id="age" class="w-full" v-model="formAge" />
           </div>
           <div class="field">
-            <label for="grade">年段 </label>
-            <InputText id="grade" class="w-full" v-model="formGrade" />
+            <label for="position">职位 </label>
+            <InputText id="position" class="w-full" v-model="formPosition" />
           </div>
           <div class="field">
             <label for="introduction">介绍</label>
