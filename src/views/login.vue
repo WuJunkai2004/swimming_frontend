@@ -80,7 +80,7 @@ const handleLogin = () => {
 };
 
 const goToHome = ()=>{
-  router.push('/');
+  router.back();
 };
 </script>
 
@@ -97,7 +97,7 @@ const goToHome = ()=>{
 
       <div class="w-full md:w-5 flex align-items-center justify-content-center p-4 relative">
         <Button 
-          label="返回主页" 
+          label="返回" 
           icon="pi pi-arrow-left" 
           class="back-button p-button-secondary" 
           @click="goToHome" 
