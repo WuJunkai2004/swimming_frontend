@@ -2,6 +2,7 @@
     "url": "/admin/login",
     "description": "管理员登录",
     "params": {
+        "loginType": "ACCOUNT_SECRET_LOGIN | WECHAT_LOGIN",
         "username": "名为用户名",
         "password": "MD5加密后的密码"
     },

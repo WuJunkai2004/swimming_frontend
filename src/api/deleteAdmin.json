@@ -1,0 +1,19 @@
+{
+    "url": "/admin/deleteAdmin",
+    "description": "删除管理员",
+    "params": {
+        "token": "鉴权token",
+        "adminid": "要删除的管理员ID"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "删除管理员成功",
+        "data": null
+    },
+    "fail": {
+        "statusCode": 422,
+        "message": "删除管理员失败",
+        "data": null
+    }
+}

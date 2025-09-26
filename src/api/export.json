@@ -1,0 +1,15 @@
+{
+    "url": "/sport/export",
+    "description": "管理员导出比赛报名数据",
+    "params": {
+        "token": "鉴权token",
+        "gameId": "比赛ID"
+    },
+    "method": ["POST"],
+    "response": {
+        "note": "二进制流文件，无需解析直接保存下载"
+    },
+    "fail": {
+        "note": "二进制流文件，无需解析直接保存下载"
+    }
+}

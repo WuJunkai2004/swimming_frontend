@@ -1,0 +1,21 @@
+{
+    "url": "/admin/updateAdmin",
+    "description": "更新管理员的信息",
+    "params": {
+        "token": "鉴权token",
+        "id": "要更新的管理员ID",
+        "adminName": "该管理员的新用户名",
+        "password": "该管理员的新密码"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "更新管理员成功",
+        "data": null
+    },
+    "fail": {
+        "statusCode": 448,
+        "message": "更新管理员失败",
+        "data": null
+    }
+}

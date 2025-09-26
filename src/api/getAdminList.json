@@ -1,0 +1,27 @@
+{
+    "url": "/admin/getAdminList",
+    "description": "获取管理员列表",
+    "params": {
+        "token": "鉴权token"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "获取管理员列表成功",
+        "data": [
+            {
+                "userName": "admin1",
+                "id": "1"
+            },
+            {
+                "userName": "admin2",
+                "id": "2"
+            }
+        ]
+    },
+    "fail": {
+        "statusCode": 421,
+        "message": "获取管理员列表失败",
+        "data": null
+    }
+}
