@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToken } from '@/composables/useToken'; // 导入我们之前创建的 Token 工具
+import { useToken } from '@/composables/useToken';
+import { useAlert } from '@/composables/useAlert';
 
-const confirm = useConfirm(); // 确认弹窗服务
 const { getToken } = useToken(); // 获取 Token 的函数
+const { alerts, awaitAlert, asyncAlert } = useAlert(); // 弹窗提示服务
 
 const leadersList = ref([]);
 const isLoading = ref(true);
@@ -207,54 +207,30 @@ const handleSubmit = async () => {
   }
 
   if (formImgUrl.value === '') {
-    // 如果头像为空，弹出一个“可选择”的确认对话框
-    confirm.require({
-      header: '确认操作',
-      message: '您还未为运动员上传头像，确定要继续提交吗？',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: '继续提交（无头像）',
-      rejectLabel: '返回上传',
-      // 按钮样式
-      acceptClass: 'p-button-info',
-      rejectClass: 'p-button-secondary p-button-outlined',
-      accept: () => {
-        proceedToSubmit();
-      },
-    });
-  } else {
-    proceedToSubmit();
+    if(!await awaitAlert('提示', 
+                  '您还未为领导/负责人上传头像。是否继续提交？', 
+                  '继续提交（无头像）', '返回上传'
+                  'pi pi-exclamation-triangle'
+    )){
+      return; // 用户选择返回上传，取消提交
+    }
   }
+  proceedToSubmit();
 };
 
 // 处理删除按钮点击
 const handleDelete = (leader) => {
-  confirm.require({
-    header: '确认删除',
-    message: `您确定要删除领导/负责人 "${leader.name}" 吗？`,
-    icon: 'pi pi-exclamation-triangle',
-    acceptClass: 'p-button-danger',
-    acceptLabel: '确认删除',
-    rejectLabel: '取消',
-    accept: async () => {
-      const success = await deleteLeader(leader.id);
-      if (success) {
-        fetchLeadersList(); // 成功后刷新列表
-      }
-    },
-  });
-};
-
-// 弹窗提示
-const alerts = (title, msg, accept = 'hidden', reject = 'hidden') => {
-  confirm.require({
-    header: title,
-    message: msg,
-    icon: 'pi pi-info-circle',
-    acceptLabel: accept,
-    rejectLabel: reject,
-    acceptClass: accept === 'hidden' ? 'hidden' : 'p-button-primary',
-    rejectClass: reject === 'hidden' ? 'hidden' : 'p-button-secondary',
-  });
+  const confirm_del = await awaitAlert('确认删除', 
+                    `您确定要删除领导/负责人 "${leader.name}" 吗？`, 
+                    '确认删除', '取消',
+                    'pi pi-exclamation-triangle');
+  if(!confirm_del){
+    return; // 用户选择取消删除
+  }
+  const success = await deleteLeader(leader.id);
+  if (success) {
+    fetchLeadersList(); // 成功后刷新列表
+  }
 };
 
 // --- 6. 生命周期钩子 ---

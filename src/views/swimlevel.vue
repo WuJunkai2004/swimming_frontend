@@ -1,13 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { useConfirm } from 'primevue/useconfirm';
-
+import { useAlert } from '@/composables/useAlert';
 import { swimLevels } from '@/composables/swimmingLevel';
 
-const confirm = useConfirm();
 // 1. 状态管理：定义所有需要的数据
 // ========================================================================
 const levelData = ref(swimLevels());
+const { alerts } = useAlert();
 
 // 用户输入和选择的状态
 const selectedPoolType = ref('50mPools');
@@ -60,14 +59,7 @@ const currentLevelStandard = computed(() => {
 // 核心计算逻辑：根据用户成绩计算出达到的等级
 const showResultDialog = (levelName) => {
   console.log('评定结果:', levelName);
-  confirm.require({
-    header: '评定结果',
-    message: `${levelName}`,
-    icon: 'pi pi-check-circle',
-    acceptClass: 'p-button-primary',
-    acceptLabel: '好的',
-    rejectClass: 'hidden',
-  });
+  alerts('评定结果', levelName, icon = 'pi pi-check-circle');
 };
 
 // 新增提交查询的函数

@@ -1,12 +1,12 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { useConfirm } from 'primevue/useconfirm';
 import { useRouter } from 'vue-router';
 import { useToken } from '@/composables/useToken';
+import { useAlert } from '@/composables/useAlert';
 
 const router = useRouter();
+const { alerts, awaitAlert } = useAlert();
 
-const confirm = useConfirm(); // PrimeVue的确认弹窗服务
 const { getToken } = useToken();
 
 // 响应式状态定义
@@ -79,61 +79,56 @@ const endOfFetch = (data) => {
   if(data.statusCode === 200){
     fetchNews();
   }
-  confirm.require({
-    header: '操作结果',
-    message: data.message,
-    icon: 'pi pi-info-circle',
-    acceptLabel: '关闭',
-    rejectClass: 'hidden',
-  })
+  alerts('操作结果', data.message, '关闭', 'hidden');
 }
 
 const deleteNews = (newsItem) => {
-  confirm.require({
-    header: '确认删除',
-    message: `您确定要删除新闻 "${newsItem.title}" 吗？此操作不可逆。`,
-    icon: 'pi pi-exclamation-triangle',
-    acceptClass: 'p-button-danger',
-    acceptLabel: '确认删除',
-    rejectLabel: '取消',
-    accept: () => {
-      fetch('/admin/deleteNews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id: newsItem.id,
-          token: getToken()
-        })
+  asyncAlert('确认删除', 
+    `您确定要删除新闻 "${newsItem.title}" 吗？`, 
+    '确认删除', '取消',
+    'pi pi-exclamation-triangle'
+  )
+  .then(() => {
+    fetch('/admin/deleteNews', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: newsItem.id,
+        token: getToken()
       })
-      .then(res => res.json())
-      .then(endOfFetch)
-    },
+    })
+    .then(res => res.json())
+    .then(endOfFetch);
+  })
+  .catch(() => {
+    // 用户取消删除
   });
 };
 
 const restoreNews = (newsItem) => {
-  confirm.require({
-    header: '确认恢复',
-    message: `您确定要恢复新闻 "${newsItem.title}" 吗？`,
-    icon: 'pi pi-info-circle',
-    acceptLabel: '确认恢复',
-    rejectLabel: '取消',
-    accept: () => {
-      fetch('/admin/withdrawNews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id: newsItem.id,
-          token: getToken()
-        })
+  asyncAlert('确认恢复', 
+    `您确定要恢复新闻 "${newsItem.title}" 吗？`, 
+    '确认恢复', '取消',
+    'pi pi-info-circle'
+  )
+  .then(() => {
+    fetch('/admin/withdrawNews', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        id: newsItem.id,
+        token: getToken()
       })
-      .then(res => res.json())
-      .then(endOfFetch)
-    },
+    })
+    .then(res => res.json())
+    .then(endOfFetch);
+  })
+  .catch(() => {
+    // 用户取消恢复
   });
 };
 

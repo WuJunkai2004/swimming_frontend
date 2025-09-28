@@ -1,27 +1,15 @@
 <script setup>
 import { ref } from 'vue';
-import { useConfirm } from 'primevue/useconfirm';
 import { useToken } from '@/composables/useToken';
+import { useAlert } from '@/composables/useAlert';
 import { useRouter } from 'vue-router'
 
 import sha256 from 'crypto-js/sha256';
 import encHex from 'crypto-js/enc-hex';
 
-const confirm = useConfirm();
 const { setToken } = useToken();
+const { alerts } = useAlert();
 const router = useRouter();
-
-const showAlert = (message) => {
-  console.log(`message ${message}`)
-  confirm.require({
-    header: '警告',
-    message: message,
-    icon: 'pi pi-info-circle',
-    acceptClass: 'p-button-primary',
-    acceptLabel: '确定',
-    rejectClass: 'hidden', 
-  });
-};
 
 const login_type = ref('ACCOUNT_SECRET_LOGIN')
 const username = ref('');
@@ -42,11 +30,11 @@ const focusPasswordInput = () => {
 // 登录按钮的点击事件处理函数
 const handleLogin = () => {
   if(!username.value) {
-    showAlert('请输入用户名');
+    alerts('警告', '请输入用户名');
     return;
   }
   if(!password.value || password.value.length < 8){
-    showAlert('密码长度不能少于8位');
+    alerts('警告', '密码长度不能少于8位');
   }
 
   (async function login(){
@@ -68,15 +56,15 @@ const handleLogin = () => {
       return response.json()
     }).then(data => {
       if(data.statusCode === 200){
-        showAlert('登录成功，正在跳转');
+        alerts('警告', '登录成功，正在跳转');
         setToken(data.data.token);
         window.location.href = '/manage';
       } else {
-        showAlert('登录失败: ' + data.message);
+        alerts('警告', '登录失败: ' + data.message);
       }
     }).catch(error =>{
       console.error('Error:', error);
-      showAlert('登录请求失败，请稍后重试');
+      alerts('警告', '登录请求失败，请稍后重试');
     });
   })()
 };

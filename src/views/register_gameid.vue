@@ -2,15 +2,15 @@
 // --- 1. 核心依赖导入 ---
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useConfirm } from 'primevue/useconfirm';
+import { useAlert } from '@/composables/useAlert';
 
 // --- 2. 静态资源导入 ---;
 // 导入学院枚举数据
 import { collegeMap } from '@/composables/collegeMapping';
 
 // --- 3. 初始化 ---
-const confirm = useConfirm(); // 用于弹窗提示
 const route = useRoute();      // 用于获取路由参数
+const { alerts } = useAlert(); // 用于错误提示
 
 // 从 URL 中获取比赛 ID
 const gameId = route.params.gameid;
@@ -39,20 +39,6 @@ const collegeOptions = ref(
 
 console.log('注册页面 - 比赛ID:', gameId);
 console.log('注册页面 - 学院信息:', collegeOptions.value);
-
-/**
- * 辅助函数：显示弹窗
- */
-const showAlert = (title, message, icon = 'pi pi-info-circle') => {
-  confirm.require({
-    header: title,
-    message: message,
-    icon: icon,
-    acceptClass: 'p-button-primary',
-    acceptLabel: '好的',
-    rejectClass: 'hidden', // 隐藏“拒绝”按钮
-  });
-};
 
 /**
  * (处理需求 4): 组件挂载时，根据 gameId 获取允许的比赛项目
@@ -91,7 +77,7 @@ const isAllowSubmit = computed(() => {
 
 const handleSubmit = async () => {
   if (!isAllowSubmit.value) {
-    showAlert('提交失败', '请填写所有必填项', 'pi pi-exclamation-triangle');
+    alerts('提交失败', '请填写所有必填项', icon = 'pi pi-exclamation-triangle');
     return;
   }
 
@@ -116,7 +102,7 @@ const handleSubmit = async () => {
     const result = await response.json();
 
     if (result.statusCode === 200) {
-      showAlert('提交成功', '您已成功报名！', 'pi pi-check-circle');
+      alerts('提交成功', '您已成功报名！', icon = 'pi pi-check-circle');
       name.value = '';
       academicNumber.value = null;
       selectedCollege.value = null;
@@ -125,7 +111,7 @@ const handleSubmit = async () => {
       throw new Error(result.message || '报名失败，请稍后重试');
     }
   } catch (e) {
-    showAlert('提交出错', e.message, 'pi pi-times-circle');
+    alerts('提交出错', e.message, icon = 'pi pi-times-circle');
   } finally {
     isSubmitting.value = false;
   }

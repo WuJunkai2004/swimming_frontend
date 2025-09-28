@@ -1,10 +1,10 @@
 <script setup>
 // --- 1. 核心依赖导入 ---
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useConfirm } from 'primevue/useconfirm'; // 保持使用 useConfirm
+import { useAlert } from '@/composables/useAlert';
 
 // --- 2. 初始化 ---
-const confirm = useConfirm();
+const { alerts, asyncAlert } = useAlert();
 const editorRef = ref(null);
 
 // --- 3. 状态定义 (保持不变) ---
@@ -30,39 +30,16 @@ const customVideoHandler = () => {
   isVideoDialogVisible.value = true;
 };
 
-// --- 5. 核心功能函数 (将 toast 替换为 showAlert) ---
-
-// 【新增】showAlert 辅助函数
-const showAlert = (title, message, icon = 'pi pi-info-circle') => {
-  confirm.require({
-    header: title,
-    message: message,
-    icon: icon,
-    acceptClass: 'p-button-primary',
-    acceptLabel: '好的',
-    rejectClass: 'hidden',
-  });
-};
-
 // 自定义媒体处理函数
 const handleImageUpload = (file) => {
   console.log('开始上传图片:', file);
   const imageUrl = 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg';
 
   // 获取 Quill 实例
-  let quill = null;
-  if (editorRef.value?.quill) {
-    quill = editorRef.value.quill;
-  } else if (editorRef.value?.$el?.querySelector('.ql-editor')) {
-    const editorEl = editorRef.value.$el.querySelector('.ql-editor');
-    quill = editorEl.__quill || window.Quill?.find(editorEl);
-  }
-
-  if (quill) {
-    quill.insertEmbed(cursorIndex, 'image', imageUrl);
-  }
+  const quill = editorRef.value.quill
+  quill.insertEmbed(cursorIndex, 'image', imageUrl);
   isImageDialogVisible.value = false;
-  showAlert('成功', '图片插入成功', 'pi pi-check-circle');
+  alerts('成功', '图片插入成功', icon = 'pi pi-check-circle');
 };
 
 const handleVideoUpload = (videoFile, previewFile) => {
@@ -71,7 +48,7 @@ const handleVideoUpload = (videoFile, previewFile) => {
   const quill = editorRef.value.quill;
   quill.insertEmbed(cursorIndex, 'video', videoUrl);
   isVideoDialogVisible.value = false;
-  showAlert('成功', '视频插入成功', 'pi pi-check-circle');
+  alerts('成功', '视频插入成功', icon = 'pi pi-check-circle');
 };
 
 // 草稿管理
@@ -91,25 +68,27 @@ const saveDraft = () => {
 
 const loadDraft = () => {
   const draftString = localStorage.getItem(DRAFT_KEY);
-  if (draftString) {
-    const draft = JSON.parse(draftString);
-    confirm.require({
-      header: '发现本地草稿',
-      message: `我们发现了一份您在 ${new Date(draft.savedAt).toLocaleString()} 保存的草稿，要恢复吗？`,
-      icon: 'pi pi-history',
-      acceptLabel: '恢复草稿',
-      rejectLabel: '放弃',
-      accept: () => {
-        title.value = draft.title;
-        content.value = draft.content;
-        showAlert('成功', '草稿已恢复', 'pi pi-check-circle'); // 【修改】
-      },
-      reject: () => {
-        localStorage.removeItem(DRAFT_KEY);
-        showAlert('提示', '草稿已放弃', 'pi pi-exclamation-triangle'); // 【修改】
-      }
-    });
+  if (!draftString) {
+    return;
   }
+  const draft = JSON.parse(draftString);
+  if(!draft.content && !draft.title){
+    return;
+  }
+  asyncAlert('发现本地草稿',
+    `我们发现了一份您在 ${new Date(draft.savedAt).toLocaleString()} 保存的草稿，要恢复吗？`,
+    '恢复草稿', '放弃',
+    'pi pi-history'
+  )
+  .then(() => {
+    title.value = draft.title;
+    content.value = draft.content;
+    alerts('成功', '草稿已恢复', icon = 'pi pi-check-circle');
+  })
+  .catch(() => {
+    localStorage.removeItem(DRAFT_KEY);
+    alerts('提示', '草稿已放弃', icon = 'pi pi-exclamation-triangle');
+  })
 };
 
 const clearDraft = () => {
@@ -120,7 +99,7 @@ const clearDraft = () => {
 // 发布新闻
 const publishNews = async () => {
   if (!title.value || content.value.length < 20) {
-    showAlert('无法发布', '请填写标题和至少一些内容', 'pi pi-exclamation-triangle'); // 【修改】
+    alerts('无法发布', '请填写标题和至少一些内容', icon = 'pi pi-exclamation-triangle');
     return;
   }
 
@@ -128,12 +107,12 @@ const publishNews = async () => {
   console.log('准备发布新闻:', { title: title.value, content: content.value });
   try {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    showAlert('发布成功', '新闻已成功发布！', 'pi pi-check-circle'); // 【修改】
+    alerts('发布成功', '新闻已成功发布！', icon = 'pi pi-check-circle');
     title.value = '';
     content.value = '';
     clearDraft();
   } catch (e) {
-    showAlert('发布失败', e.message, 'pi pi-times-circle'); // 【修改】
+    alerts('发布失败', e.message, icon = 'pi pi-times-circle');
   } finally {
     isPublishing.value = false;
   }
