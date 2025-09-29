@@ -2,10 +2,12 @@
 import { ref, onMounted } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
+import { collegeMap } from '@/composables/collegeMapping';
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
 const { alerts } = useAlert();
+const collegeNames = collegeMap();
 
 // --- 2. 状态定义 ---
 // 列表状态
@@ -46,26 +48,35 @@ const fetchGamesList = async () => {
 };
 
 // 需求 2.2: 当用户展开某一行时，按需加载该比赛的详细信息
-const onRowToggle = async (event) => {
+const onRowExpand = async (event) => {
   const game = event.data;
   // 如果是展开行，并且尚未加载过详情
-  if (expandedRows.value[game.uuid] && !game.details) {
+  if (!game.details) {
     game.isLoadingDetails = true;
-    try {
-      const response = await fetch(`/sport/getGameInfo?game=${game.uuid}`);
-      const result = await response.json();
+    fetch(`/sport/getGameInfo?game=${game.uuid}`)
+    .then(response => response.json())
+    .then(result => {
       if (result.statusCode === 200) {
-        game.details = result.data;
+        game.details = {
+          ...result.data,
+          error: null
+        };
       } else {
         game.details = { error: result.message || '加载详情失败' };
       }
-    } catch (e) {
-      game.details = { error: e.message };
-    } finally {
+    })
+    .catch(() => {
+      game.details = { error: '网络错误，加载详情失败' };
+    })
+    .finally(() => {
       game.isLoadingDetails = false;
-    }
+    });
   }
 };
+
+const jumpToPublish = () => {
+  window.location.href = '/manage#/publish-game'
+}
 
 // 需求 2.3: 预览比赛报名情况
 const showPreview = async (game) => {
@@ -74,13 +85,13 @@ const showPreview = async (game) => {
   previewData.value = null;
 
   try {
-    const token = getToken();
-    if (!token) return;
-
     const response = await fetch('/sport/preview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, gameid: game.uuid })
+      body: JSON.stringify({
+        token: getToken(),
+        gameid: game.uuid 
+      })
     });
     const result = await response.json();
 
@@ -102,13 +113,13 @@ const exportData = async (game) => {
   exportButton.disabled = true; // 临时禁用按钮防止重复点击
 
   try {
-    const token = getToken();
-    if (!token) return;
-    
     const response = await fetch('/sport/export', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, gameId: game.uuid })
+      body: JSON.stringify({ 
+        token: getToken(),
+        gameId: game.uuid 
+      })
     });
 
     if (!response.ok) {
@@ -135,18 +146,14 @@ const exportData = async (game) => {
     a.download = filename;
     document.body.appendChild(a); // 需要将 a 标签添加到 DOM 中才能在 Firefox 中正常工作
     a.click();
-    
-    // 4. 清理
     a.remove();
     window.URL.revokeObjectURL(url);
-
   } catch(e) {
     alerts('错误', '导出失败', {icon: 'pi pi-exclamation-triangle'});
   } finally {
     exportButton.disabled = false; // 重新启用按钮
   }
 };
-
 
 // --- 6. 生命周期钩子 ---
 onMounted(fetchGamesList);
@@ -161,7 +168,7 @@ onMounted(fetchGamesList);
       <Button 
         label="发布新比赛" 
         icon="pi pi-plus" 
-        @click="() => window.location.hash = '#/publish-game'" 
+        @click=jumpToPublish 
       />
     </div>
 
@@ -171,8 +178,16 @@ onMounted(fetchGamesList);
       <div v-if="isLoading">
         <DataTable :value="[{}, {}, {}]" class="p-datatable-striped">
           <Column :expander="true" />
-          <Column header="比赛名称"> <template #body><Skeleton /></template> </Column>
-          <Column header="操作"> <template #body><Skeleton height="2rem" width="10rem" /></template> </Column>
+          <Column header="比赛名称">
+            <template #body>
+              <Skeleton />
+            </template>
+          </Column>
+          <Column header="操作">
+            <template #body>
+              <Skeleton height="2rem" width="10rem" />
+            </template>
+          </Column>
         </DataTable>
       </div>
 
@@ -184,7 +199,7 @@ onMounted(fetchGamesList);
         v-else 
         :value="gamesList" 
         v-model:expandedRows="expandedRows"
-        @row-toggle="onRowToggle"
+        @row-expand="onRowExpand"
         dataKey="uuid"
         responsiveLayout="scroll"
       >
@@ -207,17 +222,19 @@ onMounted(fetchGamesList);
               <ProgressSpinner style="width: 24px; height: 24px" strokeWidth="6" />
               <span class="ml-2">正在加载详情...</span>
             </div>
-            <div v-else-if="slotProps.data.details.error" class="text-red-500">
-              {{ slotProps.data.details.error }}
-            </div>
-            <div v-else-if="slotProps.data.details" class="flex flex-wrap gap-4">
-              <div>
-                <span class="font-semibold">报名截止日期: </span>
-                <span>{{ new Date(slotProps.data.details.endTime).toLocaleString() }}</span>
+            <div v-else-if="slotProps.data.details">
+              <div v-if="slotProps.data.details.error" class="text-red-500">
+                {{ slotProps.data.details.error }}
               </div>
-              <div>
-                <span class="font-semibold">项目总数: </span>
-                <span>{{ slotProps.data.details.events.length }} 个</span>
+              <div v-else class="flex flex-wrap gap-4">
+                <div>
+                  <span class="font-semibold">报名截止日期: </span>
+                  <span>{{ new Date(slotProps.data.details.endTime).toLocaleString() }}</span>
+                </div>
+                <div>
+                  <span class="font-semibold">项目总数: </span>
+                  <span>{{ slotProps.data.details.events.length }} 个</span>
+                </div>
               </div>
             </div>
           </div>
@@ -243,12 +260,16 @@ onMounted(fetchGamesList);
           <div class="preview-summary p-3 mb-4 surface-100 border-round">
             <p><strong>比赛名称:</strong> {{ previewData.competitionName }}</p>
             <p><strong>报名截止时间:</strong> {{ new Date(previewData.endTime).toLocaleString() }}</p>
-            <p><strong>负责人联系电话:</strong> {{ previewData.leaderPhone }}</p>
+            <p><strong>负责人联系方式:</strong> {{ previewData.leaderPhone }}</p>
           </div>
-          <DataTable :value="previewData.alhleteDetail" responsiveLayout="scroll">
+          <DataTable :value="previewData.athleteDetail" responsiveLayout="scroll">
             <Column field="athleteName" header="姓名"></Column>
             <Column field="athleteId" header="学号"></Column>
-            <Column field="college" header="学院"></Column>
+            <Column field="college" header="学院">
+              <template #body="slotProps">
+                {{ collegeNames[slotProps.data.college] || slotProps.data.college }}
+              </template>
+            </Column>
             <Column field="registerEvents" header="报名项目">
               <template #body="slotProps">
                 {{ slotProps.data.registerEvents.join(', ') }}
