@@ -7,11 +7,11 @@ import PrimeVue      from 'primevue/config';
 import Aura          from '@primeuix/themes/aura';
 import './styles/main.css'
 import 'primeflex/primeflex.css';
+import 'primeicons/primeicons.css';
 
 import ConfirmationService from 'primevue/confirmationservice'
 
 import { definePreset } from '@primeuix/themes';
-import 'primeicons/primeicons.css';
 const Blue = definePreset(Aura, {
     semantic: {
         primary: {

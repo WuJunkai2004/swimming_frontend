@@ -96,9 +96,9 @@ const computedMenuModel = computed(() => {
 // --- 5. 子路由系统 (需求 2.3) ---
 // 完全按照您提供的示例，使用 hash 路由
 const routes = {
-  '/': () => import('./ManageGames.vue'),
-  '/publish-game': () => import('./PublishGame.vue'),
-  '/manage-games': () => import('./ManageGames.vue'),
+  '/': () => import('./manage-games.vue'),
+  '/publish-game': () => import('./publish-game.vue'),
+  '/manage-games': () => import('./manage-games.vue'),
   '/publish-news': () => import('./publish-news.vue'),
   '/manage-news': () => import('./manage-news.vue'),
   '/manage-athletes': () => import('./manage-athletes.vue'),
