@@ -10,7 +10,7 @@
         "statusCode": 200,
         "data": {
             "competitionName": "2025年福州大学振奋杯",
-            "alhleteDetail": [
+            "athleteDetail": [
                 {
                     "athleteName": "李泽聿",
                     "athleteId": "102301237",
