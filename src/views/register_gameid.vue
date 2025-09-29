@@ -22,6 +22,7 @@ const selectedCollege = ref(null); // 将存储 KEY (例如: SCHOOL_OF_BIOLOGICA
 const selectedSport = ref(null);   // 将存储 Enum (例如: FREESTYLES_100M)
 
 // --- 5. 选项与加载状态 ---
+const gameName = ref("运动员赛事")
 const sportOptions = ref([]); // 存储从 API 获取的比赛项目
 const isLoading = ref(true);    // 控制页面加载状态（主要用于获取项目列表）
 const isSubmitting = ref(false); // 控制提交按钮，防止重复提交
@@ -47,6 +48,7 @@ const fetchAllowableSports = async () => {
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
+      gameName.value = result.data.name || "运动员赛事";
       sportOptions.value = result.data.events.map(item => ({
         label: item.name, // 显示中文名
         value: item.enum  // 提交 Enum
@@ -123,7 +125,7 @@ const handleSubmit = async () => {
 
     <div class="hero-section text-white flex align-items-center justify-content-center">
       <div class="hero-overlay"></div>
-      <h1 class="hero-title text-center">运动员赛事报名</h1>
+      <h1 class="hero-title text-center">{{ gameName }}报名</h1>
     </div>
 
     <div class="grid justify-content-center main-content">
