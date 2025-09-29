@@ -41,17 +41,5 @@ export default defineConfig({
         drop_debugger: true
       }
     },
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('primevue')) {
-            return 'primevue';
-          }
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
-        }
-      }
-    },
   },
 })
