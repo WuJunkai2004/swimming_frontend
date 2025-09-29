@@ -227,7 +227,7 @@ const handleDelete = async (athlete) => {
     '确认删除', 
     `您确定要删除运动员 "${athlete.name}" 吗？`, 
     {
-      acceet: '确认删除',
+      accept: '确认删除',
       reject: '取消',
       icon: 'pi pi-exclamation-triangle'
     });

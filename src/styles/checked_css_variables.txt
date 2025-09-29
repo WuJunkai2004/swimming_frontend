@@ -11,3 +11,4 @@
 --p-primary-300
 --p-content-hover-background
 --p-primary-100
+--p-inputtext-border-color

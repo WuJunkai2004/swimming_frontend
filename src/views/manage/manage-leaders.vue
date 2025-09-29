@@ -222,7 +222,7 @@ const handleSubmit = async () => {
 };
 
 // 处理删除按钮点击
-const handleDelete = (leader) => {
+const handleDelete = async (leader) => {
   const confirm_del = await awaitAlert(
     '确认删除', 
     `您确定要删除领导/负责人 "${leader.name}" 吗？`, 

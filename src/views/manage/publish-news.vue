@@ -214,7 +214,7 @@ onBeforeUnmount(() => {
 /* 标题输入框样式，使其更像一个标题而不是普通输入框 */
 .title-input {
   border: none;
-  border-bottom: 1px solid var(--p-surface-border);
+  border-bottom: 1px solid var(--p-inputtext-border-color);
   border-radius: 0;
   box-shadow: none !important;
   font-weight: 600;
