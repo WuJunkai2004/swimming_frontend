@@ -59,7 +59,7 @@ const currentLevelStandard = computed(() => {
 // 核心计算逻辑：根据用户成绩计算出达到的等级
 const showResultDialog = (levelName) => {
   console.log('评定结果:', levelName);
-  alerts('评定结果', levelName, icon = 'pi pi-check-circle');
+  alerts('评定结果', levelName, {icon: 'pi pi-check-circle'});
 };
 
 // 新增提交查询的函数

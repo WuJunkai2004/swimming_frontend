@@ -18,27 +18,21 @@ const isLastPage = ref(false); // 是否是最后一页
 const fetchNews = async () => {
   loading.value = true;
   error.value = null;
-  try {
-    // 模拟 API 请求
-    // 在真实项目中，请替换成您的 fetch 或 axios 调用
-    const response = await fetch(`/activity/getNewsList?page=${currentPage.value}&limit=${limit.value}`);
-    if (!response.ok) {
-      throw new Error('网络错误，无法获取新闻列表。');
-    }
-    const result = await response.json();
-
+  fetch(`/activity/getNewsList?page=${currentPage.value}&limit=${limit.value}`)
+  .then(response => response.json())
+  .then(result => {
     if (result.statusCode === 200) {
       news.value = result.data;
       // 判断是否是最后一页：如果返回的数据量小于请求的 limit，则认为是最后一页
       isLastPage.value = result.data.length < limit.value;
     } else {
-      throw new Error(result.message || '获取新闻失败。');
+      error.value = result.message || '获取新闻失败。';
     }
-  } catch (e) {
-    error.value = e.message;
-  } finally {
+  })
+  .catch(() => {})
+  .finally(() => {
     loading.value = false;
-  }
+  });
 };
 
 // 页面切换函数

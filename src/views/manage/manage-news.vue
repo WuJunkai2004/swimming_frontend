@@ -79,15 +79,18 @@ const endOfFetch = (data) => {
   if(data.statusCode === 200){
     fetchNews();
   }
-  alerts('操作结果', data.message, '关闭', 'hidden');
+  alerts('操作结果', data.message, {accept: '关闭'});
 }
 
 const deleteNews = (newsItem) => {
-  asyncAlert('确认删除', 
+  asyncAlert(
+    '确认删除', 
     `您确定要删除新闻 "${newsItem.title}" 吗？`, 
-    '确认删除', '取消',
-    'pi pi-exclamation-triangle'
-  )
+    {
+      accept: '确认删除',
+      reject: '取消',
+      icon: 'pi pi-exclamation-triangle'
+    })
   .then(() => {
     fetch('/admin/deleteNews', {
       method: 'POST',
@@ -110,9 +113,11 @@ const deleteNews = (newsItem) => {
 const restoreNews = (newsItem) => {
   asyncAlert('确认恢复', 
     `您确定要恢复新闻 "${newsItem.title}" 吗？`, 
-    '确认恢复', '取消',
-    'pi pi-info-circle'
-  )
+    {
+      accept: '确认恢复',
+      reject: '取消',
+      icon: 'pi pi-info-circle'
+    })
   .then(() => {
     fetch('/admin/withdrawNews', {
       method: 'POST',

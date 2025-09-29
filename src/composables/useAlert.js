@@ -3,7 +3,14 @@ import { useConfirm } from 'primevue/useconfirm';
 export function useAlert() {
   const confirm = useConfirm();
 
-  const alerts = (title, msg, accept = 'hidden', reject = 'hidden', icon = 'pi pi-info-circle') => {
+  const alerts = (title, msg, options = {}) => {
+    const {
+      accept = '确定',
+      reject = 'hidden', 
+      icon = 'pi pi-info-circle'
+    } = options;
+
+    console.log('Alert:', title, msg);
     confirm.require({
       header: title,
       message: msg,
@@ -15,7 +22,13 @@ export function useAlert() {
     });
   };
 
-  const asyncAlert = (title, msg, accept = 'hidden', reject = 'hidden', icon = 'pi pi-info-circle') => {
+  const asyncAlert = (title, msg, options = {}) => {
+    const {
+      accept = '确定',
+      reject = 'hidden', 
+      icon = 'pi pi-info-circle'
+    } = options;
+
     return new Promise((resolve, rejectPromise) => {
       confirm.require({
         header: title,
@@ -31,9 +44,9 @@ export function useAlert() {
     })
   }
 
-  const awaitAlert = async (title, msg, accept = 'hidden', reject = 'hidden', icon = 'pi pi-info-circle') => {
+  const awaitAlert = async (title, msg, options = {}) => {
     try {
-      await asyncAlert(title, msg, accept, reject, icon);
+      await asyncAlert(title, msg, options);
       return true; // 用户点击了接受按钮
     } catch {
       return false; // 用户点击了拒绝按钮

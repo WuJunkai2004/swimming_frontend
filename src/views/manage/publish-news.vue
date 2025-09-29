@@ -39,7 +39,7 @@ const handleImageUpload = (file) => {
   const quill = editorRef.value.quill
   quill.insertEmbed(cursorIndex, 'image', imageUrl);
   isImageDialogVisible.value = false;
-  alerts('成功', '图片插入成功', icon = 'pi pi-check-circle');
+  alerts('成功', '图片插入成功', {icon: 'pi pi-check-circle'});
 };
 
 const handleVideoUpload = (videoFile, previewFile) => {
@@ -48,7 +48,7 @@ const handleVideoUpload = (videoFile, previewFile) => {
   const quill = editorRef.value.quill;
   quill.insertEmbed(cursorIndex, 'video', videoUrl);
   isVideoDialogVisible.value = false;
-  alerts('成功', '视频插入成功', icon = 'pi pi-check-circle');
+  alerts('成功', '视频插入成功', {icon: 'pi pi-check-circle'});
 };
 
 // 草稿管理
@@ -75,19 +75,22 @@ const loadDraft = () => {
   if(!draft.content && !draft.title){
     return;
   }
-  asyncAlert('发现本地草稿',
+  asyncAlert(
+    '发现本地草稿',
     `我们发现了一份您在 ${new Date(draft.savedAt).toLocaleString()} 保存的草稿，要恢复吗？`,
-    '恢复草稿', '放弃',
-    'pi pi-history'
-  )
+    {
+      accept: '恢复草稿',
+      reject: '放弃',
+      icon: 'pi pi-history'
+    })
   .then(() => {
     title.value = draft.title;
     content.value = draft.content;
-    alerts('成功', '草稿已恢复', icon = 'pi pi-check-circle');
+    alerts('成功', '草稿已恢复', {icon: 'pi pi-check-circle'});
   })
   .catch(() => {
     localStorage.removeItem(DRAFT_KEY);
-    alerts('提示', '草稿已放弃', icon = 'pi pi-exclamation-triangle');
+    alerts('提示', '草稿已放弃', {icon: 'pi pi-exclamation-triangle'});
   })
 };
 
@@ -99,7 +102,7 @@ const clearDraft = () => {
 // 发布新闻
 const publishNews = async () => {
   if (!title.value || content.value.length < 20) {
-    alerts('无法发布', '请填写标题和至少一些内容', icon = 'pi pi-exclamation-triangle');
+    alerts('无法发布', '请填写标题和至少一些内容', {icon: 'pi pi-exclamation-triangle'});
     return;
   }
 
@@ -107,12 +110,12 @@ const publishNews = async () => {
   console.log('准备发布新闻:', { title: title.value, content: content.value });
   try {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    alerts('发布成功', '新闻已成功发布！', icon = 'pi pi-check-circle');
+    alerts('发布成功', '新闻已成功发布！', {icon: 'pi pi-check-circle'});
     title.value = '';
     content.value = '';
     clearDraft();
   } catch (e) {
-    alerts('发布失败', e.message, icon = 'pi pi-times-circle');
+    alerts('发布失败', e.message, {icon: 'pi pi-times-circle'});
   } finally {
     isPublishing.value = false;
   }

@@ -75,7 +75,7 @@ const handleAvatarUpload = async (event) => {
     if(result.statusCode === 200){
       formImgUrl.value = result.data;
     }
-    alerts('提示', result.message, '确定');
+    alerts('提示', result.message);
   })
   .finally(() => {
     isDialogLoading.value = false;
@@ -96,7 +96,7 @@ const fetchLeaderDetail = async (id) => {
       formIntroduction.value = detail.introduction;
       formImgUrl.value = detail.imgUrl;
     } else {
-      alerts('错误', result.message, '确定');
+      alerts('错误', result.message);
     }
   })
   .finally(() => {
@@ -129,7 +129,7 @@ const addLeader = async () => {
     fetchLeadersList(); // 成功后刷新列表
     return true;
   }
-  alerts("错误", result.message, '确定');
+  alerts("错误", result.message);
   return false;
 };
 
@@ -154,7 +154,7 @@ const deleteLeader = async (id) => {
     fetchLeadersList();
     return true;
   }
-  alerts("错误", result.message, '确定');
+  alerts("错误", result.message);
   return false;
 };
 
@@ -207,11 +207,14 @@ const handleSubmit = async () => {
   }
 
   if (formImgUrl.value === '') {
-    if(!await awaitAlert('提示', 
-                  '您还未为领导/负责人上传头像。是否继续提交？', 
-                  '继续提交（无头像）', '返回上传'
-                  'pi pi-exclamation-triangle'
-    )){
+    if(!await awaitAlert(
+      '提示', 
+      '您还未为领导/负责人上传头像。是否继续提交？', 
+      {
+        accept: '继续提交（无头像）', 
+        reject: '返回上传',
+        icon: 'pi pi-exclamation-triangle'
+      })){
       return; // 用户选择返回上传，取消提交
     }
   }
@@ -220,10 +223,14 @@ const handleSubmit = async () => {
 
 // 处理删除按钮点击
 const handleDelete = (leader) => {
-  const confirm_del = await awaitAlert('确认删除', 
-                    `您确定要删除领导/负责人 "${leader.name}" 吗？`, 
-                    '确认删除', '取消',
-                    'pi pi-exclamation-triangle');
+  const confirm_del = await awaitAlert(
+    '确认删除', 
+    `您确定要删除领导/负责人 "${leader.name}" 吗？`, 
+    {
+      accept: '确认删除',
+      reject: '取消',
+      icon: 'pi pi-exclamation-triangle'
+    });
   if(!confirm_del){
     return; // 用户选择取消删除
   }

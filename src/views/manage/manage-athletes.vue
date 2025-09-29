@@ -75,7 +75,7 @@ const handleAvatarUpload = async (event) => {
     if(result.statusCode === 200){
       formImgUrl.value = result.data;
     }
-    alerts('提示', result.message, '确定');
+    alerts('提示', result.message);
   })
   .finally(() => {
     isDialogLoading.value = false;
@@ -96,7 +96,7 @@ const fetchAthleteDetail = async (id) => {
       formIntroduction.value = detail.introduction;
       formImgUrl.value = detail.imgUrl;
     } else {
-      alerts('错误', result.message, '确定');
+      alerts('错误', result.message);
     }
   })
   .finally(() => {
@@ -129,7 +129,7 @@ const addExcellence = async () => {
     fetchAthletesList(); // 成功后刷新列表
     return true;
   }
-  alerts("错误", result.message, '确定');
+  alerts("错误", result.message);
   return false;
 };
 
@@ -154,7 +154,7 @@ const deleteExcellence = async (id) => {
     fetchAthletesList();
     return true;
   }
-  alerts("错误", result.message, '确定');
+  alerts("错误", result.message);
   return false;
 };
 
@@ -207,11 +207,14 @@ const handleSubmit = async () => {
   }
 
   if (formImgUrl.value === '') {
-    if(!await awaitAlert('确认操作', 
-                   '您还未为运动员上传头像，确定要继续提交吗？', 
-                   '继续提交（无头像）', '返回上传',
-                   'pi pi-exclamation-triangle'
-    )){
+    if(!await awaitAlert(
+      '确认操作', 
+      '您还未为运动员上传头像，确定要继续提交吗？', 
+      {
+        accept: '继续提交（无头像）',
+        reject: '返回上传',
+        icon: 'pi pi-exclamation-triangle',
+      })){
       return;
     }
   }
@@ -220,10 +223,14 @@ const handleSubmit = async () => {
 
 // 处理删除按钮点击
 const handleDelete = async (athlete) => {
-  const confirm_del = await awaitAlert('确认删除', 
-                     `您确定要删除运动员 "${athlete.name}" 吗？`, 
-                     '确认删除', '取消', 
-                     'pi pi-exclamation-triangle');
+  const confirm_del = await awaitAlert(
+    '确认删除', 
+    `您确定要删除运动员 "${athlete.name}" 吗？`, 
+    {
+      acceet: '确认删除',
+      reject: '取消',
+      icon: 'pi pi-exclamation-triangle'
+    });
   if(!confirm_del){
     return; // 用户选择取消，退出函数
   }

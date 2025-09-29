@@ -37,32 +37,28 @@ const collegeOptions = ref(
   }))
 );
 
-console.log('注册页面 - 比赛ID:', gameId);
-console.log('注册页面 - 学院信息:', collegeOptions.value);
-
 /**
  * (处理需求 4): 组件挂载时，根据 gameId 获取允许的比赛项目
  */
 const fetchAllowableSports = async () => {
   isLoading.value = true;
   error.value = null;
-  try {
-    const response = await fetch(`/sport/allowSportType?game=${gameId}`);
-    const result = await response.json();
+  fetch(`/sport/getGameInfo?game=${gameId}`)
+  .then(response => response.json())
+  .then(result => {
     if (result.statusCode === 200) {
-      // 将 API 返回数据转换为 Select 组件所需的格式
-      sportOptions.value = result.data.map(item => ({
+      sportOptions.value = result.data.events.map(item => ({
         label: item.name, // 显示中文名
         value: item.enum  // 提交 Enum
       }));
     } else {
-      throw new Error(result.message || '获取比赛项目失败');
+      error.value = result.message;
     }
-  } catch (e) {
-    error.value = e.message;
-  } finally {
+  })
+  .catch(() => {})
+  .finally(() => {
     isLoading.value = false;
-  }
+  });
 };
 
 // 组件挂载后立即执行数据获取
@@ -77,7 +73,7 @@ const isAllowSubmit = computed(() => {
 
 const handleSubmit = async () => {
   if (!isAllowSubmit.value) {
-    alerts('提交失败', '请填写所有必填项', icon = 'pi pi-exclamation-triangle');
+    alerts('提交失败', '请填写所有必填项', {icon: 'pi pi-exclamation-triangle'});
     return;
   }
 
@@ -91,30 +87,32 @@ const handleSubmit = async () => {
     gameId: gameId
   };
 
-  try {
-    const response = await fetch('/sport/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(registrationData)
-    });
-    const result = await response.json();
-
+  fetch('/sport/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(registrationData)
+  })
+  .then(response => response.json())
+  .then(result => {
     if (result.statusCode === 200) {
-      alerts('提交成功', '您已成功报名！', icon = 'pi pi-check-circle');
+      alerts('提交成功', '您已成功报名！', {icon: 'pi pi-check-circle'});
       name.value = '';
       academicNumber.value = null;
       selectedCollege.value = null;
       selectedSport.value = null;
     } else {
-      throw new Error(result.message || '报名失败，请稍后重试');
+      error.value = result.message || '报名失败，请稍后重试';
     }
-  } catch (e) {
-    alerts('提交出错', e.message, icon = 'pi pi-times-circle');
-  } finally {
+  })
+  .catch(() => {})
+  .finally(() => {
     isSubmitting.value = false;
-  }
+    if(error.value) {
+      alerts('提交出错', error.value, {icon: 'pi pi-times-circle'});
+    }
+  });
 };
 </script>
 
