@@ -27,7 +27,7 @@ export function useMenu() {
     },
     {
       label: '登录',
-      icon: 'pi pi-sign-in',
+      icon: 'pi pi-user',
       command: () => router.push('/login')
     }
   ]);

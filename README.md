@@ -38,7 +38,7 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 | 页面名称 | 状态 | uri |
 | --- | --- | --- |
 | 发布比赛 |   | #/publish-game |
-| 管理比赛 |   | #/manage-game |
+| 管理比赛 | √ | #/manage-game |
 | 发布新闻 | - | #/publish-news |
 | 管理新闻 | √ | #/manage-news |
 | 管理运动员 | √ | #/manage-athletes |
