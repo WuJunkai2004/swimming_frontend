@@ -5,7 +5,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-export release=1
-
 npm install
 npm run build

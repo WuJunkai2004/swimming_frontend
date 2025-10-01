@@ -55,3 +55,23 @@ export function vueApiPlugin() {
     }
   }
 }
+
+
+export function vueApiProxy(target){
+  const apiConfig = loadApiConfig();
+  const proxyConfig = {};
+
+  for (const key in apiConfig) {
+    let api = apiConfig[key];
+    let path = api.url || key;
+    if(!path.startsWith('/')){
+      path = '/' + path;
+    }
+    proxyConfig[path] = {
+      target: target,
+      changeOrigin: true,
+    };
+  }
+
+  return proxyConfig;
+}

@@ -8,14 +8,23 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import Components from 'unplugin-vue-components/vite'
 import { PrimeVueResolver } from '@primevue/auto-import-resolver'
 
-import { vueApiPlugin } from './src/api/api.js'
+import { vueApiPlugin, vueApiProxy } from './src/api/api.js'
+
+const DEV_MODE = process.env.VITE_DEV_MODE
+const backendTarget = 'http://106.15.90.163:10086'
+
+if(DEV_MODE){
+  console.log(`Vite 正在以 ${DEV_MODE} 模式启动`)
+} else {
+  console.log("Vite 正在打包编译")
+}
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    ...(process.env.release ? [] : [vueApiPlugin()]),
+    ...(DEV_MODE === 'mock' ? [vueApiPlugin()] : []),
     Components({
       resolvers: [
         PrimeVueResolver()
@@ -32,6 +41,9 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
+  },
+  server: {
+    proxy: DEV_MODE === 'proxy' ? vueApiProxy(backendTarget) : null
   },
   build: {
     minify: 'terser',
