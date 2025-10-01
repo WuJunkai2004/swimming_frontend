@@ -17,12 +17,6 @@ const password = ref('');
 const passwordInputRef = ref(null)
 const is_loginning = ref(false);
 
-async function SHA256(str) {
-  const message = new TextEncoder().encode(str);
-  const hash    = sha256(message);
-  return hash.toString(encHex);
-}
-
 const focusPasswordInput = () => {
   passwordInputRef.value?.$el?.querySelector('input')?.focus();
 };
@@ -37,39 +31,37 @@ const handleLogin = () => {
     alerts('警告', '密码长度不能少于8位');
   }
 
-  (async function login(){
-    is_loginning.value = true;
-    let pw_sha = await SHA256(password.value);
-    let url = '/admin/login'
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        loginType: login_type.value,
-        username: username.value,
-        password: pw_sha
-      })
-    }).then(response => {
-      is_loginning.value = false;
-      return response.json()
-    }).then(data => {
-      if(data.statusCode === 200){
-        alerts('警告', '登录成功，正在跳转');
-        setToken(data.data.token);
-        window.location.href = '/manage';
-      } else {
-        alerts('警告', '登录失败: ' + data.message);
-      }
-    }).catch(error =>{
-      console.error('Error:', error);
-      alerts('警告', '登录请求失败，请稍后重试');
-    });
-  })()
+  is_loginning.value = true;
+  let pw_sha = sha256(password.value).toString(encHex);
+  let url = '/admin/login'
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      loginType: login_type.value,
+      userName: username.value,
+      password: pw_sha
+    })
+  }).then(response => {
+    is_loginning.value = false;
+    return response.json()
+  }).then(data => {
+    if(data.statusCode === 200){
+      alerts('提示', '登录成功，正在跳转');
+      setToken(data.data.token);
+      router.push('/manage');
+    } else {
+      alerts('警告', '登录失败: ' + data.message);
+    }
+  }).catch(error =>{
+    console.error('Error:', error);
+    alerts('警告', '登录请求失败，请稍后重试');
+  });
 };
 
-const goToHome = ()=>{
+const goToHome = () => {
   router.back();
 };
 </script>
