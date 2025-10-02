@@ -43,4 +43,4 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 | 管理新闻 | √ | #/manage-news |
 | 管理运动员 | √ | #/manage-athletes |
 | 管理领导/负责人 | √ | #/manage-leaders |
-| 管理管理员 |   | #/manage-admins |
+| 管理管理员 | √ | #/manage-admins |
