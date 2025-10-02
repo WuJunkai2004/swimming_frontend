@@ -32,9 +32,8 @@ const handleLogin = () => {
   }
 
   is_loginning.value = true;
-  let pw_sha = sha256(password.value).toString(encHex);
-  let url = '/admin/login'
-  fetch(url, {
+  const pw_sha = sha256(password.value).toString(encHex);
+  fetch('/admin/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
