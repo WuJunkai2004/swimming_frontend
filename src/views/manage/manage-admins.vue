@@ -23,8 +23,50 @@ const editingAdminId = ref(null); // 存储正在编辑的管理员ID
 const formUsername = ref('');
 const formPassword = ref('');
 
+const passwordStrength = computed(() => {
+  let score = 0;
+  const pw = formPassword.value;
+  if (!pw){
+    return 0;
+  }
+  if (/[a-z]/.test(pw)){
+    score++;
+  }
+  if (/[A-Z]/.test(pw)){
+    score++;
+  }
+  if (/[0-9]/.test(pw)){
+    score++;
+  }
+  if (/[^a-zA-Z0-9]/.test(pw)){
+    score++;
+  }
+  return score;
+});
+
+// 【新增】一个计算属性，将强度分数转换为对应的标签文字和颜色
+const strengthLabel = computed(() => {
+  const score = passwordStrength.value;
+  switch (score) {
+    case 1:
+      return { text: '弱', colorClass: 'text-red-500' };
+    case 2:
+      return { text: '中', colorClass: 'text-yellow-500' };
+    case 3:
+      return { text: '强', colorClass: 'text-green-500' };
+    case 4:
+      return { text: '极强', colorClass: 'text-blue-500' };
+    default:
+      if (formPassword.value && formPassword.value.length > 0) {
+        return { text: '太短', colorClass: 'text-gray-500' };
+      }
+      return { text: '', colorClass: '' };
+  }
+});
+
 const allRequiredField = computed(() => {
-  return formUsername.value && formPassword.value
+  return formUsername.value && formPassword.value && 
+         formPassword.value.length >= 8 && passwordStrength.value >= 2;
 });
 
 // --- 4. API 调用逻辑 ---
@@ -38,9 +80,9 @@ const fetchAdminsList = async () => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: {
+    body: JSON.stringify({
       token: getToken(),
-    }
+    })
   })
   .then(response => response.json())
   .then(data => {
@@ -254,6 +296,23 @@ onMounted(fetchAdminsList);
               :feedback="false"
               toggleMask
             />
+
+            <div class="flex align-items-center gap-3 mt-3">
+              <MeterGroup :value="[
+                { label: '弱', color: '#ff5252', value: passwordStrength >= 1 ? 25 : 0 },
+                { label: '中', color: '#ffc107', value: passwordStrength >= 2 ? 25 : 0 },
+                { label: '强', color: '#4caf50', value: passwordStrength >= 3 ? 25 : 0 },
+                { label: '极强', color: '#2196f3', value: passwordStrength >= 4 ? 25 : 0 }
+              ]" class="flex-1">
+              </MeterGroup>
+              <span 
+                :class="strengthLabel.colorClass" 
+                class="font-bold w-5rem text-right"
+              >
+                {{ strengthLabel.text }}
+              </span>
+            </div>
+
           </div>
         </div>
       </div>
@@ -294,5 +353,14 @@ onMounted(fetchAdminsList);
 /* 针对 Password 组件的样式微调，使其与 InputText 高度一致 */
 :deep(.p-password-input) {
   width: 100%;
+}
+
+/* 针对 MeterGroup 组件的样式微调，删除示例文字 */
+:deep(.p-metergroup-label) {
+  display: none !important;
+}
+
+:deep(.p-metergroup-label-list) {
+  display: none !important;
 }
 </style>
