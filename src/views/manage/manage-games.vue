@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
 import { collegeMap } from '@/composables/collegeMapping';
+import { Copying } from '@/composables/useCopy';
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
@@ -20,6 +21,38 @@ const expandedRows = ref({}); // 控制 DataTable 的行展开状态
 const isPreviewVisible = ref(false);
 const isPreviewLoading = ref(false);
 const previewData = ref(null);
+
+// 分享弹窗状态
+const isShareVisible = ref(false);
+const currentGame = ref(null);
+
+const showShareDialog = (game) => {
+  currentGame.value = game;
+  isShareVisible.value = true;
+};
+
+const shareLink = computed(() => {
+  if (!currentGame.value){
+    return '';
+  }
+  return `${window.location.origin}/register/${currentGame.value.uuid}`;
+});
+
+const copyShareLink = () => {
+  console.log("正在复制")
+  if (!shareLink.value){
+    return;
+  }
+  const text = `${currentGame.value.Name}报名，请访问以下链接：\n${shareLink.value}`;
+  Copying(text)
+  .then(() => {
+    alerts("提示", "复制成功");
+    isShareVisible.value = false;
+  })
+  .catch(() => {
+    alerts("警告", "复制失败，请手动复制");
+  })
+};
 
 // --- 3. API 调用与数据处理 ---
 
@@ -75,7 +108,7 @@ const onRowExpand = async (event) => {
 };
 
 const jumpToPublish = () => {
-  window.location.href = '/manage#/publish-game'
+  window.location.hash = '#/publish-game';
 }
 
 // 需求 2.3: 预览比赛报名情况
@@ -83,6 +116,7 @@ const showPreview = async (game) => {
   isPreviewVisible.value = true;
   isPreviewLoading.value = true;
   previewData.value = null;
+  currentGame.value = game;
 
   try {
     const response = await fetch('/sport/preview', {
@@ -210,8 +244,22 @@ onMounted(fetchGamesList);
         <Column header="操作" style="width: 12rem">
           <template #body="slotProps">
             <div class="flex gap-2">
-              <Button label="预览" class="p-button-text p-button-sm" @click="showPreview(slotProps.data)" />
-              <Button :id="`export-btn-${slotProps.data.uuid}`" label="导出" class="p-button-text p-button-sm" @click="exportData(slotProps.data)" />
+              <Button 
+                label="分享" 
+                class="p-button-text p-button-sm p-button-success" 
+                @click="showShareDialog(slotProps.data)" 
+              />
+              <Button 
+                label="预览" 
+                class="p-button-text p-button-sm" 
+                @click="showPreview(slotProps.data)" 
+              />
+              <Button 
+                label="导出" 
+                class="p-button-text p-button-sm" 
+                :id="`export-btn-${slotProps.data.uuid}`" 
+                @click="exportData(slotProps.data)" 
+              />
             </div>
           </template>
         </Column>
@@ -243,6 +291,27 @@ onMounted(fetchGamesList);
     </div>
 
     <Dialog 
+      v-model:visible="isShareVisible" 
+      modal 
+      header="分享比赛报名链接" 
+      :style="{ width: '90vw', maxWidth: '500px' }"
+    >
+      <div v-if="currentGame">
+        <div class="share-link-text p-3 mb-4 surface-100 border-round">
+          <p>{{ currentGame.Name }}报名，请访问以下链接：</p>
+          <p>{{ shareLink }}</p>
+        </div>
+      </div>
+      <template #footer>
+        <Button label="关闭" @click="isShareVisible = false" class="p-button-text" />
+        <Button label="复制" @click="copyShareLink" icon="pi pi-copy" />
+        <a :href="shareLink" target="_blank" rel="noopener noreferrer">
+          <Button label="跳转预览" icon="pi pi-external-link" />
+        </a>
+      </template>
+    </Dialog>
+
+    <Dialog 
       v-model:visible="isPreviewVisible" 
       modal 
       header="比赛报名情况预览" 
@@ -257,10 +326,20 @@ onMounted(fetchGamesList);
            <Message severity="error" :closable="false">{{ previewData.error }}</Message>
         </div>
         <div v-else>
-          <div class="preview-summary p-3 mb-4 surface-100 border-round">
-            <p><strong>比赛名称:</strong> {{ previewData.competitionName }}</p>
-            <p><strong>报名截止时间:</strong> {{ new Date(previewData.endTime).toLocaleString() }}</p>
-            <p><strong>负责人联系方式:</strong> {{ previewData.leaderPhone }}</p>
+          <div class="preview-summary p-3 mb-4 surface-100 border-round flex justify-content-between align-items-start">
+            <div>
+              <p><strong>比赛名称:</strong> {{ previewData.competitionName }}</p>
+              <p><strong>报名截止时间:</strong> {{ new Date(previewData.endTime).toLocaleString() }}</p>
+              <p><strong>负责人联系方式:</strong> {{ previewData.leaderPhone }}</p>
+            </div>
+            <div>
+              <Button 
+                label="导出此预览" 
+                icon="pi pi-download" 
+                class="p-button-sm"
+                @click="exportData(currentGame)"
+              />
+            </div>
           </div>
           <DataTable :value="previewData.athleteDetail" responsiveLayout="scroll">
             <Column field="athleteName" header="姓名"></Column>
@@ -286,5 +365,13 @@ onMounted(fetchGamesList);
 /* 展开行的内容样式 */
 .expansion-content {
   background-color: var(--p-surface-100);
+}
+
+/* 分享链接的预览区域文字自动换行 */
+.share-link-text p {
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 </style>
