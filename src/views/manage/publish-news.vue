@@ -5,50 +5,78 @@ import { useAlert } from '@/composables/useAlert';
 
 // --- 2. 初始化 ---
 const { alerts, asyncAlert } = useAlert();
-const editorRef = ref(null);
 
-// --- 3. 状态定义 (保持不变) ---
+// --- 3. 状态定义 ---
 const title = ref('');
-const content = ref('');
+const contentBlocks = ref([
+  { type: 'text', data: '' } // 默认始于一个空的文本块
+]);
 const isSaving = ref(false);
 const isPublishing = ref(false);
+
+// 弹窗状态
 let autosaveInterval = null;
 const isImageDialogVisible = ref(false);
 const isVideoDialogVisible = ref(false);
-let cursorIndex = 0;
+const editingBlockIndex = ref(-1);
 
-// --- 4. 编辑器定制 (保持不变) ---
-const customImageHandler = () => {
-  const quill = editorRef.value.quill;
-  cursorIndex = quill.getSelection(true).index;
+// --- 4. 编辑器定制 ---
+
+// 添加一个新的文本块
+const addTextBlock = () => {
+  contentBlocks.value.push({ type: 'text', data: '' });
+};
+
+const addImageBlock = () => {
+  contentBlocks.value.push({ type: 'image', data: '' });
+};
+
+const addVideoBlock = () => {
+  contentBlocks.value.push({ type: 'video', data: '', imgUrl: '' });
+}
+
+// 打开图片上传弹窗
+const openImageDialog = (index) => {
+  editingBlockIndex.value = index;
   isImageDialogVisible.value = true;
 };
 
-const customVideoHandler = () => {
-  const quill = editorRef.value.quill;
-  cursorIndex = quill.getSelection(true).index;
+// 打开视频上传弹窗
+const openVideoDialog = (index) => {
+  editingBlockIndex.value = index;
   isVideoDialogVisible.value = true;
 };
 
-// 自定义媒体处理函数
-const handleImageUpload = (file) => {
-  console.log('开始上传图片:', file);
-  const imageUrl = 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg';
+// 删除一个块
+const deleteBlock = (index) => {
+  contentBlocks.value.splice(index, 1);
+};
 
-  // 获取 Quill 实例
-  const quill = editorRef.value.quill
-  quill.insertEmbed(cursorIndex, 'image', imageUrl);
+// --- 5. 自定义媒体处理函数 ---
+const handleImageUpload = (file) => {
+  console.log('开始上传图片:', file, '目标块索引:', editingBlockIndex.value);
+  // 【预留逻辑】在这里调用您的 fetch 函数上传图片
+  // 假设上传成功后，后端返回了图片的 URL
+  const imageUrl = 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg'; // 模拟URL
+
+  // 将 URL 更新到对应的块中
+  if (editingBlockIndex.value !== -1) {
+    contentBlocks.value[editingBlockIndex.value].data = imageUrl;
+  }
   isImageDialogVisible.value = false;
-  alerts('成功', '图片插入成功', {icon: 'pi pi-check-circle'});
 };
 
 const handleVideoUpload = (videoFile, previewFile) => {
-  console.log('开始上传视频:', videoFile, '预览图:', previewFile);
-  const videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
-  const quill = editorRef.value.quill;
-  quill.insertEmbed(cursorIndex, 'video', videoUrl);
+  console.log('开始上传视频:', videoFile, '预览图:', previewFile, '目标块索引:', editingBlockIndex.value);
+  // 【预留逻辑】在这里调用您的 fetch 函数上传视频和预览图
+  const videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4'; // 模拟URL
+  const previewUrl = 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg'; // 模拟URL
+
+  if (editingBlockIndex.value !== -1) {
+    contentBlocks.value[editingBlockIndex.value].data = videoUrl;
+    contentBlocks.value[editingBlockIndex.value].imgUrl = previewUrl;
+  }
   isVideoDialogVisible.value = false;
-  alerts('成功', '视频插入成功', {icon: 'pi pi-check-circle'});
 };
 
 // 草稿管理
@@ -57,7 +85,7 @@ const saveDraft = () => {
   isSaving.value = true;
   const draft = {
     title: title.value,
-    content: content.value,
+    content: contentBlocks.value,
     savedAt: new Date().toISOString()
   };
   localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
@@ -85,7 +113,7 @@ const loadDraft = () => {
     })
   .then(() => {
     title.value = draft.title;
-    content.value = draft.content;
+    contentBlocks.value = draft.content;
     alerts('成功', '草稿已恢复', {icon: 'pi pi-check-circle'});
   })
   .catch(() => {
@@ -101,7 +129,7 @@ const clearDraft = () => {
 
 // 发布新闻
 const publishNews = async () => {
-  if (!title.value || content.value.length < 20) {
+  if (!title.value || contentBlocks.value) {
     alerts('无法发布', '请填写标题和至少一些内容', {icon: 'pi pi-exclamation-triangle'});
     return;
   }
@@ -112,7 +140,7 @@ const publishNews = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     alerts('发布成功', '新闻已成功发布！', {icon: 'pi pi-check-circle'});
     title.value = '';
-    content.value = '';
+    contentBlocks.value = [];
     clearDraft();
   } catch (e) {
     alerts('发布失败', e.message, {icon: 'pi pi-times-circle'});
@@ -121,21 +149,19 @@ const publishNews = async () => {
   }
 };
 
-// --- 6. 生命周期钩子 (保持不变) ---
+// --- 一些ui上的细节 --- 
+const handleTextareaInput = (event) => {
+  const textarea = event.target;
+  // 1. 先将高度重置为'auto'，让浏览器重新计算scrollHeight的最小值
+  textarea.style.height = 'auto';
+  // 2. 然后将高度设置为当前内容所需的实际高度
+  textarea.style.height = `${textarea.scrollHeight}px`;
+};
+
+// --- 6. 生命周期钩子 ---
 onMounted(() => {
   loadDraft();
   autosaveInterval = setInterval(saveDraft, 3 * 60 * 1000);
-
-  // 需要等待下一个tick，确保编辑器已经渲染完成
-  setTimeout(() => {
-    const quill = editorRef.value.quill;
-    const toolbar = quill.getModule('toolbar');
-    if (toolbar) {
-      toolbar.addHandler('image', customImageHandler);
-      toolbar.addHandler('video', customVideoHandler);
-      console.log('成功设置自定义处理器');
-    }
-  }, 500);
 });
 
 onBeforeUnmount(() => {
@@ -176,36 +202,104 @@ onBeforeUnmount(() => {
       class="title-input w-full p-3 mb-4 text-2xl" 
     />
 
-    <Editor v-model="content" editorStyle="height: 450px" ref="editorRef">
-      <template #toolbar>
-        <span class="ql-formats">
-          <button class="ql-bold"></button>
-          <button class="ql-italic"></button>
-          <button class="ql-underline"></button>
-        </span>
-        <span class="ql-formats">
-          <button class="ql-list" value="ordered"></button>
-          <button class="ql-list" value="bullet"></button>
-        </span>
-        <span class="ql-formats">
-          <select class="ql-align"></select>
-        </span>
-        <span class="ql-formats">
-          <button class="ql-link"></button>
-          <button class="ql-image"></button>
-          <button class="ql-video"></button>
-        </span>
-      </template>
-    </Editor>
+    <div class="block-editor">
+      <div 
+        v-for="(block, index) in contentBlocks" 
+        :key="index" 
+        class="block-item"
+      >
+        <div class="block-actions">
+          <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="deleteBlock(index)" />
+        </div>
 
-    <Dialog v-model:visible="isImageDialogVisible" modal header="插入图片">
-      <p>请选择要上传的图片：</p>
-      <Button label="模拟上传并插入" @click="handleImageUpload('mock_file.jpg')" />
+        <Textarea 
+          v-if="block.type === 'text'" 
+          v-model="block.data" 
+          autoResize 
+          class="w-full text-block" 
+          placeholder="请输入正文..."
+          @input="handleTextareaInput"
+        />
+        
+        <div v-else-if="block.type === 'image'" class="media-block" @click="openImageDialog(index)">
+          <img v-if="block.data" :src="block.data" alt="已插入图片" />
+          <div v-else class="placeholder">
+            <i class="pi pi-image"></i>
+            <span>点击上传图片</span>
+          </div>
+        </div>
+
+        <div v-else-if="block.type === 'video'" class="media-block" @click="openVideoDialog(index)">
+          <video v-if="block.data" :src="block.data" :poster="block.imgUrl" controls></video>
+          <div v-else class="placeholder">
+            <i class="pi pi-video"></i>
+            <span>点击上传视频</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="add-block-actions mt-4">
+        <Divider align="left">
+          <span class="text-color-secondary">添加内容</span>
+        </Divider>
+        <div class="flex gap-2">
+          <Button label="文本" icon="pi pi-align-left" @click="addTextBlock" class="p-button-outlined" />
+          <Button label="图片" icon="pi pi-image" @click="addImageBlock" class="p-button-outlined" />
+          <Button label="视频" icon="pi pi-video" @click="addVideoBlock" class="p-button-outlined" />
+        </div>
+      </div>
+    </div>
+
+    <Dialog v-model:visible="isImageDialogVisible" modal header="插入图片" :style="{ width: '50rem' }">
+      <FileUpload 
+        name="image" 
+        @uploader="handleImageUpload" 
+        :customUpload="true" 
+        accept="image/*" 
+        :maxFileSize="5000000"
+        chooseLabel="选择图片"
+        uploadLabel="上传"
+        :showCancelButton="false"
+      >
+        <template #empty>
+          <div class="flex align-items-center justify-content-center flex-column">
+            <i class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400" />
+            <p class="mt-4 mb-0">将文件拖拽到此处上传</p>
+          </div>
+        </template>
+      </FileUpload>
     </Dialog>
 
-    <Dialog v-model:visible="isVideoDialogVisible" modal header="插入视频">
-      <p>请选择视频和预览图：</p>
-      <Button label="模拟上传并插入" @click="handleVideoUpload('mock_video.mp4', 'mock_preview.jpg')" />
+    <Dialog v-model:visible="isVideoDialogVisible" modal header="插入视频" :style="{ width: '50rem' }">
+      <div class="grid formgrid">
+        <div class="col-12 field">
+          <label>第一步：上传视频文件</label>
+          <FileUpload 
+            name="video" 
+            :customUpload="true" 
+            accept="video/*" 
+            chooseLabel="选择视频" 
+            uploadLabel="上传"
+            :showCancelButton="false"
+          />
+        </div>
+        <div class="col-12 field">
+          <label>第二步：上传视频封面</label>
+          <FileUpload 
+            name="preview" 
+            :customUpload="true" 
+            accept="image/*" 
+            chooseLabel="选择图片" 
+            uploadLabel="上传"
+            :showCancelButton="false"
+          />
+        </div>
+      </div>
+       <template #footer>
+        <Button label="取消" @click="isVideoDialogVisible=false" class="p-button-text" />
+        <Button label="确认插入" @click="handleVideoUpload('mock_video.mp4', 'mock_preview.jpg')" />
+      </template>
     </Dialog>
   </div>
 </template>
@@ -224,14 +318,81 @@ onBeforeUnmount(() => {
   border-bottom-color: var(--p-primary-color);
 }
 
-/* 编辑器默认字体设置 */
-:deep(.ql-editor) {
-  /*font-family: '宋体', 'SimSun', serif;  默认字体为宋体 */
-  font-size: 1.1rem; /* 默认字号 */
+/* 块编辑器容器 */
+.block-editor {
+  border: 1px solid var(--p-surface-border);
+  border-radius: 6px;
+  padding: 1rem;
 }
 
-/* 确保 p-fluid 表单样式能正确应用 */
-.field {
+/* 每个内容块的样式 */
+.block-item {
+  position: relative;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.block-item:hover {
+  border-color: var(--p-primary-color);
+}
+.block-item:hover .block-actions {
+  opacity: 1;
+}
+
+/* 块操作按钮 (删除、移动) */
+.block-actions {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  background-color: var(--p-surface-card);
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 文本块 (Textarea) 样式 */
+.text-block {
+  /*font-family: '宋体', 'SimSun', serif;*/
+  font-size: 1.1rem;
+  line-height: 1.8;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+/* 媒体块 (图片/视频) 样式 */
+.media-block {
+  width: 100%;
+  min-height: 200px;
+  background-color: var(--p-surface-100);
+  border: 2px dashed var(--p-surface-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+.media-block:hover {
+  border-color: var(--p-primary-color);
+}
+.media-block img,
+.media-block video {
+  max-width: 100%;
+  max-height: 500px;
+  display: block;
+}
+.media-block .placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--p-text-color-secondary);
+}
+.media-block .placeholder i {
+  font-size: 3rem;
   margin-bottom: 1rem;
 }
 </style>
