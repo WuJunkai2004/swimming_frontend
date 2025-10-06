@@ -159,7 +159,7 @@ const exportData = async (game) => {
     if (!response.ok) {
       throw new Error('导出失败，服务器返回错误');
     }
-    
+
     // 1. 将返回的二进制流转换为 Blob 对象
     const blob = await response.blob();
     // 2. 从响应头中获取文件名 (如果后端设置了的话)
@@ -172,7 +172,7 @@ const exportData = async (game) => {
         filename = matches[1].replace(/['"]/g, '');
       }
     }
-    
+
     // 3. 创建一个隐藏的 <a> 标签来触发下载
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -196,7 +196,7 @@ onMounted(fetchGamesList);
 
 <template>
   <div class="p-4 surface-card shadow-2 border-round">
-    
+
     <div class="flex justify-content-between align-items-center mb-4">
       <h1 class="text-3xl font-bold m-0">比赛管理</h1>
       <Button 
@@ -238,9 +238,9 @@ onMounted(fetchGamesList);
         responsiveLayout="scroll"
       >
         <Column :expander="true" style="width: 3rem" />
-        
+
         <Column field="Name" header="比赛名称"></Column>
-        
+
         <Column header="操作" style="width: 12rem">
           <template #body="slotProps">
             <div class="flex gap-2">

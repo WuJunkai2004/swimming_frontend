@@ -238,7 +238,7 @@ onMounted(fetchAthletesList);
 
 <template>
   <div class="p-4 surface-card shadow-2 border-round">
-    
+
     <div class="flex justify-content-between align-items-center mb-4">
       <h1 class="text-3xl font-bold m-0">优秀运动员管理</h1>
       <Button label="新增运动员" icon="pi pi-plus" @click="openAddDialog" />
@@ -257,7 +257,7 @@ onMounted(fetchAthletesList);
       <div v-else-if="error">
         <Message severity="error" :closable="false">{{ error }}</Message>
       </div>
-      
+
       <DataTable v-else :value="athletesList" responsiveLayout="scroll">
         <Column field="name" header="姓名"></Column>
         <Column header="操作" style="width: 10rem">
@@ -282,7 +282,7 @@ onMounted(fetchAthletesList);
       <div v-if="isDialogLoading" class="flex justify-content-center p-5">
         <ProgressSpinner />
       </div>
-      
+
       <div v-else class="grid formgrid p-fluid">
         <div class="col-12 md:col-4 flex flex-column align-items-center">
           <Avatar 

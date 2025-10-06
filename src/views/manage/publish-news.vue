@@ -175,7 +175,7 @@ onBeforeUnmount(() => {
       placeholder="请输入新闻标题..." 
       class="title-input w-full p-3 mb-4 text-2xl" 
     />
-    
+
     <Editor v-model="content" editorStyle="height: 450px" ref="editorRef">
       <template #toolbar>
         <span class="ql-formats">

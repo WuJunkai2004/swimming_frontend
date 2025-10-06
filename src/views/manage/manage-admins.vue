@@ -232,7 +232,7 @@ onMounted(fetchAdminsList);
 
 <template>
   <div class="p-4 surface-card shadow-2 border-round">
-    
+
     <div class="flex justify-content-between align-items-center mb-4">
       <h1 class="text-3xl font-bold m-0">管理员管理</h1>
       <Button label="新增管理员" icon="pi pi-plus" @click="openAddDialog" />
@@ -251,7 +251,7 @@ onMounted(fetchAdminsList);
       <div v-else-if="error">
         <Message severity="error" :closable="false">{{ error }}</Message>
       </div>
-      
+
       <DataTable v-else :value="adminsList" responsiveLayout="scroll">
         <Column field="userName" header="姓名"></Column>
         <Column header="操作" style="width: 10rem">
@@ -276,7 +276,7 @@ onMounted(fetchAdminsList);
       <div v-if="isDialogLoading" class="flex justify-content-center p-5">
         <ProgressSpinner />
       </div>
-      
+
       <div v-else class="grid formgrid p-fluid">
         <div class="col-12 md:col-8">
           <div class="field">
