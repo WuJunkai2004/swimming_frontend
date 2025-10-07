@@ -5,8 +5,7 @@ import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
 
 const router = useRouter();
-const { alerts, awaitAlert } = useAlert();
-
+const { alerts, asyncAlert } = useAlert();
 const { getToken } = useToken();
 
 // 响应式状态定义

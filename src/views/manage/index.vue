@@ -1,12 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, shallowRef } from 'vue';
-import { useRouter } from 'vue-router';
 import { useToken } from '@/composables/useToken'
 
 import no_page from '@/views/manage/no-page.vue';
 
 // --- 2. 鉴权与导航 ---
-const router = useRouter();
 const { getToken, removeToken } = useToken();
 
 /**
