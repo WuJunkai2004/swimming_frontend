@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
+import { uploadImage } from '@/composables/uploads';
 
 const { getToken } = useToken(); // 获取 Token 的函数
 const { alerts, awaitAlert } = useAlert(); // 弹窗提示服务
@@ -59,16 +60,7 @@ const handleAvatarUpload = async (event) => {
   }
   // 开始上传，显示加载状态
   isDialogLoading.value = true; 
-  // 1. 创建一个 FormData 对象来构建请求体
-  const formData = new FormData();
-  formData.append('token', getToken());
-  formData.append('title', '用户头像')
-  formData.append('content', file);
-  // 4. 执行您自己的 fetch 请求
-  fetch('/admin/uploadImage', {
-    method: 'POST',
-    body: formData,
-  })
+  uploadImage(getToken, '用户头像', file)
   .then(response => response.json())
   .then(result => {
     if(result.statusCode === 200){
