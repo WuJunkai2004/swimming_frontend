@@ -2,9 +2,12 @@
 // --- 1. 核心依赖导入 ---
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useAlert } from '@/composables/useAlert';
+import { useToken } from '@/composables/useToken';
+import { uploadImage, uploadVideo } from '@/composables/uploads'
 
 // --- 2. 初始化 ---
 const { alerts, asyncAlert } = useAlert();
+const { getToken } = useToken();
 
 // --- 3. 状态定义 ---
 const title = ref('');
@@ -54,28 +57,51 @@ const deleteBlock = (index) => {
 
 // --- 5. 自定义媒体处理函数 ---
 const handleImageUpload = (file) => {
-  console.log('开始上传图片:', file, '目标块索引:', editingBlockIndex.value);
-  // 【预留逻辑】在这里调用您的 fetch 函数上传图片
-  // 假设上传成功后，后端返回了图片的 URL
-  const imageUrl = 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg'; // 模拟URL
-
-  // 将 URL 更新到对应的块中
-  if (editingBlockIndex.value !== -1) {
-    contentBlocks.value[editingBlockIndex.value].data = imageUrl;
+  const editing = editingBlockIndex.value;
+  if(editing === -1 || contentBlocks.value[editing].type !== 'image'){
+    alerts('错误', '当前没有选中的图片块', {icon: 'pi pi-times-circle'});
+    return;
   }
-  isImageDialogVisible.value = false;
+  console.log('开始上传图片:', file, '目标块索引:', editingBlockIndex.value);
+  uploadImage(getToken(), '新闻图片', file)
+  .then(response => response.json())
+  .then(result => {
+    if(result.statusCode === 200){
+      contentBlocks.value[editing].data = result.data;
+    } else {
+      alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
+    }
+  })
+  .catch(err => {
+    alerts('上传失败', err.message, {icon: 'pi pi-times-circle'});
+  })
+  .finally(() => {
+    isImageDialogVisible.value = false;
+  });
 };
 
-const handleVideoUpload = (videoFile, previewFile) => {
-  console.log('开始上传视频:', videoFile, '预览图:', previewFile, '目标块索引:', editingBlockIndex.value);
-  // 【预留逻辑】在这里调用您的 fetch 函数上传视频和预览图
-  const videoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4'; // 模拟URL
-  const previewUrl = 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg'; // 模拟URL
-
-  if (editingBlockIndex.value !== -1) {
-    contentBlocks.value[editingBlockIndex.value].data = videoUrl;
-    contentBlocks.value[editingBlockIndex.value].imgUrl = previewUrl;
+const handleVideoUpload = async (videoFile, previewFile) => {
+  const editing = editingBlockIndex.value;
+  if(editing === -1 || contentBlocks.value[editing].type !== 'video'){
+    alerts('错误', '当前没有选中的视频块', {icon: 'pi pi-times-circle'});
+    return;
   }
+  console.log('开始上传视频:', videoFile, '预览图:', previewFile, '目标块索引:', editingBlockIndex.value);
+  // 先上传图片再上传视频
+  const imageResponse = await uploadImage(getToken(), '视频封面', previewFile);
+  const imageResult   = await imageResponse.json();
+  if(imageResult.statusCode !== 200){
+    alerts('上传失败', `视频封面上传失败, 停止上传。\n${imageResult.message}`, {icon: 'pi pi-times-circle'});
+    return;
+  }
+  const videoResponse = await uploadVideo(getToken(), '新闻视频', videoFile,);
+  const videoResult   = await videoResponse.json();
+  if(videoResult.statusCode !== 200){
+    alerts('上传失败', `视频上传失败, 停止上传。\n${videoResult.message}`, {icon: 'pi pi-times-circle'});
+    return; 
+  }
+  contentBlocks.value[editing].data   = videoResult.data;
+  contentBlocks.value[editing].imgUrl = imageResult.data;
   isVideoDialogVisible.value = false;
 };
 
@@ -130,23 +156,47 @@ const clearDraft = () => {
 // 发布新闻
 const publishNews = async () => {
   if (!title.value || contentBlocks.value) {
-    alerts('无法发布', '请填写标题和至少一些内容', {icon: 'pi pi-exclamation-triangle'});
+    alerts('无法发布', '请填写标题和一些内容', {icon: 'pi pi-exclamation-triangle'});
     return;
   }
-
   isPublishing.value = true;
   console.log('准备发布新闻:', { title: title.value, content: content.value });
-  try {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    alerts('发布成功', '新闻已成功发布！', {icon: 'pi pi-check-circle'});
-    title.value = '';
-    contentBlocks.value = [];
-    clearDraft();
-  } catch (e) {
-    alerts('发布失败', e.message, {icon: 'pi pi-times-circle'});
-  } finally {
+  fetch('/admin/uploadNews', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      token: getToken(),
+      title: title.value,
+      content: contentBlocks.value
+    })
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.statusCode === 200) {
+      title.value = '';
+      contentBlocks.value = [];
+      clearDraft();
+      asyncAlert('恭喜', '新闻发布成功！', {
+        icon: 'pi pi-check-circle',
+        accept: '查看新闻',
+        reject: '关闭'
+      })
+      .then(() => {
+        window.open(`/activity/${result.id}`, '_blank');
+      })
+      .catch(() => {});
+    } else {
+      alerts('发布失败', result.message, {icon: 'pi pi-times-circle'});
+    }
+  })
+  .catch(err => {
+    alerts('发布失败', err.message, {icon: 'pi pi-times-circle'});
+  })
+  .finally(() => {
     isPublishing.value = false;
-  }
+  });
 };
 
 // --- 一些ui上的细节 --- 
