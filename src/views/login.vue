@@ -2,10 +2,8 @@
 import { ref } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
+import { SHA256 } from '@/composables/useHash';
 import { useRouter } from 'vue-router'
-
-import sha256 from 'crypto-js/sha256';
-import encHex from 'crypto-js/enc-hex';
 
 const { setToken } = useToken();
 const { alerts } = useAlert();
@@ -22,7 +20,7 @@ const focusPasswordInput = () => {
 };
 
 // 登录按钮的点击事件处理函数
-const handleLogin = () => {
+const handleLogin = async () => {
   if(!username.value) {
     alerts('警告', '请输入用户名');
     return;
@@ -32,7 +30,7 @@ const handleLogin = () => {
   }
 
   is_loginning.value = true;
-  const pw_sha = sha256(password.value).toString(encHex);
+  const pw_sha = await SHA256(password.value);
   fetch('/admin/login', {
     method: 'POST',
     headers: {

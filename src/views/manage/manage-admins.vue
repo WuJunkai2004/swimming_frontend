@@ -2,9 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
-
-import sha256 from 'crypto-js/sha256';
-import encHex from 'crypto-js/enc-hex';
+import { SHA256 } from '@/composables/useHash';
 
 const { getToken } = useToken(); // 获取 Token 的函数
 const { alerts, awaitAlert } = useAlert(); // 弹窗提示服务
@@ -99,7 +97,7 @@ const fetchAdminsList = async () => {
 
 // 新增管理员
 const addAdmin = async () => {
-  const pw_sha = sha256(formPassword.value).toString(encHex);
+  const pw_sha = await SHA256(formPassword.value);
   const response = await fetch('/admin/addAdmin', {
     method: 'POST',
     headers: {
@@ -122,7 +120,7 @@ const addAdmin = async () => {
 
 // 更新管理员信息
 const updateAdmin = async () => {
-  const pw_sha = sha256(formPassword.value).toString(encHex);
+  const pw_sha = await SHA256(formPassword.value);
   const response = await fetch('/admin/updateAdmin', {
     method: 'POST',
     headers: {
