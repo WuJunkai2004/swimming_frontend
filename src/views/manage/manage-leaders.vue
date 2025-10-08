@@ -299,19 +299,19 @@ onMounted(fetchLeadersList);
         </div>
         <div class="col-12 md:col-8">
           <div class="field">
-            <label for="name">姓名 </label>
+            <label>姓名 </label>
             <InputText id="name"  class="w-full" v-model="formName" />
           </div>
           <div class="field">
-            <label for="age">年龄 </label>
+            <label>年龄 </label>
             <InputNumber id="age" class="w-full" v-model="formAge" />
           </div>
           <div class="field">
-            <label for="position">职位 </label>
+            <label>职位 </label>
             <InputText id="position" class="w-full" v-model="formPosition" />
           </div>
           <div class="field">
-            <label for="introduction">介绍</label>
+            <label>介绍</label>
             <Textarea 
               id="introduction" 
               v-model="formIntroduction" 

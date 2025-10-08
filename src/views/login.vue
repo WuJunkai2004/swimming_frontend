@@ -95,7 +95,7 @@ const goToHome = () => {
                   @keydown.enter.prevent="focusPasswordInput"
                   :disabled="is_loginning"
                 />
-                <label for="username">用户名</label>
+                <label>用户名</label>
               </div>
 
               <div class="p-float-label">
@@ -109,7 +109,7 @@ const goToHome = () => {
                   toggleMask 
                   @keydown.enter="handleLogin"
                 />
-                <label for="password">密码</label>
+                <label>密码</label>
               </div>
 
               <Button 

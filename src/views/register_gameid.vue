@@ -146,17 +146,17 @@ const handleSubmit = async () => {
             <div v-else class="flex flex-column gap-5">
 
               <div class="step p-float-label">
-                <label for="name" class="step-label">姓名</label>
+                <label class="step-label">姓名</label>
                 <InputText id="name" v-model="name" class="w-full" />
               </div>
 
               <div class="step p-float-label">
-                <label for="academicNumber" class="step-label">学号</label>
+                <label class="step-label">学号</label>
                 <InputNumber id="academicNumber" v-model="academicNumber" class="w-full" :useGrouping="false" />
               </div>
 
               <div class="step p-float-label">
-                <label for="college" class="step-label">学院</label>
+                <label class="step-label">学院</label>
                 <Select
                   id="college"
                   v-model="selectedCollege"
@@ -169,7 +169,7 @@ const handleSubmit = async () => {
               </div>
 
               <div class="step p-float-label">
-                <label for="sport" class="step-label">比赛项目</label>
+                <label class="step-label">比赛项目</label>
                 <Select
                   id="sport"
                   v-model="selectedSport"

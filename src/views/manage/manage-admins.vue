@@ -278,7 +278,7 @@ onMounted(fetchAdminsList);
       <div v-else class="grid formgrid p-fluid">
         <div class="col-12 md:col-8">
           <div class="field">
-            <label for="username">管理员用户名 </label>
+            <label>管理员用户名 </label>
             <InputText 
               id="username" 
               class="w-full" 
@@ -286,7 +286,7 @@ onMounted(fetchAdminsList);
             />
           </div>
           <div class="field">
-            <label for="password">管理员新密码 </label>
+            <label>管理员新密码 </label>
             <Password 
               id="password" 
               class="w-full" 

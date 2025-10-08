@@ -176,7 +176,7 @@ onMounted(fetchNews);
 
       <div class="flex align-items-center">
         <ToggleSwitch v-model="showDeleted" inputId="showDeletedSwitch" />
-        <label for="showDeletedSwitch" class="ml-2 font-semibold">显示已删除新闻</label>
+        <label class="ml-2 font-semibold">显示已删除新闻</label>
       </div>
 
       <div class="pagination-controls flex align-items-center">
