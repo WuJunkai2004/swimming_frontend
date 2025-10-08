@@ -1,0 +1,48 @@
+name: Deploy to Vercel on Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'public/VERSION.txt' # 仅当 VERSION.txt 文件发生变化时触发
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 步骤 1: 检出您的代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 步骤 2: 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' # 指定 Node.js 版本
+
+      # 步骤 3: 设置 Python 环境
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' # 指定 Python 版本
+
+      # 步骤 4: 安装项目依赖
+      - name: Install dependencies
+        run: npm install
+
+      # 步骤 5: 我们将从 GitHub Secrets 中读取后端 URL 并作为环境变量传入
+      - name: Generate vercel.json
+        env:
+          BACKEND_URL: ${{ secrets.PREVIEW_BACKEND_URL }}
+        run: python3 src/api/generate_vercel.py
+
+      # 步骤 6: 安装 Vercel CLI 并部署
+      - name: Deploy to Vercel
+        # 从 GitHub Secrets 中读取 Vercel 所需的环境变量
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        # Vercel CLI 部署命令
+        run: npx vercel --prod --yes

@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       # 2. 设置 Python 3 环境
-      # generate_api_doc.py 脚本需要 Python 3
+      # generate_apidoc.py 脚本需要 Python 3
       - name: 设置 Python 3
         uses: actions/setup-python@v5
         with:
@@ -27,7 +27,7 @@ jobs:
       # 该脚本会检查项目根目录的 vite.config.js 文件，必须在根目录运行
       # 脚本会将文档输出到 dist/接口文档.auto.md
       - name: 运行 API 文档生成器
-        run: python src/api/generate_api_doc.py
+        run: python src/api/generate_apidoc.py
 
       # 4. 验证生成的文档是否存在
       - name: 检查生成的文件
