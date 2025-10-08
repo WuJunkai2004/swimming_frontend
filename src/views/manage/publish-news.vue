@@ -370,7 +370,7 @@ onBeforeUnmount(() => {
 
 /* 块编辑器容器 */
 .block-editor {
-  border: 1px solid var(--p-surface-border);
+  border: 1px solid var(--p-inputtext-border-color);
   border-radius: 6px;
   padding: 1rem;
 }
@@ -397,7 +397,7 @@ onBeforeUnmount(() => {
   right: -10px;
   opacity: 0;
   transition: opacity 0.2s;
-  background-color: var(--p-surface-card);
+  background-color: var(--p-surface-50);
   border-radius: 50%;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
@@ -418,7 +418,7 @@ onBeforeUnmount(() => {
   width: 100%;
   min-height: 200px;
   background-color: var(--p-surface-100);
-  border: 2px dashed var(--p-surface-border);
+  border: 2px dashed var(--p-inputtext-border-color);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -439,7 +439,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--p-text-color-secondary);
+  color: var(--p-inputtext-color);
 }
 .media-block .placeholder i {
   font-size: 3rem;
