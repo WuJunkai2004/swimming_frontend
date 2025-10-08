@@ -6,16 +6,23 @@
 import os
 import json
 
+print("开始生成 Vercel 配置文件...")
+
 # 判断是否在主目录
 if not os.path.exists('vite.config.js'):
     print("请在项目主目录下运行此脚本")
     exit(1)
+
+# 判断 dist 目录是否存在, 不存在则创建
+if not os.path.exists('dist'):
+    os.makedirs('dist')
 
 # 读取环境变量
 backend_url = os.getenv('BACKEND_URL')
 if not backend_url:
     print("错误：环境变量 BACKEND_URL 未设置。")
     exit(1)
+print(f"使用的后端测试地址: {backend_url}")
 while backend_url.endswith('/'):
     backend_url = backend_url[:-1]
 
@@ -49,5 +56,8 @@ vercel_config["rewrites"].append({
 })
 
 # 写入 vercel.json 文件
-with open('vercel.json', 'w', encoding='utf-8') as f:
+with open('./vercel.json', 'w', encoding='utf-8') as f:
     json.dump(vercel_config, f, indent=2, ensure_ascii=False)
+
+# 输出结果
+print("成功生成 vercel.json 文件")

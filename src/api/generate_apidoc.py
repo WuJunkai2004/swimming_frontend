@@ -6,6 +6,8 @@
 import os
 import json
 
+print("开始生成 API 接口文档...")
+
 # 判断是否在主目录
 if not os.path.exists('vite.config.js'):
     print("请在项目主目录下运行此脚本")
@@ -90,3 +92,6 @@ for api in data_list:
 output_path = os.path.join('dist', './接口文档.auto.md')
 with open(output_path, 'w', encoding='utf-8') as f:
     f.write('\n'.join(markdown_content))
+
+# 输出结果
+print(f"成功生成 API 接口文档: {output_path}")

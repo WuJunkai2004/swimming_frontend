@@ -1,11 +1,7 @@
-name: Deploy to Vercel on Release
+name: 在 Vercel 上部署预览版本
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'public/VERSION.txt' # 仅当 VERSION.txt 文件发生变化时触发
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -34,7 +30,7 @@ jobs:
       # 步骤 5: 我们将从 GitHub Secrets 中读取后端 URL 并作为环境变量传入
       - name: Generate vercel.json
         env:
-          BACKEND_URL: ${{ secrets.PREVIEW_BACKEND_URL }}
+          BACKEND_URL: ${{ vars.PREVIEW_BACKEND_URL }}
         run: python3 src/api/generate_vercel.py
 
       # 步骤 6: 安装 Vercel CLI 并部署
@@ -45,4 +41,4 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         # Vercel CLI 部署命令
-        run: npx vercel --prod --yes
+        run: npx vercel --prod --token=$VERCEL_TOKEN
