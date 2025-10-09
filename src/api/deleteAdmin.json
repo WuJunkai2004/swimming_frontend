@@ -3,7 +3,7 @@
     "description": "删除管理员",
     "params": {
         "token": "鉴权token",
-        "adminid": "要删除的管理员ID"
+        "adminId": "要删除的管理员ID"
     },
     "method": ["POST"],
     "response": {

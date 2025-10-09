@@ -3,11 +3,13 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useAlert } from '@/composables/useAlert';
 import { useToken } from '@/composables/useToken';
-import { uploadImage, uploadVideo } from '@/composables/uploads'
+import { uploadImage, uploadVideo } from '@/composables/uploads';
+import { useRouter } from 'vue-router';
 
 // --- 2. 初始化 ---
 const { alerts, asyncAlert } = useAlert();
 const { getToken } = useToken();
+const router = useRouter();
 
 // --- 3. 状态定义 ---
 const title = ref('');
@@ -155,12 +157,23 @@ const clearDraft = () => {
 
 // 发布新闻
 const publishNews = async () => {
-  if (!title.value || contentBlocks.value) {
+  const isContentEmpty = () => {
+    return contentBlocks.value.every(block => {
+      if (block.type === 'text') {
+        return !block.data.trim();
+      }
+      if (block.type === 'image' || block.type === 'video') {
+        return !block.data;
+      }
+      return true;
+    });
+  }
+  if (!title.value || isContentEmpty()) {
     alerts('无法发布', '请填写标题和一些内容', {icon: 'pi pi-exclamation-triangle'});
     return;
   }
   isPublishing.value = true;
-  console.log('准备发布新闻:', { title: title.value, content: content.value });
+  console.log('准备发布新闻:', { title: title.value, content: contentBlocks.value });
   fetch('/admin/uploadNews', {
     method: 'POST',
     headers: {
@@ -184,7 +197,7 @@ const publishNews = async () => {
         reject: '关闭'
       })
       .then(() => {
-        window.open(`/activity/${result.id}`, '_blank');
+        router.push(`/activity/${result.data}`);
       })
       .catch(() => {});
     } else {
@@ -404,7 +417,6 @@ onBeforeUnmount(() => {
 
 /* 文本块 (Textarea) 样式 */
 .text-block {
-  /*font-family: '宋体', 'SimSun', serif;*/
   font-size: 1.1rem;
   line-height: 1.8;
   border: none !important;

@@ -112,6 +112,7 @@ const addExcellence = async () => {
     }),
   });
   const result = await response.json();
+  isDialogLoading.value = false;
   if(result.statusCode === 200){
     fetchAthletesList(); // 成功后刷新列表
     return true;

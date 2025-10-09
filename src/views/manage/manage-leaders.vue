@@ -112,6 +112,7 @@ const addLeader = async () => {
     }),
   });
   const result = await response.json();
+  isDialogLoading.value = false;
   if(result.statusCode === 200){
     fetchLeadersList(); // 成功后刷新列表
     return true;

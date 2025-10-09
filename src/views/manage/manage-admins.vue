@@ -151,7 +151,7 @@ const deleteAdmin = async (id) => {
     },
     body: JSON.stringify({
       token: getToken(),
-      id: id,
+      adminId: id,
     }),
   });
   const result = await response.json();
