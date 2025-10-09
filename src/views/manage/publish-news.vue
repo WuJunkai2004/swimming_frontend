@@ -199,7 +199,9 @@ const publishNews = async () => {
       .then(() => {
         router.push(`/activity/${result.data}`);
       })
-      .catch(() => {});
+      .catch(() => {
+        error.value = '网络错误，请稍后重试';
+      });
     } else {
       alerts('发布失败', result.message, {icon: 'pi pi-times-circle'});
     }

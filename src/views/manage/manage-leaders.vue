@@ -40,7 +40,7 @@ const fetchLeadersList = async () => {
     if(data.statusCode === 200){
       leadersList.value = data.data;
     } else {
-      error.value = data.message;
+      error.value = data.message || '无法加载领导列表，请稍后重试';
     }
   })
   .finally(() => {

@@ -87,7 +87,7 @@ const fetchAdminsList = async () => {
     if(data.statusCode === 200){
       adminsList.value = data.data;
     } else {
-      error.value = data.message;
+      error.value = data.message || '无法加载管理员列表，请稍后重试';
     }
   })
   .finally(() => {

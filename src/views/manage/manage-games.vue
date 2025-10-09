@@ -71,10 +71,12 @@ const fetchGamesList = async () => {
         isLoadingDetails: false, // 控制展开后的加载状态
       }));
     } else {
-      error.value = result.message;
+      error.value = result.message || '无法加载比赛列表，请稍后重试'
     }
   })
-  .catch(() => {})
+  .catch(() => {
+    error.value = '网络错误，请稍后重试';
+  })
   .finally(() => {
     isLoading.value = false;
   })

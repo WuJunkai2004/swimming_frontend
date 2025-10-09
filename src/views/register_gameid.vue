@@ -41,7 +41,7 @@ const collegeOptions = ref(
 /**
  * (处理需求 4): 组件挂载时，根据 gameId 获取允许的比赛项目
  */
-const fetchAllowableSports = async () => {
+const fetchGameInfo = async () => {
   isLoading.value = true;
   error.value = null;
   fetch(`/sport/getGameInfo?game=${gameId}`)
@@ -54,17 +54,19 @@ const fetchAllowableSports = async () => {
         value: item.enum  // 提交 Enum
       }));
     } else {
-      error.value = result.message;
+      error.value = result.message || '无法加载赛事信息，请稍后重试';
     }
   })
-  .catch(() => {})
+  .catch(() => {
+    error.value = '网络异常，无法加载赛事信息，请稍后重试';
+  })
   .finally(() => {
     isLoading.value = false;
   });
 };
 
 // 组件挂载后立即执行数据获取
-onMounted(fetchAllowableSports);
+onMounted(fetchGameInfo);
 
 /**
  * (处理需求 5): 提交报名表单
@@ -108,7 +110,9 @@ const handleSubmit = async () => {
       error.value = result.message || '报名失败，请稍后重试';
     }
   })
-  .catch(() => {})
+  .catch(() => {
+    error.value = '网络异常，报名失败，请稍后重试';
+  })
   .finally(() => {
     isSubmitting.value = false;
     if(error.value) {

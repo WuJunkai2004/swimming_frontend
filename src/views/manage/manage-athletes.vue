@@ -40,7 +40,7 @@ const fetchAthletesList = async () => {
     if(data.statusCode === 200){
       athletesList.value = data.data;
     } else {
-      error.value = data.message;
+      error.value = data.message || '无法加载优秀运动员列表，请稍后重试';
     }
   })
   .finally(() => {

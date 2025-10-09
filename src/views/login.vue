@@ -52,8 +52,8 @@ const handleLogin = async () => {
     } else {
       alerts('警告', '登录失败: ' + data.message);
     }
-  }).catch(error =>{
-    console.error('Error:', error);
+  }).catch(e =>{
+    console.error('Error:', e);
     alerts('警告', '登录请求失败，请稍后重试');
   });
 };

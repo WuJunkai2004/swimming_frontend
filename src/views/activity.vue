@@ -37,7 +37,9 @@ const fetchNews = async (page) => {
       error.value = result.message || '获取新闻失败。';
     }
   })
-  .catch(() => {})
+  .catch(() => {
+    error.value = '网络错误，请稍后再试';
+  })
   .finally(() => {
     loadingFirst.value = false;
     loadingMore.value = false;
