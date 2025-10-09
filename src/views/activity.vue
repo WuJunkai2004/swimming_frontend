@@ -84,7 +84,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
+  <div style="overflow-x: hidden;">
     <MobileMenuBar />
     <ComputerMenuBar />
 
@@ -141,9 +141,6 @@ onBeforeUnmount(() => {
 
 <style scoped>
 /* 响应式布局的核心由 PrimeFlex 的 grid 和 col-* 类处理，无需太多自定义 CSS */
-.grid {
-  width: 100%;
-}
 .news-item {
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;

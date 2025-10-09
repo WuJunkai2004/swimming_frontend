@@ -145,6 +145,7 @@ const awards = ref([
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 1rem;
 }
 
 /* 第一部分：Hero Section */

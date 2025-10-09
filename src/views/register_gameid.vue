@@ -119,7 +119,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div>
+  <div style="overflow-x: hidden;">
     <MobileMenuBar />
     <ComputerMenuBar />
 
@@ -200,9 +200,6 @@ const handleSubmit = async () => {
 </template>
 
 <style scoped>
-.grid {
-  width: 100%;
-}
 .hero-section {
   position: relative;
   height: 40vh;

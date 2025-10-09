@@ -73,7 +73,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="page-wrapper">
+  <div style="overflow-x: hidden;">
     <MobileMenuBar />
     <ComputerMenuBar />
 
@@ -167,11 +167,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.page-wrapper {
-  width: 100%; 
-  overflow-x: hidden;
-}
-
 /* 页面标题 */
 .page-header h1 {
   color: var(--p-text-color);
