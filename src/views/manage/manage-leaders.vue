@@ -60,11 +60,11 @@ const handleAvatarUpload = async (event) => {
   }
   // 开始上传，显示加载状态
   isDialogLoading.value = true; 
-  uploadImage(getToken, '用户头像', file)
+  uploadImage(getToken(), file)
   .then(response => response.json())
   .then(result => {
     if(result.statusCode === 200){
-      formImgUrl.value = result.data;
+      formImgUrl.value = result.data.url;
     }
     alerts('提示', result.message);
   })

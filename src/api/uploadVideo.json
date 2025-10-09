@@ -3,16 +3,15 @@
   "description": "管理员发布视频",
   "params": {
     "token": "鉴权token",
-    "title": "视频标题",
-    "content": [
-      "视频数据"
-    ]
+    "file": "视频二进制数据"
   },
   "method": ["POST"],
   "response": {
     "statusCode": 200,
     "message": "成功",
-    "data": null
+    "data": {
+      "url": "视频链接"
+    }
   },
   "fail": {
     "statusCode": 434,

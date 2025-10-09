@@ -65,11 +65,11 @@ const handleImageUpload = (file) => {
     return;
   }
   console.log('开始上传图片:', file, '目标块索引:', editingBlockIndex.value);
-  uploadImage(getToken(), '新闻图片', file)
+  uploadImage(getToken(), file)
   .then(response => response.json())
   .then(result => {
     if(result.statusCode === 200){
-      contentBlocks.value[editing].data = result.data;
+      contentBlocks.value[editing].data = result.data.url;
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
@@ -90,20 +90,20 @@ const handleVideoUpload = async (videoFile, previewFile) => {
   }
   console.log('开始上传视频:', videoFile, '预览图:', previewFile, '目标块索引:', editingBlockIndex.value);
   // 先上传图片再上传视频
-  const imageResponse = await uploadImage(getToken(), '视频封面', previewFile);
+  const imageResponse = await uploadImage(getToken(), previewFile);
   const imageResult   = await imageResponse.json();
   if(imageResult.statusCode !== 200){
     alerts('上传失败', `视频封面上传失败, 停止上传。\n${imageResult.message}`, {icon: 'pi pi-times-circle'});
     return;
   }
-  const videoResponse = await uploadVideo(getToken(), '新闻视频', videoFile,);
+  const videoResponse = await uploadVideo(getToken(), videoFile);
   const videoResult   = await videoResponse.json();
   if(videoResult.statusCode !== 200){
     alerts('上传失败', `视频上传失败, 停止上传。\n${videoResult.message}`, {icon: 'pi pi-times-circle'});
     return; 
   }
-  contentBlocks.value[editing].data   = videoResult.data;
-  contentBlocks.value[editing].imgUrl = imageResult.data;
+  contentBlocks.value[editing].data   = videoResult.data.url;
+  contentBlocks.value[editing].imgUrl = imageResult.data.url;
   isVideoDialogVisible.value = false;
 };
 
