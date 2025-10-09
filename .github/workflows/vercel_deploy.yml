@@ -3,6 +3,9 @@ name: 在 Vercel 上部署预览版本
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

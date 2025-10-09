@@ -7,6 +7,9 @@ on:
     paths:
       - 'src/api/**.json' # 仅当 src/api/ 目录下的 json 文件发生变化时触发
 
+permissions:
+  contents: read
+
 jobs:
   build-and-sync-docs:
     runs-on: ubuntu-latest
