@@ -58,54 +58,95 @@ const deleteBlock = (index) => {
 };
 
 // --- 5. 自定义媒体处理函数 ---
-const handleImageUpload = (file) => {
-  const editing = editingBlockIndex.value;
-  if(editing === -1 || contentBlocks.value[editing].type !== 'image'){
-    alerts('错误', '当前没有选中的图片块', {icon: 'pi pi-times-circle'});
-    return;
+const insertFunction = (type, deal, final) => {
+  return (event) => {
+    const editing = editingBlockIndex.value;
+    if(editing === -1 || contentBlocks.value[editing].type !== type){
+      alerts('错误', `错误的函数调用方式`, {icon: 'pi pi-times-circle'});
+      return;
+    }
+    const file = event.files[0];
+    if(!file){
+      alerts('错误', '未选择文件', {icon: 'pi pi-times-circle'});
+      return;
+    }
+    const handler = {
+      "image": uploadImage,
+      "video": uploadVideo,
+    }[type];
+    handler(getToken(), file)
+    .then(response => response.json())
+    .then(deal)
+    .catch(() => {
+      alerts('上传失败', '网络异常，上传失败', {icon: 'pi pi-times-circle'});
+    })
+    .finally(final);
   }
-  console.log('开始上传图片:', file, '目标块索引:', editingBlockIndex.value);
-  uploadImage(getToken(), file)
-  .then(response => response.json())
-  .then(result => {
+}
+
+const insertImage = insertFunction('image', 
+  (result) => {
     if(result.statusCode === 200){
+      const editing = editingBlockIndex.value;
       contentBlocks.value[editing].data = result.data.url;
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
-  })
-  .catch(err => {
-    alerts('上传失败', err.message, {icon: 'pi pi-times-circle'});
-  })
-  .finally(() => {
+  }, 
+  () => {
     isImageDialogVisible.value = false;
-  });
-};
+  }
+);
 
-const handleVideoUpload = async (videoFile, previewFile) => {
+const insertVideoContent = insertFunction('video', 
+  (result) => {
+    if(result.statusCode === 200){
+      const editing = editingBlockIndex.value;
+      contentBlocks.value[editing].data = result.data.url;
+    } else {
+      alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
+    }
+  }, 
+  () => {
+    // 上传视频后不关闭弹窗，等待封面上传
+  }
+);
+
+const insertVideoPreview = insertFunction('image', 
+  (result) => {
+    if(result.statusCode === 200){
+      const editing = editingBlockIndex.value;
+      contentBlocks.value[editing].imgUrl = result.data.url;
+    } else {
+      alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
+    }
+  }, 
+  () => {
+    // 上传封面后不关闭弹窗，等待用户确认插入
+  }
+);
+
+const insertVideoFinish = async () => {
   const editing = editingBlockIndex.value;
   if(editing === -1 || contentBlocks.value[editing].type !== 'video'){
-    alerts('错误', '当前没有选中的视频块', {icon: 'pi pi-times-circle'});
+    alerts('错误', `错误的函数调用方式`, {icon: 'pi pi-times-circle'});
     return;
   }
-  console.log('开始上传视频:', videoFile, '预览图:', previewFile, '目标块索引:', editingBlockIndex.value);
-  // 先上传图片再上传视频
-  const imageResponse = await uploadImage(getToken(), previewFile);
-  const imageResult   = await imageResponse.json();
-  if(imageResult.statusCode !== 200){
-    alerts('上传失败', `视频封面上传失败, 停止上传。\n${imageResult.message}`, {icon: 'pi pi-times-circle'});
+  if(!contentBlocks.value[editing].data){
+    alerts('错误', '请先上传视频文件', {icon: 'pi pi-times-circle'});
     return;
   }
-  const videoResponse = await uploadVideo(getToken(), videoFile);
-  const videoResult   = await videoResponse.json();
-  if(videoResult.statusCode !== 200){
-    alerts('上传失败', `视频上传失败, 停止上传。\n${videoResult.message}`, {icon: 'pi pi-times-circle'});
-    return; 
+  if(!contentBlocks.value[editing].imgUrl){
+    if(!await awaitAlert('确认插入', '您还未上传封面图，是否继续？', {
+      icon: 'pi pi-exclamation-triangle',
+      accept: '继续插入',
+      reject: '取消'
+    })){
+      return;
+    }
   }
-  contentBlocks.value[editing].data   = videoResult.data.url;
-  contentBlocks.value[editing].imgUrl = imageResult.data.url;
   isVideoDialogVisible.value = false;
-};
+}
 
 // 草稿管理
 const DRAFT_KEY = 'news_draft';
@@ -319,12 +360,13 @@ onBeforeUnmount(() => {
     <Dialog v-model:visible="isImageDialogVisible" modal header="插入图片" :style="{ width: '50rem' }">
       <FileUpload 
         name="image" 
-        @uploader="handleImageUpload" 
+        @uploader="insertImage" 
         :customUpload="true" 
         accept="image/*" 
         :maxFileSize="5000000"
         chooseLabel="选择图片"
-        uploadLabel="上传"
+        :auto="true" 
+        :showUploadButton="false"
         :showCancelButton="false"
       >
         <template #empty>
@@ -339,31 +381,36 @@ onBeforeUnmount(() => {
     <Dialog v-model:visible="isVideoDialogVisible" modal header="插入视频" :style="{ width: '50rem' }">
       <div class="grid formgrid">
         <div class="col-12 field">
-          <label>第一步：上传视频文件</label>
+          <label>上传视频文件</label>
           <FileUpload 
             name="video" 
+            @uploader="insertVideoContent" 
             :customUpload="true" 
             accept="video/*" 
             chooseLabel="选择视频" 
-            uploadLabel="上传"
+            :auto="true" 
+            :showUploadButton="false"
             :showCancelButton="false"
           />
         </div>
         <div class="col-12 field">
-          <label>第二步：上传视频封面</label>
+          <label>上传视频封面</label>
           <FileUpload 
             name="preview" 
+            @uploader="insertVideoPreview" 
             :customUpload="true" 
             accept="image/*" 
-            chooseLabel="选择图片" 
-            uploadLabel="上传"
+            :maxFileSize="5000000"
+            chooseLabel="选择封面图" 
+            :auto="true"
+            :showUploadButton="false"
             :showCancelButton="false"
           />
         </div>
       </div>
        <template #footer>
         <Button label="取消" @click="isVideoDialogVisible=false" class="p-button-text" />
-        <Button label="确认插入" @click="handleVideoUpload('mock_video.mp4', 'mock_preview.jpg')" />
+        <Button label="确认插入" @click="insertVideoFinish" />
       </template>
     </Dialog>
   </div>
