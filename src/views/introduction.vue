@@ -197,12 +197,9 @@ const awards = ref([
 
 
 /* 第二部分：Activities Section */
-.activities-section {
-  background-color: var(--p-surface-ground);
-}
 .feature-card {
   text-align: center;
-  border: 1px solid var(--p-surface-border);
+  border: 1px solid var(--p-card-shadow);
   transition: all 0.3s ease;
 }
 .feature-card:hover {
@@ -217,7 +214,7 @@ const awards = ref([
 
 /* 第三部分：Awards Section */
 .awards-section {
-  background-color: var(--p-surface-section);
+  background-color: var(--p-surface-100);
 }
 .custom-marker {
   display: flex;

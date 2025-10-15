@@ -14,3 +14,4 @@
 --p-inputtext-border-color
 --p-inputtext-color
 --p-button-primary-background
+--p-card-shadow
