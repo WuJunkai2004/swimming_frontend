@@ -26,7 +26,7 @@ const fetchNews = async (page) => {
     loadingMore.value = true;
   }
   error.value = null;
-  fetch(`/activity/getNewsList?page=${currentPage.value}&limit=${limit.value}`)
+  fetch(`/activity/getNewsList?page=${page}&limit=${limit.value}`)
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
@@ -57,6 +57,7 @@ const handleScroll = () => {
   if (scrollTop + clientHeight >= scrollHeight - 50) {
     // 触发加载下一页
     fetchNews(currentPage.value + 1);
+    currentPage.value += 1;
   }
 };
 
