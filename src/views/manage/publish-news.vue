@@ -1,6 +1,6 @@
 <script setup>
 // --- 1. 核心依赖导入 ---
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useAlert } from '@/composables/useAlert';
 import { useToken } from '@/composables/useToken';
 import { uploadImage, uploadVideo } from '@/composables/uploads';
@@ -26,6 +26,13 @@ const isVideoDialogVisible = ref(false);
 const editingBlockIndex = ref(-1);
 
 // --- 4. 编辑器定制 ---
+
+// 限制插入视频数量，最多1个
+const maxVideoBlocks = 1;
+const canAddVideoBlock = computed(() => {
+  const videoCount = contentBlocks.value.filter(block => block.type === 'video').length;
+  return videoCount < maxVideoBlocks;
+});
 
 // 添加一个新的文本块
 const addTextBlock = () => {
@@ -352,7 +359,7 @@ onBeforeUnmount(() => {
         <div class="flex gap-2">
           <Button label="文本" icon="pi pi-align-left" @click="addTextBlock" class="p-button-outlined" />
           <Button label="图片" icon="pi pi-image" @click="addImageBlock" class="p-button-outlined" />
-          <Button label="视频" icon="pi pi-video" @click="addVideoBlock" class="p-button-outlined" />
+          <Button label="视频" icon="pi pi-video" @click="addVideoBlock" class="p-button-outlined" :disabled="!canAddVideoBlock"/>
         </div>
       </div>
     </div>
