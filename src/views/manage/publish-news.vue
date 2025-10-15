@@ -64,6 +64,24 @@ const deleteBlock = (index) => {
   contentBlocks.value.splice(index, 1);
 };
 
+// 上移一个块
+const moveBlockUp = (index) => {
+  if(index === 0){
+    return;
+  }
+  [contentBlocks.value[index - 1], contentBlocks.value[index]] = 
+    [contentBlocks.value[index], contentBlocks.value[index - 1]];
+};
+
+// 下移一个块
+const moveBlockDown = (index) => {
+  if(index >= contentBlocks.value.length - 1){
+    return;
+  }
+  [contentBlocks.value[index + 1], contentBlocks.value[index]] = 
+    [contentBlocks.value[index], contentBlocks.value[index + 1]];
+}
+
 // --- 5. 自定义媒体处理函数 ---
 const insertFunction = (type, deal, final) => {
   return (event) => {
@@ -322,7 +340,9 @@ onBeforeUnmount(() => {
         class="block-item"
       >
         <div class="block-actions">
-          <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="deleteBlock(index)" />
+          <Button icon="pi pi-arrow-up"   class="p-button-rounded p-button-text p-button-help" @click="moveBlockUp(index)" :disabled="index===0" />
+          <Button icon="pi pi-trash"      class="p-button-rounded p-button-text p-button-danger" @click="deleteBlock(index)" />
+          <Button icon="pi pi-arrow-down" class="p-button-rounded p-button-text p-button-help" @click="moveBlockDown(index)" :disabled="index===contentBlocks.length-1" />
         </div>
 
         <Textarea 
@@ -457,18 +477,25 @@ onBeforeUnmount(() => {
 }
 .block-item:hover .block-actions {
   opacity: 1;
+  transform: translateY(-50%) translateX(-1rem);
+  pointer-events: auto;
 }
 
 /* 块操作按钮 (删除、移动) */
 .block-actions {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: 50%;
+  left: -1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.0rem; /* 按钮之间的垂直间距 */
   opacity: 0;
-  transition: opacity 0.2s;
+  transform: translateY(-50%) translateX(0); /* 初始向右偏移，translateY 用于垂直居中 */
   background-color: var(--p-surface-50);
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 0;
+  transition: all 0.2s ease-in-out; /* 对所有属性应用过渡效果 */
+  pointer-events: none; /* 隐藏时禁用鼠标事件 */
 }
 
 /* 文本块 (Textarea) 样式 */
