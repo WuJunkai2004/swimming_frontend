@@ -40,11 +40,11 @@ const addTextBlock = () => {
 };
 
 const addImageBlock = () => {
-  contentBlocks.value.push({ type: 'image', data: '' });
+  contentBlocks.value.push({ type: 'image', url: '', preview: '' });
 };
 
 const addVideoBlock = () => {
-  contentBlocks.value.push({ type: 'video', data: '', imgUrl: '' });
+  contentBlocks.value.push({ type: 'video', url: '', preview: '' });
 }
 
 // 打开图片上传弹窗
@@ -113,7 +113,7 @@ const insertImage = insertFunction('image',
   (result) => {
     if(result.statusCode === 200){
       const editing = editingBlockIndex.value;
-      contentBlocks.value[editing].data = result.data.url;
+      contentBlocks.value[editing].url = result.data.url;
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
@@ -127,7 +127,7 @@ const insertVideoContent = insertFunction('video',
   (result) => {
     if(result.statusCode === 200){
       const editing = editingBlockIndex.value;
-      contentBlocks.value[editing].data = result.data.url;
+      contentBlocks.value[editing].url = result.data.url;
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
@@ -141,7 +141,7 @@ const insertVideoPreview = insertFunction('image',
   (result) => {
     if(result.statusCode === 200){
       const editing = editingBlockIndex.value;
-      contentBlocks.value[editing].imgUrl = result.data.url;
+      contentBlocks.value[editing].preview = result.data.url;
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
@@ -157,11 +157,11 @@ const insertVideoFinish = async () => {
     alerts('错误', `错误的函数调用方式`, {icon: 'pi pi-times-circle'});
     return;
   }
-  if(!contentBlocks.value[editing].data){
+  if(!contentBlocks.value[editing].url){
     alerts('错误', '请先上传视频文件', {icon: 'pi pi-times-circle'});
     return;
   }
-  if(!contentBlocks.value[editing].imgUrl){
+  if(!contentBlocks.value[editing].preview){
     if(!await awaitAlert('确认插入', '您还未上传封面图，是否继续？', {
       icon: 'pi pi-exclamation-triangle',
       accept: '继续插入',
@@ -229,7 +229,7 @@ const publishNews = async () => {
         return !block.data.trim();
       }
       if (block.type === 'image' || block.type === 'video') {
-        return !block.data;
+        return !block.url;
       }
       return true;
     });
@@ -355,7 +355,7 @@ onBeforeUnmount(() => {
         />
         
         <div v-else-if="block.type === 'image'" class="media-block" @click="openImageDialog(index)">
-          <img v-if="block.data" :src="block.data" alt="已插入图片" />
+          <img v-if="block.url" :src="block.url" alt="已插入图片" />
           <div v-else class="placeholder">
             <i class="pi pi-image"></i>
             <span>点击上传图片</span>
@@ -363,7 +363,7 @@ onBeforeUnmount(() => {
         </div>
 
         <div v-else-if="block.type === 'video'" class="media-block" @click="openVideoDialog(index)">
-          <video v-if="block.data" :src="block.data" :poster="block.imgUrl" controls></video>
+          <video v-if="block.url" :src="block.url" :poster="block.preview" controls></video>
           <div v-else class="placeholder">
             <i class="pi pi-video"></i>
             <span>点击上传视频</span>
