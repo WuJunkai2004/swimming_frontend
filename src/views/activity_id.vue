@@ -91,7 +91,7 @@ onMounted(() => {
       <div class="meta flex align-items-center gap-4 text-sm text-gray-500">
         <span class="flex align-items-center">
           <i class="pi pi-calendar mr-2"></i>
-          发布于: {{ newsDetail.time }}
+          发布于: {{ newsDetail.publishTime }}
         </span>
         <span class="flex align-items-center">
           <i class="pi pi-eye mr-2"></i>
