@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import Carousel from 'primevue/carousel';
 
 // 需求：从文章中提取历史奖项，并格式化为 PrimeVue Timeline 组件所需的数据结构
 const awards = ref([
@@ -34,6 +35,24 @@ const awards = ref([
     color: '#CD7F32' // 铜色
   },
 ]);
+
+const activities = ref([
+  {
+    icon: 'pi pi-trophy',
+    title: '“振奋杯”学生游泳比赛',
+    content: '每年10月份左右举办的“振奋杯”学生比赛，为本校的在校学生提供了展现自我游泳技能、体验体育竞赛氛围的平台。此外，泳协还将根据同学们的比赛成绩，从新生中选拔泳队成员参加校游泳队，为队伍注入新鲜活力。'
+  },
+  {
+    icon: 'pi pi-sitemap',
+    title: '省级、国家级比赛',
+    content: '截至目前，校游泳队共参加了三次省运会，多次全国大学生游泳锦标赛，取得了优异的成绩，是福建省各类游泳赛事领奖台的常驻嘉宾。'
+  },
+  {
+    icon: 'pi pi-calendar-plus',
+    title: '系统性日常训练',
+    content: '自2022年成立以来，校游泳队保持着一周六训的备战传统。队员们在专职教师的指导下，由高水平运动员带领进行系统性训练，其内容涵盖技术分解、包干冲刺、划频调控、有氧耐力等核心环节，同时兼顾出发转身等技术细节，力求全面提升运动表现。'
+  }
+]);
 </script>
 
 <template>
@@ -67,34 +86,28 @@ const awards = ref([
         <div class="grid align-items-center h-full">
           <div class="col-12 p-4 md:p-6 lg:p-8">
             <h2 class="text-5xl font-light text-center mb-6">我们的足迹</h2>
-            <div class="grid">
-              <!-- “振奋杯” -->
-              <div class="col-12 md:col-4 p-3 hidden md:block">
+            <!-- Mobile Carousel -->
+            <Carousel :value="activities" :numVisible="1" :numScroll="1" :showNavigators="false" class="activities-carousel">
+                <template #item="slotProps">
+                    <div class="p-3">
+                        <Card class="h-full feature-card">
+                            <template #header><i :class="slotProps.data.icon" class="card-icon"></i></template>
+                            <template #title>{{ slotProps.data.title }}</template>
+                            <template #content>
+                                <p>{{ slotProps.data.content }}</p>
+                            </template>
+                        </Card>
+                    </div>
+                </template>
+            </Carousel>
+            <!-- Desktop Grid -->
+            <div class="grid activities-grid">
+              <div v-for="activity in activities" :key="activity.title" class="col-12 md:col-4 p-3">
                 <Card class="h-full feature-card">
-                  <template #header><i class="pi pi-trophy card-icon"></i></template>
-                  <template #title>“振奋杯”学生游泳比赛</template>
+                  <template #header><i :class="activity.icon" class="card-icon"></i></template>
+                  <template #title>{{ activity.title }}</template>
                   <template #content>
-                    <p>每年10月份左右举办的“振奋杯”学生比赛，为本校的在校学生提供了展现自我游泳技能、体验体育竞赛氛围的平台。此外，泳协还将根据同学们的比赛成绩，从新生中选拔泳队成员参加校游泳队，为队伍注入新鲜活力。</p>
-                  </template>
-                </Card>
-              </div>
-              <!-- 省级、国家级比赛 -->
-              <div class="col-12 md:col-4 p-3">
-                <Card class="h-full feature-card">
-                  <template #header><i class="pi pi-sitemap card-icon"></i></template>
-                  <template #title>省级、国家级比赛</template>
-                  <template #content>
-                    <p>截至目前，校游泳队共参加了三次省运会，多次全国大学生游泳锦标赛，取得了优异的成绩，是福建省各类游泳赛事领奖台的常驻嘉宾。</p>
-                  </template>
-                </Card>
-              </div>
-              <!-- 日常训练 -->
-              <div class="col-12 md:col-4 p-3">
-                <Card class="h-full feature-card">
-                  <template #header><i class="pi pi-calendar-plus card-icon"></i></template>
-                  <template #title>系统性日常训练</template>
-                  <template #content>
-                    <p>自2022年成立以来，校游泳队保持着一周六训的备战传统。队员们在专职教师的指导下，由高水平运动员带领进行系统性训练，其内容涵盖技术分解、包干冲刺、划频调控、有氧耐力等核心环节，同时兼顾出发转身等技术细节，力求全面提升运动表现。</p>
+                    <p>{{ activity.content }}</p>
                   </template>
                 </Card>
               </div>
@@ -197,6 +210,9 @@ const awards = ref([
 
 
 /* 第二部分：Activities Section */
+.activities-grid {
+    display: none; /* Hidden by default */
+}
 .feature-card {
   text-align: center;
   border: 1px solid var(--p-card-shadow);
@@ -232,10 +248,25 @@ const awards = ref([
 }
 
 /* 响应式调整 */
+@media (min-width: 768px) {
+  .activities-carousel {
+    display: none;
+  }
+  .activities-grid {
+    display: flex;
+  }
+}
+
 @media (max-width: 767px) {
-  .hero-section h1 { font-size: 2.5rem; }
-  .hero-section .motto { font-size: 1.2rem; }
-  .activities-section h2, .awards-section h2 { font-size: 2.5rem; }
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+  .hero-section .motto {
+    font-size: 1.2rem;
+  }
+  .activities-section h2, .awards-section h2 {
+    font-size: 2.5rem;
+  }
   
   /* 在移动端，让Timeline内容都在右侧，更易读 */
   :deep(.p-timeline-event:nth-child(even)) {
