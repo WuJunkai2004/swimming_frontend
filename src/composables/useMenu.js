@@ -26,6 +26,11 @@ export function useMenu() {
       command: () => router.push('/excellence')
     },
     {
+      label: '等级查询',
+      icon: 'pi pi-search',
+      command: () => router.push('/swimlevel')
+    },
+    {
       label: '登录',
       icon: 'pi pi-user',
       command: () => router.push('/login')

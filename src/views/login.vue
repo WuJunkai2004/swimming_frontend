@@ -70,7 +70,7 @@ const goToHome = () => {
       <div class="w-7 hidden md:flex align-items-center justify-content-center p-5 text-white image-panel">
         <div class="text-center">
           <h1 class="font-bold text-6xl mb-4">欢迎使用本系统</h1>
-          <p class="text-2xl line-height-3">一个现代化、响应式的管理平台，由 Vue 和 PrimeVue 强力驱动。</p>
+          <p class="text-2xl line-height-3">「安全第一、快乐游泳、共同进步」</p>
         </div>
       </div>
 
@@ -88,6 +88,7 @@ const goToHome = () => {
           <template #content>
             <div class="flex flex-column gap-4">
               <div class="p-float-label">
+                <label>用户名</label>
                 <InputText 
                   id="username" 
                   v-model="username" 
@@ -95,10 +96,10 @@ const goToHome = () => {
                   @keydown.enter.prevent="focusPasswordInput"
                   :disabled="is_loginning"
                 />
-                <label>用户名</label>
               </div>
 
               <div class="p-float-label">
+                <label>密码</label>
                 <Password 
                   id="password" 
                   ref="passwordInputRef" 
@@ -109,7 +110,6 @@ const goToHome = () => {
                   toggleMask 
                   @keydown.enter="handleLogin"
                 />
-                <label>密码</label>
               </div>
 
               <Button 

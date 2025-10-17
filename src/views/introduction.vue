@@ -12,8 +12,8 @@ const awards = ref([
   {
     date: '2022年11月',
     title: '福建省第十七届运动会男子4×50米自由泳接力第六名',
-    icon: 'pi pi-medal',
-    color: '#C0C0C0' // 银色
+    icon: 'pi pi-thumbs-up',
+    color: '#28a745' // 绿色
   },
   {
     date: '2023年3月',
@@ -24,8 +24,8 @@ const awards = ref([
   {
     date: '2023年3月',
     title: '第四届中国大学生阳光体育锦标赛男子甲组4×100自由泳接力第24名',
-    icon: 'pi pi-medal',
-    color: '#C0C0C0'
+    icon: 'pi pi-verified',
+    color: '#28a745'
   },
   {
     date: '2024年6月',

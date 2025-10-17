@@ -98,7 +98,7 @@ const resetFollowingSteps = (step) => {
 </script>
 
 <template>
-  <div>
+  <div style="overflow-x: hidden;">
     <MobileMenuBar />
     <ComputerMenuBar />
 
@@ -180,9 +180,6 @@ const resetFollowingSteps = (step) => {
 </template>
 
 <style scoped>
-.grid {
-  width: 100%;
-}
 .hero-section {
   position: relative;
   height: 40vh;
@@ -224,7 +221,7 @@ const resetFollowingSteps = (step) => {
   padding-bottom: 4rem;
 }
 .query-panel {
-  background-color: var(--p-card-color);
+  background-color: var(--p-surface-50);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
