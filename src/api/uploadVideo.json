@@ -10,7 +10,7 @@
     "statusCode": 200,
     "message": "成功",
     "data": {
-      "url": "视频链接"
+      "videoUrl": "视频链接"
     }
   },
   "fail": {

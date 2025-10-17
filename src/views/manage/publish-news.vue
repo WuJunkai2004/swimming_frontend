@@ -86,7 +86,11 @@ const moveBlockDown = (index) => {
 const insertFunction = (type, deal, final) => {
   return (event) => {
     const editing = editingBlockIndex.value;
-    if(editing === -1 || contentBlocks.value[editing].type !== type){
+    const allowed = {
+      "image": ["image"],
+      "video": ["video", "image"], // 视频块允许上传视频和封面图
+    }
+    if(editing === -1 || !allowed[contentBlocks.value[editing].type].includes(type)){
       alerts('错误', `错误的函数调用方式`, {icon: 'pi pi-times-circle'});
       return;
     }
@@ -127,7 +131,7 @@ const insertVideoContent = insertFunction('video',
   (result) => {
     if(result.statusCode === 200){
       const editing = editingBlockIndex.value;
-      contentBlocks.value[editing].url = result.data.url;
+      contentBlocks.value[editing].url = result.data.videoUrl;
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
