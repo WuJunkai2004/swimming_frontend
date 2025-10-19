@@ -8,8 +8,7 @@ const listError = ref(null);     // 列表加载错误信息
 
 // 详情弹窗的状态
 const isDetailDialogVisible = ref(false); // 详情弹窗是否可见
-const isDetailLoading = ref(false);       // 详情是否正在加载（用于弹窗内的Spinner）
-const selectedLeaderDetail = ref(null); // 存储当前选中领导的详细数据
+const leaderDialogRef = ref(null);
 
 // --- 2. API 调用逻辑 ---
 /**
@@ -41,27 +40,8 @@ const fetchLeaderList = async () => {
  * @param {string} leaderId - 被点击的领导ID
  */
 const fetchLeaderDetail = async (leaderId) => {
-  // 1. 立即打开弹窗，并显示加载状态
   isDetailDialogVisible.value = true;
-  isDetailLoading.value = true;
-  selectedLeaderDetail.value = null; // 清空上次的数据
-
-  fetch(`/leader/getLeaderDetail?id=${leaderId}`)
-  .then(response => response.json())
-  .then(data => {
-    if(data && data.statusCode === 200){
-      selectedLeaderDetail.value = data.data;
-    } else {
-      selectedLeaderDetail.value = { error: data.message || '获取详情失败' };
-    }
-  })
-  .catch(e => {
-    selectedLeaderDetail.value = { error: '获取详情失败' };
-    console.error(e);
-  })
-  .finally(() => {
-    isDetailLoading.value = false;
-  });
+  leaderDialogRef.value.fetchLeaderDetail(leaderId);
 };
 
 // --- 3. 生命周期钩子 ---
@@ -126,43 +106,10 @@ onMounted(() => {
       </div>
     </div>
 
-
-    <Dialog 
+    <LeaderDialog 
+      ref="leaderDialogRef"
       v-model:visible="isDetailDialogVisible" 
-      modal 
-      header="成员详情" 
-      :style="{ width: '90vw', maxWidth: '650px' }"
-      :dismissableMask="true"
-    >
-      <div v-if="isDetailLoading" class="detail-loading text-center p-5">
-        <ProgressSpinner />
-        <p>正在加载详情...</p>
-      </div>
-
-      <div v-else-if="selectedLeaderDetail">
-        <div v-if="selectedLeaderDetail.error">
-           <Message severity="error" :closable="false">加载失败: {{ selectedLeaderDetail.error }}</Message>
-        </div>
-
-        <div v-else class="leader-detail-content">
-          <div class="flex flex-column align-items-center md:flex-row align-items-start gap-4">
-            <Avatar v-if="!selectedLeaderDetail.imgUrl" :label="selectedLeaderDetail.name.charAt(0)" size="xlarge" shape="circle" class="detail-avatar" />
-            <img v-else :src="selectedLeaderDetail.imgUrl" :alt="selectedLeaderDetail.name" class="detail-image" />
-
-            <div class="flex-1 text-center md:text-left">
-              <h2 class="text-3xl font-bold mb-2">{{ selectedLeaderDetail.name }}</h2>
-              <Tag :value="selectedLeaderDetail.position" severity="info" class="mr-2"></Tag>
-              <Tag :value="`${selectedLeaderDetail.age}岁`"></Tag>
-              <Divider />
-              <p class="introduction">
-                {{ selectedLeaderDetail.introduction || '暂无简介。' }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Dialog>
-
+    />
   </div>
 </template>
 
@@ -202,25 +149,5 @@ onMounted(() => {
   font-size: 3rem;
   width: 100px;
   height: 100px;
-}
-
-/* 弹窗详情页样式 */
-.detail-image {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%; /* 圆形头像 */
-  object-fit: cover;
-  border: 4px solid var(--p-content-border-color);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-.detail-avatar {
-  font-size: 4rem;
-  width: 150px;
-  height: 150px;
-}
-.introduction {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: var(--p-text-color);
 }
 </style>
