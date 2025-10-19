@@ -126,7 +126,7 @@ const showPreview = async (game) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         token: getToken(),
-        gameid: game.uuid 
+        gameid: game.uuid
       })
     });
     const result = await response.json();
@@ -152,9 +152,9 @@ const exportData = async (game) => {
     const response = await fetch('/sport/export', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         token: getToken(),
-        gameId: game.uuid 
+        gameId: game.uuid
       })
     });
 
@@ -170,7 +170,7 @@ const exportData = async (game) => {
     if (disposition && disposition.indexOf('attachment') !== -1) {
       const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
       const matches = filenameRegex.exec(disposition);
-      if (matches != null && matches[1]) { 
+      if (matches != null && matches[1]) {
         filename = matches[1].replace(/['"]/g, '');
       }
     }
@@ -201,10 +201,10 @@ onMounted(fetchGamesList);
 
     <div class="flex justify-content-between align-items-center mb-4">
       <h1 class="text-3xl font-bold m-0">比赛管理</h1>
-      <Button 
-        label="发布新比赛" 
-        icon="pi pi-plus" 
-        @click=jumpToPublish 
+      <Button
+        label="发布新比赛"
+        icon="pi pi-plus"
+        @click=jumpToPublish
       />
     </div>
 
@@ -213,7 +213,7 @@ onMounted(fetchGamesList);
     <div>
       <div v-if="isLoading">
         <DataTable :value="[{}, {}, {}]" class="p-datatable-striped">
-          <Column :expander="true" />
+          <Column expander/>
           <Column header="比赛名称">
             <template #body>
               <Skeleton />
@@ -231,36 +231,36 @@ onMounted(fetchGamesList);
         <Message severity="error" :closable="false">{{ error }}</Message>
       </div>
 
-      <DataTable 
-        v-else 
-        :value="gamesList" 
+      <DataTable
+        v-else
+        :value="gamesList"
         v-model:expandedRows="expandedRows"
         @row-expand="onRowExpand"
         dataKey="uuid"
         responsiveLayout="scroll"
       >
-        <Column :expander="true" style="width: 3rem" />
+        <Column expander style="width: 3rem" />
 
         <Column field="Name" header="比赛名称"></Column>
 
         <Column header="操作" style="width: 12rem">
           <template #body="slotProps">
             <div class="flex gap-2">
-              <Button 
-                label="分享" 
-                class="p-button-text p-button-sm p-button-success" 
-                @click="showShareDialog(slotProps.data)" 
+              <Button
+                label="分享"
+                class="p-button-text p-button-sm p-button-success"
+                @click="showShareDialog(slotProps.data)"
               />
-              <Button 
-                label="预览" 
-                class="p-button-text p-button-sm" 
-                @click="showPreview(slotProps.data)" 
+              <Button
+                label="预览"
+                class="p-button-text p-button-sm"
+                @click="showPreview(slotProps.data)"
               />
-              <Button 
-                label="导出" 
-                class="p-button-text p-button-sm" 
-                :id="`export-btn-${slotProps.data.uuid}`" 
-                @click="exportData(slotProps.data)" 
+              <Button
+                label="导出"
+                class="p-button-text p-button-sm"
+                :id="`export-btn-${slotProps.data.uuid}`"
+                @click="exportData(slotProps.data)"
               />
             </div>
           </template>
@@ -292,10 +292,10 @@ onMounted(fetchGamesList);
       </DataTable>
     </div>
 
-    <Dialog 
-      v-model:visible="isShareVisible" 
-      modal 
-      header="分享比赛报名链接" 
+    <Dialog
+      v-model:visible="isShareVisible"
+      modal
+      header="分享比赛报名链接"
       :style="{ width: '90vw', maxWidth: '500px' }"
     >
       <div v-if="currentGame">
@@ -313,12 +313,12 @@ onMounted(fetchGamesList);
       </template>
     </Dialog>
 
-    <Dialog 
-      v-model:visible="isPreviewVisible" 
-      modal 
-      header="比赛报名情况预览" 
+    <Dialog
+      v-model:visible="isPreviewVisible"
+      modal
+      header="比赛报名情况预览"
       :style="{ width: '90vw', maxWidth: '960px' }"
-      :dismissableMask="true"
+      dismissableMask
     >
       <div v-if="isPreviewLoading" class="text-center p-5">
         <ProgressSpinner />
@@ -335,9 +335,9 @@ onMounted(fetchGamesList);
               <p><strong>负责人联系方式:</strong> {{ previewData.leaderPhone }}</p>
             </div>
             <div>
-              <Button 
-                label="导出此预览" 
-                icon="pi pi-download" 
+              <Button
+                label="导出此预览"
+                icon="pi pi-download"
                 class="p-button-sm"
                 @click="exportData(currentGame)"
               />

@@ -76,9 +76,9 @@ onMounted(() => {
         </div>
 
         <div v-else-if="playersList.length > 0" class="grid px-2">
-          <div 
-            v-for="player in playersList" 
-            :key="player.id" 
+          <div
+            v-for="player in playersList"
+            :key="player.id"
             class="col-12 md:col-6 lg:col-4 p-2"
           >
             <Card class="player-card" @click="fetchPlayerDetail(player.id)">
@@ -106,9 +106,9 @@ onMounted(() => {
       </div>
     </div>
 
-    <PlayerDialog 
+    <PlayerDialog
       ref="playerDialogRef"
-      v-model:visible="isDetailDialogVisible" 
+      v-model:visible="isDetailDialogVisible"
     />
   </div>
 </template>

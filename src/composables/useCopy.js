@@ -8,15 +8,15 @@ const TraditionalCopy = (text) => {
   return new Promise((resolve, reject) => {
     const textArea = document.createElement("textarea");
     textArea.value = text;
-    
+
     // 将 textarea 移到屏幕外，使其不可见
     textArea.style.position = "absolute";
     textArea.style.left = "-9999px";
-    
+
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
+
     try {
       const successful = document.execCommand('copy');
       if (successful) {
@@ -28,7 +28,7 @@ const TraditionalCopy = (text) => {
       console.error('传统方法复制时发生错误:', err);
       reject(err);
     }
-    
+
     document.body.removeChild(textArea);
   });
 };

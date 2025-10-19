@@ -76,9 +76,9 @@ onMounted(() => {
         </div>
 
         <div v-else-if="leadersList.length > 0" class="grid px-2">
-          <div 
-            v-for="leader in leadersList" 
-            :key="leader.id" 
+          <div
+            v-for="leader in leadersList"
+            :key="leader.id"
             class="col-12 md:col-6 lg:col-4 p-2"
           >
             <Card class="leader-card" @click="fetchLeaderDetail(leader.id)">
@@ -106,9 +106,9 @@ onMounted(() => {
       </div>
     </div>
 
-    <LeaderDialog 
+    <LeaderDialog
       ref="leaderDialogRef"
-      v-model:visible="isDetailDialogVisible" 
+      v-model:visible="isDetailDialogVisible"
     />
   </div>
 </template>

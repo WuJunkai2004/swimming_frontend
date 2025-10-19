@@ -69,7 +69,7 @@ const moveBlockUp = (index) => {
   if(index === 0){
     return;
   }
-  [contentBlocks.value[index - 1], contentBlocks.value[index]] = 
+  [contentBlocks.value[index - 1], contentBlocks.value[index]] =
     [contentBlocks.value[index], contentBlocks.value[index - 1]];
 };
 
@@ -78,7 +78,7 @@ const moveBlockDown = (index) => {
   if(index >= contentBlocks.value.length - 1){
     return;
   }
-  [contentBlocks.value[index + 1], contentBlocks.value[index]] = 
+  [contentBlocks.value[index + 1], contentBlocks.value[index]] =
     [contentBlocks.value[index], contentBlocks.value[index + 1]];
 }
 
@@ -113,7 +113,7 @@ const insertFunction = (type, deal, final) => {
   }
 }
 
-const insertImage = insertFunction('image', 
+const insertImage = insertFunction('image',
   (result) => {
     if(result.statusCode === 200){
       const editing = editingBlockIndex.value;
@@ -121,13 +121,13 @@ const insertImage = insertFunction('image',
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
-  }, 
+  },
   () => {
     // 上传文件后不关闭弹窗，等待其他操作
   }
 );
 
-const insertVideoContent = insertFunction('video', 
+const insertVideoContent = insertFunction('video',
   (result) => {
     if(result.statusCode === 200){
       const editing = editingBlockIndex.value;
@@ -135,13 +135,13 @@ const insertVideoContent = insertFunction('video',
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
-  }, 
+  },
   () => {
     // 上传视频后不关闭弹窗，等待封面上传
   }
 );
 
-const insertVideoPreview = insertFunction('image', 
+const insertVideoPreview = insertFunction('image',
   (result) => {
     if(result.statusCode === 200){
       const editing = editingBlockIndex.value;
@@ -149,7 +149,7 @@ const insertVideoPreview = insertFunction('image',
     } else {
       alerts('上传失败', result.message, {icon: 'pi pi-times-circle'});
     }
-  }, 
+  },
   () => {
     // 上传封面后不关闭弹窗，等待用户确认插入
   }
@@ -306,7 +306,7 @@ const publishNews = async () => {
   });
 };
 
-// --- 一些ui上的细节 --- 
+// --- 一些ui上的细节 ---
 const handleTextareaInput = (event) => {
   const textarea = event.target;
   // 1. 先将高度重置为'auto'，让浏览器重新计算scrollHeight的最小值
@@ -335,34 +335,34 @@ onBeforeUnmount(() => {
     <div class="flex justify-content-between align-items-center mb-4">
       <h1 class="text-3xl font-bold m-0">新闻编辑</h1>
       <div class="flex gap-2">
-        <Button 
-          label="保存草稿" 
-          icon="pi pi-save" 
-          severity="secondary" 
-          outlined 
-          @click="saveDraft" 
-          :loading="isSaving" 
+        <Button
+          label="保存草稿"
+          icon="pi pi-save"
+          severity="secondary"
+          outlined
+          @click="saveDraft"
+          :loading="isSaving"
         />
-        <Button 
-          label="发布" 
-          icon="pi pi-send" 
-          @click="publishNews" 
-          :loading="isPublishing" 
+        <Button
+          label="发布"
+          icon="pi pi-send"
+          @click="publishNews"
+          :loading="isPublishing"
         />
       </div>
     </div>
     <Divider />
 
-    <InputText 
-      v-model="title" 
-      placeholder="请输入新闻标题..." 
-      class="title-input w-full p-3 mb-4 text-2xl" 
+    <InputText
+      v-model="title"
+      placeholder="请输入新闻标题..."
+      class="title-input w-full p-3 mb-4 text-2xl"
     />
 
     <div class="block-editor">
-      <div 
-        v-for="(block, index) in contentBlocks" 
-        :key="index" 
+      <div
+        v-for="(block, index) in contentBlocks"
+        :key="index"
         class="block-item"
       >
         <div class="block-actions">
@@ -371,15 +371,15 @@ onBeforeUnmount(() => {
           <Button icon="pi pi-arrow-down" class="p-button-rounded p-button-text p-button-help" @click="moveBlockDown(index)" :disabled="index===contentBlocks.length-1" />
         </div>
 
-        <Textarea 
-          v-if="block.type === 'text'" 
-          v-model="block.data" 
-          autoResize 
-          class="w-full text-block" 
+        <Textarea
+          v-if="block.type === 'text'"
+          v-model="block.data"
+          autoResize
+          class="w-full text-block"
           placeholder="请输入正文..."
           @input="handleTextareaInput"
         />
-        
+
         <div v-else-if="block.type === 'image'" class="media-block" @click="openImageDialog(index)">
           <img v-if="block.url" :src="block.url" alt="已插入图片" />
           <div v-else class="placeholder">
@@ -411,14 +411,14 @@ onBeforeUnmount(() => {
     </div>
 
     <Dialog v-model:visible="isImageDialogVisible" modal header="插入图片" :style="{ width: '50rem' }">
-      <FileUpload 
-        name="image" 
-        @uploader="insertImage" 
-        :customUpload="true" 
-        accept="image/*" 
+      <FileUpload
+        name="image"
+        @uploader="insertImage"
+        auto
+        customUpload
+        accept="image/*"
         :maxFileSize="5000000"
         chooseLabel="选择图片"
-        :auto="true" 
         :showUploadButton="false"
         :showCancelButton="false"
       >
@@ -440,27 +440,27 @@ onBeforeUnmount(() => {
       <div class="grid formgrid">
         <div class="col-12 field">
           <label>上传视频文件</label>
-          <FileUpload 
-            name="video" 
-            @uploader="insertVideoContent" 
-            :customUpload="true" 
-            accept="video/*" 
-            chooseLabel="选择视频" 
-            :auto="true" 
+          <FileUpload
+            name="video"
+            @uploader="insertVideoContent"
+            auto
+            customUpload
+            accept="video/*"
+            chooseLabel="选择视频"
             :showUploadButton="false"
             :showCancelButton="false"
           />
         </div>
         <div class="col-12 field">
           <label>上传视频封面</label>
-          <FileUpload 
-            name="preview" 
-            @uploader="insertVideoPreview" 
-            :customUpload="true" 
-            accept="image/*" 
+          <FileUpload
+            name="preview"
+            @uploader="insertVideoPreview"
+            auto
+            customUpload
+            accept="image/*"
             :maxFileSize="5000000"
-            chooseLabel="选择封面图" 
-            :auto="true"
+            chooseLabel="选择封面图"
             :showUploadButton="false"
             :showCancelButton="false"
           />

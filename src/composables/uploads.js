@@ -1,7 +1,7 @@
 /**
  * Upload an image file
- * @param {string} token 
- * @param {File} file 
+ * @param {string} token
+ * @param {File} file
  * @returns {Promise<Response>}
  */
 export function uploadImage(token, file){

@@ -59,7 +59,7 @@ const handleAvatarUpload = async (event) => {
     return; // 如果用户没有选择文件，则不执行任何操作
   }
   // 开始上传，显示加载状态
-  isDialogLoading.value = true; 
+  isDialogLoading.value = true;
   uploadImage(getToken(), file)
   .then(response => response.json())
   .then(result => {
@@ -192,8 +192,8 @@ const handleSubmit = async () => {
 
   if (formImgUrl.value === '') {
     if(!await awaitAlert(
-      '确认操作', 
-      '您还未为运动员上传头像，确定要继续提交吗？', 
+      '确认操作',
+      '您还未为运动员上传头像，确定要继续提交吗？',
       {
         accept: '继续提交（无头像）',
         reject: '返回上传',
@@ -208,8 +208,8 @@ const handleSubmit = async () => {
 // 处理删除按钮点击
 const handleDelete = async (athlete) => {
   const confirm_del = await awaitAlert(
-    '确认删除', 
-    `您确定要删除运动员 "${athlete.name}" 吗？`, 
+    '确认删除',
+    `您确定要删除运动员 "${athlete.name}" 吗？`,
     {
       accept: '确认删除',
       reject: '取消',
@@ -265,12 +265,12 @@ onMounted(fetchAthletesList);
 
     </div>
 
-    <Dialog 
-      v-model:visible="isDialogVisible" 
-      modal 
-      :header="dialogMode === 'add' ? '新增优秀运动员' : '修改运动员信息'" 
+    <Dialog
+      v-model:visible="isDialogVisible"
+      modal
+      :header="dialogMode === 'add' ? '新增优秀运动员' : '修改运动员信息'"
       :style="{ width: '90vw', maxWidth: '800px' }"
-      :dismissableMask="true"
+      dismissableMask
     >
       <div v-if="isDialogLoading" class="flex justify-content-center p-5">
         <ProgressSpinner />
@@ -278,23 +278,23 @@ onMounted(fetchAthletesList);
 
       <div v-else class="grid formgrid p-fluid">
         <div class="col-12 md:col-4 flex flex-column align-items-center">
-          <Avatar 
-            :image="formImgUrl" 
+          <Avatar
+            :image="formImgUrl"
             :label="formImgUrl ? '' : '头像'"
-            shape="square" 
-            class="mb-3 rounded-avatar keep-width" 
-            style="width: 150px; height: 150px; font-size: 4rem;" 
+            shape="square"
+            class="mb-3 rounded-avatar keep-width"
+            style="width: 150px; height: 150px; font-size: 4rem;"
           />
 
-          <FileUpload 
-            mode="basic" 
+          <FileUpload
+            mode="basic"
             name="avatar"
-            accept="image/*" 
-            :maxFileSize="1000000" 
-            :customUpload="true" 
-            @uploader="handleAvatarUpload" 
-            chooseLabel="上传头像" 
+            accept="image/*"
+            :maxFileSize="1000000"
             auto
+            customUpload
+            @uploader="handleAvatarUpload"
+            chooseLabel="上传头像"
           />
           <small class="text-color-secondary mt-2">支持图片格式, 小于1MB</small>
         </div>
@@ -313,9 +313,9 @@ onMounted(fetchAthletesList);
           </div>
           <div class="field">
             <label>介绍</label>
-            <Textarea 
-              id="introduction" 
-              v-model="formIntroduction" 
+            <Textarea
+              id="introduction"
+              v-model="formIntroduction"
               rows="5"
               class="w-full resize-none" autoResize/>
           </div>

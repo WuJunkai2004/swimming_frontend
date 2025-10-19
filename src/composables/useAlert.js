@@ -6,7 +6,7 @@ export function useAlert() {
   const alerts = (title, msg, options = {}) => {
     const {
       accept = '确定',
-      reject = 'hidden', 
+      reject = 'hidden',
       icon = 'pi pi-info-circle'
     } = options;
 
@@ -25,7 +25,7 @@ export function useAlert() {
   const asyncAlert = (title, msg, options = {}) => {
     const {
       accept = '确定',
-      reject = 'hidden', 
+      reject = 'hidden',
       icon = 'pi pi-info-circle'
     } = options;
 

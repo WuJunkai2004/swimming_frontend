@@ -75,11 +75,11 @@ const goToHome = () => {
       </div>
 
       <div class="w-full md:w-5 flex align-items-center justify-content-center p-4 relative">
-        <Button 
-          label="返回" 
-          icon="pi pi-arrow-left" 
-          class="back-button p-button-secondary" 
-          @click="goToHome" 
+        <Button
+          label="返回"
+          icon="pi pi-arrow-left"
+          class="back-button p-button-secondary"
+          @click="goToHome"
         />
         <Card class="login-card w-full">
           <template #title>
@@ -89,10 +89,10 @@ const goToHome = () => {
             <div class="flex flex-column gap-4">
               <div class="p-float-label">
                 <label>用户名</label>
-                <InputText 
-                  id="username" 
-                  v-model="username" 
-                  class="w-full" 
+                <InputText
+                  id="username"
+                  v-model="username"
+                  class="w-full"
                   @keydown.enter.prevent="focusPasswordInput"
                   :disabled="is_loginning"
                 />
@@ -100,24 +100,24 @@ const goToHome = () => {
 
               <div class="p-float-label">
                 <label>密码</label>
-                <Password 
-                  id="password" 
-                  ref="passwordInputRef" 
-                  v-model="password" 
+                <Password
+                  id="password"
+                  ref="passwordInputRef"
+                  v-model="password"
                   class="w-full"
-                  :feedback="false" 
+                  :feedback="false"
                   :disabled="is_loginning"
-                  toggleMask 
+                  toggleMask
                   @keydown.enter="handleLogin"
                 />
               </div>
 
-              <Button 
-                label="登录" 
-                icon="pi pi-sign-in" 
-                class="w-full mt-3" 
-                :class="{ 'p-disabled': password.length < 8 || is_loginning}" 
-                @click="handleLogin" 
+              <Button
+                label="登录"
+                icon="pi pi-sign-in"
+                class="w-full mt-3"
+                :class="{ 'p-disabled': password.length < 8 || is_loginning}"
+                @click="handleLogin"
               />
             </div>
           </template>

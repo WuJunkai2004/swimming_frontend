@@ -64,11 +64,11 @@ onMounted(() => {
 
   <div class="page-content-container">
 
-    <Button 
-      label="返回" 
-      icon="pi pi-arrow-left" 
-      @click="goBack" 
-      class="p-button-text p-button-secondary mt-4 mb-3 md:hidden" 
+    <Button
+      label="返回"
+      icon="pi pi-arrow-left"
+      @click="goBack"
+      class="p-button-text p-button-secondary mt-4 mb-3 md:hidden"
     />
 
     <div v-if="loading" class="news-content-skeleton">

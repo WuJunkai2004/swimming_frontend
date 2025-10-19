@@ -148,9 +148,9 @@ const currentView = computed(() => {
       <template #start>
         <Button
           icon="pi pi-bars"
-          severity="secondary" 
-          outlined 
-          class="md:hidden mr-2" 
+          severity="secondary"
+          outlined
+          class="md:hidden mr-2"
           @click="isMobileSidebarVisible = true"
         />
         <div class="hidden md:flex align-items-center">

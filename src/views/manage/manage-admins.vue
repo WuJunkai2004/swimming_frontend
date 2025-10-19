@@ -63,7 +63,7 @@ const strengthLabel = computed(() => {
 });
 
 const allRequiredField = computed(() => {
-  return formUsername.value && formPassword.value && 
+  return formUsername.value && formPassword.value &&
          formPassword.value.length >= 8 && passwordStrength.value >= 2;
 });
 
@@ -207,8 +207,8 @@ const handleSubmit = async () => {
 // 处理删除按钮点击
 const handleDelete = async (admin) => {
   const confirm_del = await awaitAlert(
-    '确认删除', 
-    `您确定要删除管理员 "${admin.userName}" 吗？此操作不可逆！`, 
+    '确认删除',
+    `您确定要删除管理员 "${admin.userName}" 吗？此操作不可逆！`,
     {
       accept: '确认删除',
       reject: '取消',
@@ -264,12 +264,12 @@ onMounted(fetchAdminsList);
 
     </div>
 
-    <Dialog 
-      v-model:visible="isDialogVisible" 
-      modal 
-      :header="dialogMode === 'add' ? '新增管理员' : '修改管理员信息'" 
+    <Dialog
+      v-model:visible="isDialogVisible"
+      modal
+      :header="dialogMode === 'add' ? '新增管理员' : '修改管理员信息'"
       :style="{ width: '90vw', maxWidth: '800px' }"
-      :dismissableMask="true"
+      dismissableMask
     >
       <div v-if="isDialogLoading" class="flex justify-content-center p-5">
         <ProgressSpinner />
@@ -279,18 +279,18 @@ onMounted(fetchAdminsList);
         <div class="col-12 md:col-8">
           <div class="field">
             <label>管理员用户名 </label>
-            <InputText 
-              id="username" 
-              class="w-full" 
-              v-model="formUsername" 
+            <InputText
+              id="username"
+              class="w-full"
+              v-model="formUsername"
             />
           </div>
           <div class="field">
             <label>管理员新密码 </label>
-            <Password 
-              id="password" 
-              class="w-full" 
-              v-model="formPassword" 
+            <Password
+              id="password"
+              class="w-full"
+              v-model="formPassword"
               :feedback="false"
               toggleMask
             />
@@ -303,8 +303,8 @@ onMounted(fetchAdminsList);
                 { label: '极强', color: '#2196f3', value: passwordStrength >= 4 ? 25 : 0 }
               ]" class="flex-1">
               </MeterGroup>
-              <span 
-                :class="strengthLabel.colorClass" 
+              <span
+                :class="strengthLabel.colorClass"
                 class="font-bold w-5rem text-right"
               >
                 {{ strengthLabel.text }}

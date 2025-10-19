@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router';
 
 export function useToken() {
     const router = useRouter();
-    
+
     const setToken = (token) => {
         Cookies.set('token', token, { expires: 1 });
     };

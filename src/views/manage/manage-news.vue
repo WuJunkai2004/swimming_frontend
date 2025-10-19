@@ -83,8 +83,8 @@ const endOfFetch = (data) => {
 
 const deleteNews = (newsItem) => {
   asyncAlert(
-    '确认删除', 
-    `您确定要删除新闻 "${newsItem.title}" 吗？`, 
+    '确认删除',
+    `您确定要删除新闻 "${newsItem.title}" 吗？`,
     {
       accept: '确认删除',
       reject: '取消',
@@ -110,8 +110,8 @@ const deleteNews = (newsItem) => {
 };
 
 const restoreNews = (newsItem) => {
-  asyncAlert('确认恢复', 
-    `您确定要恢复新闻 "${newsItem.title}" 吗？`, 
+  asyncAlert('确认恢复',
+    `您确定要恢复新闻 "${newsItem.title}" 吗？`,
     {
       accept: '确认恢复',
       reject: '取消',
@@ -180,18 +180,18 @@ onMounted(fetchNews);
       </div>
 
       <div class="pagination-controls flex align-items-center">
-        <Button 
-          icon="pi pi-angle-left" 
+        <Button
+          icon="pi pi-angle-left"
           class="p-button-secondary p-button-outlined"
-          @click="prevPage" 
-          :disabled="currentPage === 1 || isLoading" 
+          @click="prevPage"
+          :disabled="currentPage === 1 || isLoading"
         />
         <span class="mx-3 text-color-secondary">第 {{ currentPage }} 页</span>
-        <Button 
-          icon="pi pi-angle-right" 
+        <Button
+          icon="pi pi-angle-right"
           class="p-button-secondary p-button-outlined"
-          @click="nextPage" 
-          :disabled="isLastPage || isLoading" 
+          @click="nextPage"
+          :disabled="isLastPage || isLoading"
         />
       </div>
     </div>
@@ -208,9 +208,9 @@ onMounted(fetchNews);
       </div>
 
       <div v-else-if="newsList.length > 0" class="news-list">
-        <div 
-          v-for="item in newsList" 
-          :key="item.id" 
+        <div
+          v-for="item in newsList"
+          :key="item.id"
           class="news-item flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center p-3"
         >
           <div class="news-title font-medium text-lg mb-2 md:mb-0">

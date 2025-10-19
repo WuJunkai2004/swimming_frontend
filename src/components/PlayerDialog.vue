@@ -56,10 +56,10 @@ defineExpose({
 </script>
 
 <template>
-  <Dialog 
-    v-model:visible="dialogVisible" 
-    modal 
-    header="运动员详情" 
+  <Dialog
+    v-model:visible="dialogVisible"
+    modal
+    header="运动员详情"
     :style="{ width: '90vw', maxWidth: '650px' }"
     dismissableMask
     :draggable="false"

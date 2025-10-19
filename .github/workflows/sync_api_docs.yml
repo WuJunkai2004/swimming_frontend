@@ -57,10 +57,10 @@ jobs:
           # 我们在 action runner 中添加 gitee.com 到 known_hosts
           mkdir -p ~/.ssh/
           ssh-keyscan gitee.com >> ~/.ssh/known_hosts
-          
+
           # 使用 SSH URL 克隆
           git clone git@gitee.com:murphy_955/fzu_swim_association_web.git gitee_docs_repo
-      
+
       # 7. 将新文档复制到 Gitee 仓库的 docs 文件夹
       - name: 复制并准备提交
         run: |
@@ -75,14 +75,14 @@ jobs:
       - name: 提交并推送到 Gitee
         run: |
           cd gitee_docs_repo
-          
+
           # 配置 Git 用户信息
           git config user.name "GitHub Action Bot"
           git config user.email "action-bot@github.com"
-          
+
           # 添加更改并检查是否有实际变动
           git add docs/接口文档.auto.md
-          
+
           # 检查是否有文件被暂存（即有变动）
           if git diff --staged --quiet; then
             echo "API文档没有变化，无需推送。"

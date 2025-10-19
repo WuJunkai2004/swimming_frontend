@@ -4,7 +4,7 @@ const routes = [
   {
     path: '/',              // 访问根路径 / 时
     name: 'Home',
-    component: () => import('@/views/index.vue') 
+    component: () => import('@/views/index.vue')
   },
   {
     path: '/index.html',    // 访问 /index.html 路径时, 与根路径相同

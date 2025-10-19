@@ -190,7 +190,7 @@ const handleSubmit = async () => {
                 label="确认提交报名"
                 icon="pi pi-check"
                 class="w-full mt-3"
-                :loading="isSubmitting" 
+                :loading="isSubmitting"
                 :disabled="!isAllowSubmit"
                 @click="handleSubmit"
               />

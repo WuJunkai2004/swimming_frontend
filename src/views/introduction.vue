@@ -59,7 +59,7 @@ const activities = ref([
   <div>
     <MobileMenuBar />
     <ComputerMenuBar />
-    <!-- 
+    <!--
       需求 3: 实现上下翻页效果的核心容器。
       我们使用 CSS Scroll Snapping 技术。
     -->
@@ -145,7 +145,7 @@ const activities = ref([
 /* 滚动吸附容器 */
 .scroll-container {
   /* 高度减去菜单栏的大致高度，确保滚动区域不被遮挡 */
-  height: calc(100vh - 80px); 
+  height: calc(100vh - 80px);
   overflow-y: scroll;
   scroll-snap-type: y mandatory; /* 核心：在Y轴上强制吸附 */
 }
@@ -267,7 +267,7 @@ const activities = ref([
   .activities-section h2, .awards-section h2 {
     font-size: 2.5rem;
   }
-  
+
   /* 在移动端，让Timeline内容都在右侧，更易读 */
   :deep(.p-timeline-event:nth-child(even)) {
     flex-direction: row !important;

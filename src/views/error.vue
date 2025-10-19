@@ -27,7 +27,7 @@
 .notfound-page-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%; 
+  height: 100%;
 }
 .notfound-bg {
   background: linear-gradient(135deg, #f1f1f1 0%, #e3e3e3 100%);
