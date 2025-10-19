@@ -123,7 +123,7 @@ const insertImage = insertFunction('image',
     }
   }, 
   () => {
-    isImageDialogVisible.value = false;
+    // 上传文件后不关闭弹窗，等待其他操作
   }
 );
 
@@ -154,6 +154,28 @@ const insertVideoPreview = insertFunction('image',
     // 上传封面后不关闭弹窗，等待用户确认插入
   }
 );
+
+const insertImageFinish = async () => {
+  const editing = editingBlockIndex.value;
+  if(editing === -1 || contentBlocks.value[editing].type !== 'image'){
+    alerts('错误', `错误的函数调用方式`, {icon: 'pi pi-times-circle'});
+    return;
+  }
+  if(!contentBlocks.value[editing].url){
+    alerts('错误', '请先上传图片文件', {icon: 'pi pi-times-circle'});
+    return;
+  }
+  if(!contentBlocks.value[editing].preview){
+    if(!await awaitAlert('确认插入', '您还未填写图片描述，是否继续？', {
+      icon: 'pi pi-exclamation-triangle',
+      accept: '继续插入',
+      reject: '取消'
+    })){
+      return;
+    }
+  }
+  isImageDialogVisible.value = falses;
+}
 
 const insertVideoFinish = async () => {
   const editing = editingBlockIndex.value;
@@ -407,6 +429,11 @@ onBeforeUnmount(() => {
           </div>
         </template>
       </FileUpload>
+      <InputText v-model="contentBlocks[editingBlockIndex].preview" placeholder="请输入文字描述，将呈现在图片下方" class="w-full mt-3" />
+      <template #footer>
+        <Button label="取消" @click="isImageDialogVisible=false" class="p-button-text" />
+        <Button label="确认插入" @click="insertImageFinish" />
+      </template>
     </Dialog>
 
     <Dialog v-model:visible="isVideoDialogVisible" modal header="插入视频" :style="{ width: '50rem' }">

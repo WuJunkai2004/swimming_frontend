@@ -104,8 +104,9 @@ onMounted(() => {
 
           <div v-if="item.type === 'text'" v-html="item.data" class="news-text"></div>
 
-          <div v-else-if="item.type === 'image'" class="flex justify-content-center my-4">
+          <div v-else-if="item.type === 'image'" class="flex flex-column align-items-center my-4">
             <Image :src="item.url" class="news-image" alt="新闻图片" preview />
+            <p class="text-sm text-gray-500 mt-2 text-center">{{ item.preview }}</p>
           </div>
 
           <div v-else-if="item.type === 'video'" class="news-video flex justify-content-center my-4">
