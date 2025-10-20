@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch, shallowRef } from 'vue';
 import { useToken } from '@/composables/useToken'
 
-import no_page from '@/views/manage/no-page.vue';
+import loading from '@/views/manage/loading.vue';
 
 // --- 2. 鉴权与导航 ---
 const { getToken, removeToken } = useToken();
@@ -117,7 +117,7 @@ const loadComponent = async (path) => {
     const component = await page();
     return component.default;
   } else {
-    return no_page;
+    return loading;
   }
 }
 
@@ -137,7 +137,7 @@ watch(currentPath, async (newPath) => {
 
 // 计算当前应该显示的组件
 const currentView = computed(() => {
-  return loadedComponent.value || no_page;
+  return loadedComponent.value || loading;
 });
 </script>
 

@@ -56,7 +56,7 @@ const activities = ref([
 </script>
 
 <template>
-  <div>
+  <div style="overflow-x: hidden;">
     <MobileMenuBar />
     <ComputerMenuBar />
     <!--

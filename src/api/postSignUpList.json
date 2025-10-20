@@ -1,0 +1,31 @@
+{
+    "url": "/admin/postSignUpList",
+    "description": "管理员发布报名名单",
+    "params": {
+        "token": "鉴权token",
+        "athleteList": "运动员列表，是字典组成的列表",
+        "athleteList[].name": "运动员姓名",
+        "athleteList[].academicNumber": "运动员学号",
+        "athleteList[].college": "运动员学院的枚举值",
+        "activityTypes": "活动类型的枚举值列表",
+        "colleges": "允许学院的枚举值列表, 由运动员学院去重得到",
+        "collegeActivityLimits": "设置每个学院的相同项目允许的最大报名人数, 数字",
+        "athleteActivityLimits": "设置每个运动员允许报名的最大项目数, 数字",
+        "sameActivityMaxLimit": "设置每个项目的最大报名人数, 数字; null表示不限制",
+        "leaderPhone": "负责人联系电话",
+        "startTime": "2025-11-23，格式YYYY-MM-DD",
+        "endTime": "2025-11-24，格式YYYY-MM-DD",
+        "competitionName" : "2025年福州大学振奋杯"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "发布报名名单成功",
+        "data": null
+    },
+    "fail": {
+        "statusCode": 422,
+        "message": "发布报名名单失败",
+        "data": null
+    }
+}

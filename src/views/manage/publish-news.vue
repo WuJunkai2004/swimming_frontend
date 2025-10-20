@@ -174,7 +174,7 @@ const insertImageFinish = async () => {
       return;
     }
   }
-  isImageDialogVisible.value = falses;
+  isImageDialogVisible.value = false;
 }
 
 const insertVideoFinish = async () => {
