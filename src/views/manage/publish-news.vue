@@ -265,7 +265,16 @@ const publishNews = async () => {
     return;
   }
   isPublishing.value = true;
-  console.log('准备发布新闻:', { title: title.value, content: contentBlocks.value });
+  const publishContent = contentBlocks.value.filter(block => {
+    if (block.type === 'text') {
+      return block.data.trim() !== '';
+    }
+    if (block.type === 'image' || block.type === 'video') {
+      return block.url !== '';
+    }
+    return false;
+  });
+  console.log('准备发布新闻:', { title: title.value, content: publishContent });
   fetch('/admin/uploadNews', {
     method: 'POST',
     headers: {
@@ -274,7 +283,7 @@ const publishNews = async () => {
     body: JSON.stringify({
       token: getToken(),
       title: title.value,
-      content: contentBlocks.value
+      content: publishContent,
     })
   })
   .then(response => response.json())
