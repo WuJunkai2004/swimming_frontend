@@ -2,13 +2,13 @@
 import { ref, onMounted, computed } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
-import { collegeMap } from '@/composables/collegeMapping';
+import { useCollegeEnum } from '@/composables/collegeMapping';
 import { Copying } from '@/composables/useCopy';
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
 const { alerts } = useAlert();
-const collegeNames = collegeMap();
+const { collegeMap } = useCollegeEnum();
 
 // --- 2. 状态定义 ---
 // 列表状态
@@ -348,7 +348,7 @@ onMounted(fetchGamesList);
             <Column field="athleteId" header="学号"></Column>
             <Column field="college" header="学院">
               <template #body="slotProps">
-                {{ collegeNames[slotProps.data.college] || slotProps.data.college }}
+                {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
               </template>
             </Column>
             <Column field="registerEvents" header="报名项目">

@@ -6,11 +6,12 @@ import { useAlert } from '@/composables/useAlert';
 
 // --- 2. 静态资源导入 ---;
 // 导入学院枚举数据
-import { collegeMap } from '@/composables/collegeMapping';
+import { useCollegeEnum } from '@/composables/collegeMapping';
 
 // --- 3. 初始化 ---
 const route = useRoute();      // 用于获取路由参数
 const { alerts } = useAlert(); // 用于错误提示
+const { collegeMap } = useCollegeEnum(); // 获取学院映射数据
 
 // 从 URL 中获取比赛 ID
 const gameId = route.params.gameid;
@@ -32,7 +33,7 @@ const error = ref(null);        // 存储错误信息
 
 // (处理需求 3): 转换学院枚举对象为 PrimeVue Select 组件所需的数组格式
 const collegeOptions = ref(
-  Object.entries(collegeMap()).map(([key, value]) => ({
+  Object.entries(collegeMap).map(([key, value]) => ({
     label: value, // 显示中文名
     value: key   // 提交 KEY
   }))

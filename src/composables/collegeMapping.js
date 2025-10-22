@@ -1,4 +1,5 @@
-const data = {
+// 原始映射
+const collegeMap = {
   "ZIJIN_ADDRESS_AND_SCHOOL_OF_MINING": "紫金地址与矿业学院",
   "SCHOOL_OF_ELECTRICAL_ENGINEERING_AND_AUTOMATION": "电气工程与自动化学院",
   "MEDICAL_COLLEGE_OF_FZU": "医学院",
@@ -28,6 +29,22 @@ const data = {
   "DEPARTMENT_OF_PHYSICAL_EDUCATION_AND_RESEARCH": "体育教学研究部"
 }
 
-export function collegeMap() {
-  return data;
+// 只有枚举字符串
+const collegeEnum = Object.keys(collegeMap);
+
+// 只有学院名字
+const collegeName = Object.values(collegeMap);
+
+// 反映射
+const collegeEnumMap = Object.fromEntries(
+  Object.entries(collegeMap).map(([key, value]) => [value, key])
+);
+
+export function useCollegeEnum() {
+  return {
+    collegeMap,   // enum -> name mapping
+    collegeEnum,  // only enum string
+    collegeName,  // only name string
+    collegeEnumMap // name -> enum mapping
+  }
 }
