@@ -12,11 +12,6 @@ const routes = [
     component: () => import('@/views/index.vue')
   },
   {
-    path: '/introduction',  // 访问 /introduction 路径时
-    name: 'Introduction',
-    component: () => import('@/views/introduction.vue')
-  },
-  {
     path: '/swimlevel',   // 访问 /swimlevel 路径时
     name: 'LevelQuery',
     component: () => import('@/views/swimlevel.vue')

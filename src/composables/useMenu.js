@@ -11,9 +11,9 @@ export function useMenu() {
       command: () => router.push('/')
     },
     {
-      label: '关于',
+      label: '联系我们',
       icon: 'pi pi-info-circle',
-      command: () => router.push('/introduction')
+      command: () => router.push('/#introduction')
     },
     {
       label: '资讯',
