@@ -21,6 +21,11 @@ export function useMenu() {
       command: () => router.push('/activity')
     },
     {
+      label: '教练团队',
+      icon: 'pi pi-users',
+      command: () => router.push('/leaders')
+    },
+    {
       label: '优秀运动员',
       icon: 'pi pi-star',
       command: () => router.push('/excellence')

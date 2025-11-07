@@ -67,13 +67,13 @@ const activities = ref([
       <!--简单介绍-->
       <section class="scroll-section hero-section">
         <div class="hero-overlay"></div>
-        <div class="hero-content text-center">
+        <div class="hero-content text-left">
           <h1 class="text-6xl font-light mb-4">福州大学学生游泳协会</h1>
           <p class="text-2xl font-light motto">「安全第一、快乐游泳、共同进步」</p>
           <p class="mt-4 max-w-30rem line-height-3">
-            福州大学学生游泳协会成立于2022年，是由校团委指导、校学生会监督的校级体育类社团。自成立以来，我们始终秉持“安全第一、快乐游泳、共同进步”的宗旨，致力于推广游泳运动、普及游泳知识、搭建交流平台。
+            {{"　　"}}福州大学学生游泳协会成立于2022年，是由校团委指导、校学生会监督的校级体育类社团。自成立以来，我们始终秉持“安全第一、快乐游泳、共同进步”的宗旨，致力于推广游泳运动、普及游泳知识、搭建交流平台。
             <br>
-            从最初的几十人小团体，到如今拥有注册会员五百余人、年均组织活动十余场的“五星社团”，无论您是零基础的“旱鸭子”，还是追求速度的“游泳达人”，在这里都能找到属于自己的“泳”者天地！
+            {{"　　"}}从最初的几十人小团体，到如今拥有注册会员五百余人、年均组织活动十余场的“五星社团”，无论您是零基础的“旱鸭子”，还是追求速度的“游泳达人”，在这里都能找到属于自己的“泳”者天地！
           </p>
         </div>
         <div class="scroll-indicator">
@@ -135,6 +135,11 @@ const activities = ref([
             </Timeline>
           </div>
         </div>
+      </section>
+
+      <!-- 第四部分：关于我们 -->
+      <section class="scroll-section about-us">
+
       </section>
 
     </div>
