@@ -160,7 +160,7 @@ const goToHome = () => {
 /* 左侧图片面板样式 */
 .image-panel {
   position: relative;
-  background: url('https://imags.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+  background: url('/login.webp') no-repeat center center;
   background-size: cover;
 }
 
