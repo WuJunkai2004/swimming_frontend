@@ -1,6 +1,6 @@
 {
-    "url": "/admin/deleteExcellence",
-    "description": "删除优秀运动员",
+    "url": "/admin/deleteAlumnus",
+    "description": "删除优秀运动员/校友",
     "params": {
         "id": "运动员的id",
         "token": "登录成功返回的鉴权token"

@@ -15,7 +15,7 @@ const error = ref(null);
 const isDialogVisible = ref(false);
 const dialogMode = ref('add'); // 'add' 或 'edit'
 const isDialogLoading = ref(false); // 用于弹窗内部的操作（获取详情、提交）
-const editingAthleteId = ref(null); // 存储正在编辑的运动员ID
+const editingAthleteId = ref(null); // 存储正在编辑的校友ID
 
 // 表单数据状态
 const formName = ref('');
@@ -30,17 +30,17 @@ const allRequiredField = computed(() => {
 
 // --- 4. API 调用逻辑 ---
 
-// 获取运动员列表
+// 获取校友列表
 const fetchAthletesList = async () => {
   isLoading.value = true;
   error.value = null;
-  fetch('/player/getExcellenceList')
+  fetch('/alumnus/getAlumnusList')
   .then(response => response.json())
   .then(data => {
     if(data.statusCode === 200){
       athletesList.value = data.data;
     } else {
-      error.value = data.message || '无法加载优秀运动员列表，请稍后重试';
+      error.value = data.message || '无法加载优秀校友列表，请稍后重试';
     }
   })
   .finally(() => {
@@ -73,10 +73,10 @@ const handleAvatarUpload = async (event) => {
   })
 };
 
-// 获取运动员详情 (用于修改时预填表单)
+// 获取校友详情 (用于修改时预填表单)
 const fetchAthleteDetail = async (id) => {
   isDialogLoading.value = true;
-  fetch(`/player/getExcellenceDetail?id=${id}`)
+  fetch(`/alumnus/getAlumnusDetail?id=${id}`)
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
@@ -95,9 +95,9 @@ const fetchAthleteDetail = async (id) => {
   });
 };
 
-// 新增运动员
+// 新增校友
 const addExcellence = async () => {
-  const response = await fetch('/admin/addExcellence', {
+  const response = await fetch('/admin/addAlumnus', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -121,9 +121,9 @@ const addExcellence = async () => {
   return false;
 };
 
-// 删除运动员
+// 删除校友
 const deleteExcellence = async (id) => {
-  const response = await fetch('/admin/deleteExcellence', {
+  const response = await fetch('/admin/deleteAlumnus', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ const handleSubmit = async () => {
   if (formImgUrl.value === '') {
     if(!await awaitAlert(
       '确认操作',
-      '您还未为运动员上传头像，确定要继续提交吗？',
+      '您还未为校友上传头像，确定要继续提交吗？',
       {
         accept: '继续提交（无头像）',
         reject: '返回上传',
@@ -209,7 +209,7 @@ const handleSubmit = async () => {
 const handleDelete = async (athlete) => {
   const confirm_del = await awaitAlert(
     '确认删除',
-    `您确定要删除运动员 "${athlete.name}" 吗？`,
+    `您确定要删除校友 "${athlete.name}" 吗？`,
     {
       accept: '确认删除',
       reject: '取消',
@@ -233,8 +233,8 @@ onMounted(fetchAthletesList);
   <div class="p-4 surface-card shadow-2 border-round">
 
     <div class="flex justify-content-between align-items-center mb-4">
-      <h1 class="text-3xl font-bold m-0">优秀运动员管理</h1>
-      <Button label="新增运动员" icon="pi pi-plus" @click="openAddDialog" />
+      <h1 class="text-3xl font-bold m-0">优秀校友管理</h1>
+      <Button label="新增校友" icon="pi pi-plus" @click="openAddDialog" />
     </div>
 
     <Divider />
@@ -268,7 +268,7 @@ onMounted(fetchAthletesList);
     <Dialog
       v-model:visible="isDialogVisible"
       modal
-      :header="dialogMode === 'add' ? '新增优秀运动员' : '修改运动员信息'"
+      :header="dialogMode === 'add' ? '新增优秀校友' : '修改校友信息'"
       :style="{ width: '90vw', maxWidth: '800px' }"
       dismissableMask
     >

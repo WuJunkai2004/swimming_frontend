@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 // --- 1. 状态定义 ---
-// 优秀运动员列表的状态
+// 优秀校友列表的状态
 const playersList = ref([]);
 const isListLoading = ref(true); // 列表是否正在加载（用于骨架屏）
 const listError = ref(null);     // 列表加载错误信息
@@ -12,22 +12,22 @@ const playerDialogRef = ref(null);
 
 // --- 2. API 调用逻辑 ---
 /**
- * 异步函数：获取优秀运动员列表
+ * 异步函数：获取优秀校友列表
  */
 const fetchPlayerList = async () => {
   isListLoading.value = true;
   listError.value = null;
-  fetch('/player/getExcellenceList')
+  fetch('/alumnus/getAlumnusList')
   .then(response => response.json())
   .then(data => {
     if(data && data.statusCode === 200){
       playersList.value = data.data;
     } else {
-      listError.value = data.message || '无法加载优秀运动员列表，请稍后重试。';
+      listError.value = data.message || '无法加载优秀校友列表，请稍后重试。';
     }
   })
   .catch(e => {
-    listError.value = '无法加载优秀运动员列表，请稍后重试。';
+    listError.value = '无法加载优秀校友列表，请稍后重试。';
     console.error(e);
   })
   .finally(() => {
@@ -36,8 +36,8 @@ const fetchPlayerList = async () => {
 };
 
 /**
- * 异步函数：根据 ID 获取运动员详情
- * @param {string} playerId - 被点击的运动员ID
+ * 异步函数：根据 ID 获取校友详情
+ * @param {string} playerId - 被点击的校友ID
  */
 const fetchPlayerDetail = async (playerId) => {
   isDetailDialogVisible.value = true;
@@ -46,7 +46,7 @@ const fetchPlayerDetail = async (playerId) => {
 
 // --- 3. 生命周期钩子 ---
 
-// 当组件挂载完成后，立即获取优秀运动员列表
+// 当组件挂载完成后，立即获取优秀校友列表
 onMounted(() => {
   fetchPlayerList();
 });
@@ -61,7 +61,7 @@ onMounted(() => {
       <div class="col-12 lg:col-10 xl:col-8">
 
         <div class="page-header px-3 mb-4">
-          <h1 class="text-3xl font-bold">优秀运动员表彰</h1>
+          <h1 class="text-3xl font-bold">优秀校友表彰</h1>
           <Divider />
         </div>
 
@@ -100,7 +100,7 @@ onMounted(() => {
 
         <div v-else class="text-center p-5">
           <i class="pi pi-inbox" style="font-size: 2rem"></i>
-          <p>暂无优秀运动员信息</p>
+          <p>暂无优秀校友信息</p>
         </div>
 
       </div>
@@ -119,7 +119,7 @@ onMounted(() => {
   color: var(--p-text-color);
 }
 
-/* 优秀运动员卡片样式 */
+/* 优秀校友卡片样式 */
 .player-card {
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;

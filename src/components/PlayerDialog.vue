@@ -23,8 +23,8 @@ const dialogVisible = computed({
 });
 
 /**
- * 异步函数：根据 ID 获取运动员详情
- * @param {string} playerId - 被点击的运动员ID
+ * 异步函数：根据 ID 获取校友详情
+ * @param {string} playerId - 被点击的校友ID
  */
 const fetchPlayerDetail = (playerId) => {
   // 1. 显示加载状态
@@ -59,7 +59,7 @@ defineExpose({
   <Dialog
     v-model:visible="dialogVisible"
     modal
-    header="运动员详情"
+    header="校友详情"
     :style="{ width: '90vw', maxWidth: '650px' }"
     dismissableMask
     :draggable="false"

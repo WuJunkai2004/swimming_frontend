@@ -50,7 +50,7 @@ const activities = ref([
   {
     icon: 'pi pi-calendar-plus',
     title: '系统性日常训练',
-    content: '自2022年成立以来，校游泳队保持着一周六训的备战传统。队员们在专职教师的指导下，由高水平运动员带领进行系统性训练，其内容涵盖技术分解、包干冲刺、划频调控、有氧耐力等核心环节，同时兼顾出发转身等技术细节，力求全面提升运动表现。'
+    content: '自2022年成立以来，校游泳队保持着一周六训的备战传统。队员们在专职教师的指导下，由高水平校友带领进行系统性训练，其内容涵盖技术分解、包干冲刺、划频调控、有氧耐力等核心环节，同时兼顾出发转身等技术细节，力求全面提升运动表现。'
   }
 ]);
 </script>
@@ -67,7 +67,7 @@ const activities = ref([
       <!--简单介绍-->
       <section class="scroll-section hero-section">
         <div class="hero-overlay"></div>
-        <div class="hero-content text-left">
+        <div class="hero-content text-center">
           <h1 class="text-6xl font-light mb-4">福州大学学生游泳协会</h1>
           <p class="text-2xl font-light motto">「安全第一、快乐游泳、共同进步」</p>
           <p class="mt-4 max-w-30rem line-height-3">

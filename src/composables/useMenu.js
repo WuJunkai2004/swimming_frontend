@@ -26,20 +26,15 @@ export function useMenu() {
       command: () => router.push('/leaders')
     },
     {
-      label: '优秀运动员',
+      label: '校友墙',
       icon: 'pi pi-star',
-      command: () => router.push('/excellence')
+      command: () => router.push('/alumnus')
     },
     {
       label: '等级查询',
       icon: 'pi pi-search',
       command: () => router.push('/swimlevel')
     },
-    {
-      label: '登录',
-      icon: 'pi pi-user',
-      command: () => router.push('/login')
-    }
   ]);
   return {
     menuItems

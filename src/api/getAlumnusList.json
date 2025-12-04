@@ -1,7 +1,10 @@
 {
-    "url": "/player/getExcellenceList",
-    "description": "获取优秀运动员列表",
-    "params": {},
+    "url": "/alumnus/getAlumnusList",
+    "description": "获取校友列表",
+    "params": {
+        "limit": "返回数量限制（可选）,默认10",
+        "page": "页码（可选）,默认1"
+    },
     "method": ["GET"],
     "response": {
         "statusCode": 200,

@@ -1,12 +1,13 @@
 {
-    "url": "/admin/addExcellence",
-    "description": "新增优秀运动员",
+    "url": "/admin/addAlumnus",
+    "description": "新增优秀运动员/校友",
     "params": {
         "token": "鉴权token",
         "name": "姓名（张三）",
         "age": "年龄（10086）",
         "grade": "年段（大一）",
         "introduction": "介绍（...）",
+        "wetherInSchool": "是否在校（是/否）,boolean类型",
         "imgUrl": "图片链接"
     },
     "method": ["POST"],
