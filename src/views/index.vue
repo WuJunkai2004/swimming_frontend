@@ -137,9 +137,22 @@ const activities = ref([
         </div>
       </section>
 
-      <!-- 第四部分：关于我们 -->
-      <section class="scroll-section about-us">
+      <!-- 第四部分：关注我们 -->
+      <section class="scroll-section contact-section">
+        <div class="grid align-items-center h-full w-full justify-content-center">
+          <div class="col-12 md:col-8 flex flex-column md:flex-row align-items-center justify-content-center gap-5">
+            
+            <div class="text-content text-center md:text-right order-2 md:order-1">
+              <h2 class="text-3xl md:text-5xl font-light mb-2">欢迎关注公众号</h2>
+              <p class="text-sm md:text-xl text-color-secondary">获取最新赛事资讯与活动动态</p>
+            </div>
 
+            <div class="qr-code-container order-1 md:order-2">
+              <img src="/QRcode.webp" alt="公众号二维码" class="qr-code-img shadow-4" />
+            </div>
+
+          </div>
+        </div>
       </section>
 
     </div>
@@ -252,6 +265,18 @@ const activities = ref([
   padding: 0 !important;
 }
 
+/* 第四部分：Contact Section */
+.contact-section {
+  background-color: var(--p-surface-0);
+}
+.qr-code-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  /* 如果二维码是白底，加个边框会让它在浅色背景上更清晰 */
+  border: 1px solid var(--p-surface-border); 
+}
+
 /* 响应式调整 */
 @media (min-width: 768px) {
   .activities-carousel {
@@ -279,6 +304,11 @@ const activities = ref([
   }
   :deep(.p-timeline-event-content) {
     text-align: left !important;
+  }
+  /* 并适当缩小二维码 */
+  .qr-code-img {
+    width: 150px;
+    height: 150px;
   }
 }
 </style>

@@ -61,7 +61,7 @@ onMounted(() => {
       <div class="col-12 lg:col-10 xl:col-8">
 
         <div class="page-header px-3 mb-4">
-          <h1 class="text-3xl font-bold">优秀校友表彰</h1>
+          <h1 class="text-3xl font-bold">校友墙</h1>
           <Divider />
         </div>
 
@@ -93,6 +93,9 @@ onMounted(() => {
               </template>
               <template #subtitle>
                 {{ player.grade }} ({{ player.age }}岁)
+              </template>
+              <template>
+                {{ player.wetherInSchool ? '在校生' : '校友' }}
               </template>
             </Card>
           </div>
