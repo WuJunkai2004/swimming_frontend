@@ -17,6 +17,55 @@ const limit = ref(10);                  // 每页显示数量
 const showDeleted = ref(false);         // 是否显示已删除新闻的切换状态
 const isLastPage = ref(false);          // 是否为最后一页，用于禁用“下一页”按钮
 
+// 修改日期对话框状态
+const isDateDialogVisible = ref(false); // 控制弹窗显示
+const editingNewsId = ref(null);        // 当前正在编辑的新闻 ID
+const newDate = ref(null);              // 存储选中的日期对象
+const isSavingDate = ref(false);        // 控制保存按钮的加载状态
+const editTime = (newsItem) => {
+  editingNewsId.value = newsItem.id;
+  newDate.value = new Date(newsItem.publishTime);
+  isDateDialogVisible.value = true;
+};
+const saveTime = async () => {
+  if (!newDate.value) {
+    alerts('提示', '请选择一个日期', { icon: 'pi pi-info-circle' });
+    return;
+  }
+  isSavingDate.value = true;
+  try {
+    const year = newDate.value.getFullYear();
+    const month = String(newDate.value.getMonth() + 1).padStart(2, '0');
+    const day = String(newDate.value.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    console.log('准备保存日期:', formattedDate, '新闻ID:', editingNewsId.value);
+
+    const res = await fetch('/admin/updatePublishTime', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        newsId: editingNewsId.value,
+        publishTime: formattedDate,
+        token: getToken()
+      })
+    });
+    const data = await res.json();
+    if (data.statusCode !== 200) {
+      alerts('错误', data.message || '修改失败，请重试', { icon: 'pi pi-times-circle' });
+      return;
+    }
+    isDateDialogVisible.value = false;
+    alerts('成功', '发布时间修改成功', { icon: 'pi pi-check-circle' });
+  } catch (e) {
+    alerts('错误', '修改失败，请重试', { icon: 'pi pi-times-circle' });
+    console.error(e);
+  } finally {
+    isSavingDate.value = false;
+  }
+};
+
 /**
  * 获取新闻列表的核心函数
  * 会根据 currentPage, limit, showDeleted 的值动态构建请求
@@ -219,6 +268,7 @@ onMounted(fetchNews);
           <div class="actions flex gap-2">
             <template v-if="!showDeleted">
               <Button label="查看" icon="pi pi-eye" class="p-button-text p-button-sm" @click="viewNews(item)" />
+              <Button label="修改日期" icon="pi pi-calendar" class="p-button-text p-button-sm" @click="editTime(item)" />
               <Button label="删除" icon="pi pi-trash" class="p-button-text p-button-danger p-button-sm" @click="deleteNews(item)" />
             </template>
             <template v-else>
@@ -234,6 +284,30 @@ onMounted(fetchNews);
       </div>
 
     </div>
+
+  <Dialog 
+    v-model:visible="isDateDialogVisible" 
+    modal 
+    header="修改发布时间" 
+    :style="{ width: '90vw', maxWidth: '400px' }"
+  >
+    <div class="flex flex-column gap-2">
+      <label for="newDate" class="font-semibold">选择新日期</label>
+      <DatePicker 
+        id="newDate" 
+        v-model="newDate" 
+        dateFormat="yy-mm-dd" 
+        showIcon 
+        fluid 
+        class="w-full"
+      />
+    </div>
+    <template #footer>
+      <Button label="取消" icon="pi pi-times" text @click="isDateDialogVisible = false" />
+      <Button label="保存" icon="pi pi-check" @click="saveTime" :loading="isSavingDate" />
+    </template>
+  </Dialog>
+
   </div>
 </template>
 

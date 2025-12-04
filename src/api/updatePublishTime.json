@@ -1,0 +1,20 @@
+{
+    "url": "/admin/updatePublishTime",
+    "description": "更新新闻的发布时间",
+    "params": {
+        "token": "鉴权token",
+        "newsId": "要更新的新闻ID",
+        "publishTime": "新的发布时间，格式为YYYY-MM-DD HH:mm:ss"
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "更新发布时间成功",
+        "data": null
+    },
+    "fail": {
+        "statusCode": 449,
+        "message": "更新发布时间失败",
+        "data": null
+    }
+}
