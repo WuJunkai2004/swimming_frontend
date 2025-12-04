@@ -31,7 +31,7 @@ const fetchPlayerDetail = (playerId) => {
   isDetailLoading.value = true;
   selectedPlayerDetail.value = null; // 清空上次的数据
 
-  fetch(`/player/getExcellenceDetail?id=${playerId}`)
+  fetch(`/alumnus/getAlumnusDetail?id=${playerId}`)
   .then(response => response.json())
   .then(data => {
     if(data && data.statusCode === 200){
@@ -83,6 +83,7 @@ defineExpose({
             <h2 class="text-3xl font-bold mb-2">{{ selectedPlayerDetail.name }}</h2>
             <Tag :value="selectedPlayerDetail.grade" severity="info" class="mr-2"></Tag>
             <Tag :value="`${selectedPlayerDetail.age}岁`"></Tag>
+            <Tag v-if="!selectedPlayerDetail.wetherInSchool" value="校友" severity="success" class="ml-2"></Tag>
             <Divider />
             <p class="introduction">
               {{ selectedPlayerDetail.introduction || '暂无简介。' }}

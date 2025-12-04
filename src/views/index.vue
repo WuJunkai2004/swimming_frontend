@@ -1,6 +1,38 @@
 <script setup>
-import { ref } from 'vue';
-import Carousel from 'primevue/carousel';
+import { ref, onMounted, nextTick, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute(); // 获取当前路由信息
+let firstView = true;
+
+const handleScrollToAnchor = () => {
+  let hash = route.hash;
+  if(!hash){
+    hash = '#first';
+  }
+  if(firstView && hash === '#first'){
+    firstView = false;
+    return;
+  }
+  const id = hash.replace('#', '');
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+onMounted(() => {
+  nextTick(() => {
+    handleScrollToAnchor();
+  });
+});
+watch(
+  () => route.hash, 
+  () => {
+    nextTick(() => {
+      handleScrollToAnchor();
+    });
+  }
+);
 
 // 需求：从文章中提取历史奖项，并格式化为 PrimeVue Timeline 组件所需的数据结构
 const awards = ref([
@@ -65,7 +97,7 @@ const activities = ref([
     -->
     <div class="scroll-container">
       <!--简单介绍-->
-      <section class="scroll-section hero-section">
+      <section class="scroll-section hero-section" id="first">
         <div class="hero-overlay"></div>
         <div class="hero-content text-center">
           <h1 class="text-6xl font-light mb-4">福州大学学生游泳协会</h1>
@@ -138,7 +170,7 @@ const activities = ref([
       </section>
 
       <!-- 第四部分：关注我们 -->
-      <section class="scroll-section contact-section">
+      <section class="scroll-section contact-section" id="introduction">
         <div class="grid align-items-center h-full w-full justify-content-center">
           <div class="col-12 md:col-8 flex flex-column md:flex-row align-items-center justify-content-center gap-5">
             

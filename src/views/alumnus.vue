@@ -94,7 +94,7 @@ onMounted(() => {
               <template #subtitle>
                 {{ player.grade }} ({{ player.age }}岁)
               </template>
-              <template>
+              <template #content>
                 {{ player.wetherInSchool ? '在校生' : '校友' }}
               </template>
             </Card>
