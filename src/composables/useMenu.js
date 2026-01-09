@@ -21,6 +21,11 @@ export function useMenu() {
       command: () => router.push('/activity')
     },
     {
+      label: '比赛',
+      icon: 'pi pi-trophy',
+      command: () => router.push('/competition')
+    },
+    {
       label: '教练团队',
       icon: 'pi pi-users',
       command: () => router.push('/leaders')
