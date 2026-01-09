@@ -6,7 +6,8 @@
         "academicNumber": "学号102301121",
         "sportType": "FREESTYLES_100M",
         "college": "SCHOOL_OF_MATHEMATICS_AND_STATISTICS",
-        "gameId": "比赛ID"
+        "gameId": "比赛ID",
+        "group": "组别，A组/B组。取A/B单字母"
     },
     "method": ["POST"],
     "response": {

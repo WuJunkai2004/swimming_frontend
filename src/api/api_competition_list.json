@@ -1,0 +1,27 @@
+{
+    "url": "/api/competition/list",
+    "description": "公开接口，获取比赛列表",
+    "method": ["GET"],
+    "params": {
+        "page": "数字类型，默认1",
+        "limit": "数字类型，默认10"
+    },
+    "response": {
+        "statusCode": 200,
+        "message": "返回信息，成功时为'success'，失败时为错误描述",
+        "data": [
+            {
+                "id": "uuid",
+                "competitionName": "2025年福州大学振奋杯",
+                "startTime": "2025-11-23T08:00:00.000Z",
+                "endTime": "2025-11-24T16:00:00.000Z",
+                "status": "REGISTRATION_IN"
+            }
+        ]
+    },
+    "fail": {
+        "statusCode": 400,
+        "message": "错误描述",
+        "data": null
+    }
+}

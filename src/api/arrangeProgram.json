@@ -1,0 +1,32 @@
+{
+    "url": "/admin/arrangeProgram",
+    "description": "管理员安排比赛的顺序",
+    "params": {
+        "token": "登录成功返回的token",
+        "gameid": "比赛编号",
+        "event": "MAN_BUTTERFLY_50M",
+        "date": "2026-01-01",
+        "time": "MORNING | AFTERNOON | EVENING",
+        "marked": "项目的编号，从1递增，不能重复",
+        "group": "组别 A|B",
+        "data": [
+            {
+                "name": "朴国昌",
+                "studentNumber": "102301237",
+                "road": "数字类型，表示泳道",
+                "group": "数字类型，表示组别"
+            }
+        ]
+    },
+    "method": ["POST"],
+    "response": {
+        "statusCode": 200,
+        "message": "安排成功",
+        "data": null
+    },
+    "fail": {
+        "statusCode": 400,
+        "message": "安排失败，可能是参数错误或权限不足",
+        "data": null
+    }
+}
