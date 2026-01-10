@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
 import { SHA256 } from '@/composables/useHash';
@@ -10,25 +10,45 @@ const { alerts } = useAlert();
 const router = useRouter();
 
 const login_type = ref('ACCOUNT_SECRET_LOGIN')
+const usertype = ref('VOLS')
+const userOptions = [
+  { label: '志愿者', value: 'VOLS' },
+  { label: '管理员', value: 'ADMIN' }
+];
+const isVolsLogin = computed(() => usertype.value === 'VOLS');
 const username = ref('');
+// 志愿者登录所需数据
+const volsNumber = ref('');  // 学号
+const volsPosition = ref('STARTER');
+const volsPositionMap = {
+  "EXECUTIVE_PRESIDENT": "执行总裁",
+  "STARTER": "发令员",
+  "TIMER": "计时员",
+  "TECHNICAL_INSPECTION_OF_SWIMMING_IN": "游进技术检查",
+  "REINTAKE_INSPECTION": "转身检查",
+  "REBORN_INSPECTOR": "转身检查长",
+  "OTHER": "其他"
+}
+const volsPositionOptions = Object.entries(volsPositionMap).map(([value, label]) => ({ value, label }));
+const volsTakeRoad = ref(0)  // 所负责的泳道数组
+// 管理员登录所需数据
 const password = ref('');
 const passwordInputRef = ref(null)
+// 登录状态
 const is_loginning = ref(false);
 
 const focusPasswordInput = () => {
   passwordInputRef.value?.$el?.querySelector('input')?.focus();
 };
 
-// 登录按钮的点击事件处理函数
-const handleLogin = async () => {
-  if(!username.value) {
-    alerts('警告', '请输入用户名');
-    return;
-  }
-  if(!password.value || password.value.length < 8){
-    alerts('警告', '密码长度不能少于8位');
-  }
+const volsLogin = async () => {
+  // @todo: 实现志愿者登录逻辑
+  is_loginning.value = true;
+  alerts('提示', '志愿者登录功能尚未实现');
+  is_loginning.value = false;
+};
 
+const adminLogin = async () => {
   is_loginning.value = true;
   const pw_sha = await SHA256(password.value);
   fetch('/admin/login', {
@@ -56,6 +76,40 @@ const handleLogin = async () => {
     console.error('Error:', e);
     alerts('警告', '登录请求失败，请稍后重试');
   });
+};
+
+// 登录按钮的点击事件处理函数
+const handleLogin = async () => {
+  if(!username.value) {
+    alerts('警告', '请输入用户名');
+    return;
+  }
+  if(isVolsLogin){
+    if(!volsNumber.value){
+      alerts('警告', '请输入学号');
+      return;
+    }
+    if(volsNumber.value.replace(/\d/g, '').length > 0){
+      alerts('警告', '学号只能包含数字');
+      return;
+    }
+    if(!volsPosition.value){
+      alerts('警告', '请选择职务');
+      return;
+    }
+    if((volsPosition.value === 'REINTAKE_INSPECTION' || volsPosition.value === 'TIMER')
+      && !volsTakeRoad.value){
+      alerts('警告', '请选择负责泳道');
+      return;
+    }
+    await volsLogin();
+  } else {
+    if(!password.value || password.value.length < 8){
+      alerts('警告', '密码长度不能少于8位');
+      return;
+    }
+    await adminLogin();
+  }
 };
 
 const goToHome = () => {
@@ -87,6 +141,15 @@ const goToHome = () => {
           </template>
           <template #content>
             <div class="flex flex-column gap-4">
+              <SelectButton
+                v-model="usertype"
+                :options="userOptions"
+                option-label="label"
+                option-value="value"
+                class="w-full"
+                fluid
+              />
+
               <div class="p-float-label">
                 <label>用户名</label>
                 <InputText
@@ -98,7 +161,7 @@ const goToHome = () => {
                 />
               </div>
 
-              <div class="p-float-label">
+              <div v-if="!isVolsLogin" class="p-float-label">
                 <label>密码</label>
                 <Password
                   id="password"
@@ -112,11 +175,47 @@ const goToHome = () => {
                 />
               </div>
 
+              <div v-if="isVolsLogin" class="p-float-label">
+                <label>学号</label>
+                <InputText
+                  id="volsNumber"
+                  v-model="volsNumber"
+                  class="w-full"
+                  :disabled="is_loginning"
+                  :invalid="volsNumber.replace(/\d/g, '').length > 0"
+                />
+              </div>
+
+              <div v-if="isVolsLogin" class="p-float-label">
+                <label>职务</label>
+                <Select
+                  v-model="volsPosition"
+                  :options="volsPositionOptions"
+                  option-label="label"
+                  option-value="value"
+                  class="w-full"
+                  :disabled="is_loginning"
+                />
+              </div>
+
+              <div v-if="isVolsLogin && (volsPosition === 'REINTAKE_INSPECTION' || volsPosition === 'TIMER')" class="p-float-label">
+                <label>负责泳道</label>
+                <Select
+                  v-model="volsTakeRoad"
+                  :options="Array.from({ length: 8 }, (_, i) => ({ label: `泳道 ${i + 1}`, value: i + 1 }))"
+                  class="w-full"
+                  option-label="label"
+                  option-value="value"
+                  :disabled="is_loginning"
+                  placeholder="请选择负责的泳道"
+                />
+              </div>
+
               <Button
                 label="登录"
                 icon="pi pi-sign-in"
                 class="w-full mt-3"
-                :class="{ 'p-disabled': password.length < 8 || is_loginning}"
+                :class="{ 'p-disabled': !isVolsLogin && (password.length < 8 || is_loginning)}"
                 @click="handleLogin"
               />
             </div>

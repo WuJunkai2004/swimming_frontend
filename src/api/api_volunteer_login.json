@@ -1,0 +1,25 @@
+{
+    "url": "/api/volunteer/login",
+    "description": "志愿者登录接口",
+    "method": ["POST"],
+    "params": {
+        "name": "字符串类型，志愿者名字",
+        "position": "字符串类型，志愿者职位: EXECUTIVE_PRESIDENT|STARTER|TIMER|TECHNICAL_INSPECTION_OF_SWIMMING_IN|REINTAKE_INSPECTION|REBORN_INSPECTOR|OTHER",
+        "studentNumber": "字符串类型，志愿者学号",
+        "road": "列表类型，里面是数字。unique，取值1-8"
+    },
+    "response": {
+        "message": "成功",
+        "statusCode": 200,
+        "data": {
+            "token": "登录成功返回的token",
+            "position": "TECHNICAL_INSPECTION_OF_SWIMMING_IN",
+            "road": "自愿者负责的道，仅有TIMER,REINTAKE_INSPECTION有，其他职位返回空列表[]"
+        }
+    },
+    "fail": {
+        "message": "失败",
+        "statusCode": 400,
+        "data": null
+    }
+}
