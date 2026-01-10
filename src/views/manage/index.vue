@@ -102,13 +102,14 @@ const routes = {
   '/manage-athletes': () => import('./manage-athletes.vue'),
   '/manage-leaders': () => import('./manage-leaders.vue'),
   '/manage-admins': () => import('./manage-admins.vue'),
+  '/manage-vols': () => import('./manage-vols.vue'),
 };
 
 const currentPath = ref(window.location.hash);
 const loadedComponent = shallowRef(null)
 
 const updateCurrentPath = () => {
-  currentPath.value = window.location.hash;
+  currentPath.value = window.location.hash.split('?')[0];
 };
 
 const loadComponent = async (path) => {

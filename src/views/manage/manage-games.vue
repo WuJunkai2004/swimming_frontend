@@ -110,7 +110,7 @@ const onRowExpand = async (event) => {
 };
 
 const jumpToPublish = () => {
-  window.location.hash = '#/publish-game';
+    window.location.href = `${window.location.href.split('#')[0]}#/publish-game`;
 }
 
 // 需求 2.3: 预览比赛报名情况
@@ -191,6 +191,11 @@ const exportData = async (game) => {
   }
 };
 
+// 需求 2.5: 打开志愿者导入页面
+const jumpVolsManage = (game) => {
+  window.location.href = `${window.location.href.split('#')[0]}#/manage-vols?game=${game.uuid}`;
+};
+
 // --- 6. 生命周期钩子 ---
 onMounted(fetchGamesList);
 
@@ -261,6 +266,11 @@ onMounted(fetchGamesList);
                 class="p-button-text p-button-sm"
                 :id="`export-btn-${slotProps.data.uuid}`"
                 @click="exportData(slotProps.data)"
+              />
+              <Button
+                label="志愿者"
+                class="p-button-text p-button-sm p-button-info"
+                @click="jumpVolsManage(slotProps.data)"
               />
             </div>
           </template>
