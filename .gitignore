@@ -31,3 +31,6 @@ coverage
 # vercel config
 .vercel
 vercel.json
+
+# zed editor config
+.zed
