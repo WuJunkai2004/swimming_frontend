@@ -84,7 +84,7 @@ const handleLogin = async () => {
     alerts('警告', '请输入用户名');
     return;
   }
-  if(isVolsLogin){
+  if(isVolsLogin.value){
     if(!volsNumber.value){
       alerts('警告', '请输入学号');
       return;
