@@ -105,7 +105,7 @@ const routes = {
   '/manage-vols': () => import('./manage-vols.vue'),
 };
 
-const currentPath = ref(window.location.hash);
+const currentPath = ref(window.location.hash.split('?')[0]);
 const loadedComponent = shallowRef(null)
 
 const updateCurrentPath = () => {
