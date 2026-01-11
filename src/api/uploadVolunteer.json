@@ -1,0 +1,24 @@
+{
+    "url": "/admin/uploadVolunteer",
+    "description": "管理员上传志愿者信息",
+    "method": ["POST"],
+    "params": {
+        "token": "登录成功返回的token",
+        "gameid": "比赛编号",
+        "data": "信息列表",
+        "data[].name": "志愿者姓名",
+        "data[].studentNumber": "志愿者学号",
+        "data[].position": "志愿者岗位",
+        "data[].road": "志愿者所负责道次，整数转字符串，1-8道。仅TIMER和REINTAKE_INSPECTION岗位需要填写，其他岗位必须为空"
+    },
+    "response": {
+        "statusCode": "状态码，200表示成功，400表示请求参数错误，401表示未登录或token过期，403表示没有权限，500表示服务器错误",
+        "message": "状态描述",
+        "data": []
+    },
+    "fail": {
+        "statusCode": 400,
+        "message": "请求参数错误",
+        "data": []
+    }
+}

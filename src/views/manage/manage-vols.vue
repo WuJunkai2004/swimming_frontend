@@ -2,8 +2,10 @@
 import { ref, onMounted, computed } from 'vue';
 import { useAlert } from '@/composables/useAlert';
 import { Excetract } from '@/composables/excelUtils';
+import { useToken } from '@/composables/useToken';
 
 const { alerts, awaitAlert } = useAlert();
+const { getToken } = useToken();
 
 const gameId = ref(null);
 const gameInfo = ref({});
@@ -108,6 +110,79 @@ const getExcelFile = async (event) => {
   stage.value = 'manage';
 }
 
+const positionMap = {
+  "执行总裁": "EXECUTIVE_PRESIDENT",
+  "发令员": "STARTER",
+  "计时员": "TIMER",
+  "游进技术检查": "TECHNICAL_INSPECTION_OF_SWIMMING_IN",
+  "转身检查": "REINTAKE_INSPECTION",
+  "转身检查长": "REBORN_INSPECTOR",
+  "其他": "OTHER"
+};
+
+const confirmUpload = async () => {
+  if (volunteerList.value.length === 0){
+    return;
+  }
+
+  const data = [];
+  for (const vol of volunteerList.value) {
+    const code = positionMap[vol.position];
+    if (!code) {
+      alerts('错误', `未知职务: ${vol.position} (姓名: ${vol.name})`);
+      return;
+    }
+    let road = '';
+    if (code === 'TIMER' || code === 'REINTAKE_INSPECTION') {
+      if (!vol.lane) {
+        alerts('错误', `${vol.name} (${vol.position}) 需要填写泳道`);
+        return;
+      }
+      road = String(vol.lane);
+      if (!['1', '2', '3', '4', '5', '6', '7', '8'].includes(road)) {
+        alerts('错误', `泳道必须是 1-8: ${vol.lane} (姓名: ${vol.name})`);
+        return;
+      }
+    }
+
+    data.push({
+      name: vol.name,
+      studentNumber: String(vol.studentId),
+      position: code,
+      road: road
+    });
+  }
+
+  isLoading.value = true;
+
+  try {
+    const response = await fetch('/admin/uploadVolunteer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: getToken(),
+        gameid: gameId.value,
+        data: data
+      })
+    });
+    const result = await response.json();
+    if (result.statusCode === 200) {
+      alerts('成功', '上传成功');
+      volunteerList.value = [];
+      stage.value = 'upload';
+    } else {
+      alerts('错误', result.message || '上传失败');
+    }
+  } catch (e) {
+    console.error(e);
+    alerts('错误', '网络异常，请稍后重试');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 onMounted(() => {
   const params = window.location.href.split('?')[1];
   if (!params){
@@ -138,11 +213,13 @@ onMounted(() => {
           label="返回上传"
           icon="pi pi-eye"
           @click="resetAll"
+          class="p-button-secondary"
         />
         <Button
-          label="上传志愿者报名表"
-          icon="pi pi-upload"
-          @click="stage = 'upload'"
+          label="确认提交"
+          icon="pi pi-check"
+          @click="confirmUpload"
+          :loading="isLoading"
         />
       </div>
     </div>
@@ -181,7 +258,7 @@ onMounted(() => {
             <template #empty>
               <div class="flex align-items-center justify-content-center flex-column p-5">
                 <i class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400" />
-                <p class="mt-4 mb-0 text-xl">将比赛报名总表 (Excel) 拖拽到此处</p>
+                <p class="mt-4 mb-0 text-xl">将志愿者信息表 (Excel) 拖拽到此处</p>
                 <p class="mt-2 text-color-secondary">或点击选择文件</p>
               </div>
             </template>
