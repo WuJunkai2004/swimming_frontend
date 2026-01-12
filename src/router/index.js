@@ -57,6 +57,11 @@ const routes = [
     component: () => import('@/views/register_gameid.vue')
   },
   {
+    path: "/volunteer", // 访问 /volunteer 路径时，使用哈希路由模式
+    name: "Volunteer",
+    component: () => import("@/views/vols/index.vue"),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/error.vue')

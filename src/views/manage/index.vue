@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch, shallowRef } from 'vue';
 import { useToken } from '@/composables/useToken'
 
-import loading from '@/views/manage/loading.vue';
+import loading from '@/views/loading.vue';
 
 // --- 2. 鉴权与导航 ---
 const { getToken, removeToken } = useToken();
