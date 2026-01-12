@@ -6,7 +6,8 @@
         "name": "字符串类型，志愿者名字",
         "position": "字符串类型，志愿者职位: EXECUTIVE_PRESIDENT|STARTER|TIMER|TECHNICAL_INSPECTION_OF_SWIMMING_IN|REINTAKE_INSPECTION|REBORN_INSPECTOR|OTHER",
         "studentNumber": "字符串类型，志愿者学号",
-        "road": "列表类型，里面是数字。unique，取值1-8"
+        "road": "列表类型，里面是数字。unique，取值1-8",
+        "gameId": "字符串类型，比赛ID"
     },
     "response": {
         "message": "成功",

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
 import { SHA256 } from '@/composables/useHash';
@@ -31,6 +31,10 @@ const volsPositionMap = {
 }
 const volsPositionOptions = Object.entries(volsPositionMap).map(([value, label]) => ({ value, label }));
 const volsTakeRoad = ref(0)  // 所负责的泳道数组
+const availableCompetitions = ref([]);
+const selectedCompetitionId = ref('');
+const isQueryingCompetitions = ref(false);
+
 // 管理员登录所需数据
 const password = ref('');
 const passwordInputRef = ref(null)
@@ -41,11 +45,90 @@ const focusPasswordInput = () => {
   passwordInputRef.value?.$el?.querySelector('input')?.focus();
 };
 
+let debounceTimeout = null;
+
+const queryCompetitions = async () => {
+  if (!volsNumber.value || volsNumber.value.length !== 9) {
+    return;
+  }
+
+  isQueryingCompetitions.value = true;
+  fetch(`/api/competition/queryCompetition?studentNumber=${volsNumber.value}`)
+  .then(response => response.json())
+  .then(data => {
+    if (data.statusCode === 200) {
+      availableCompetitions.value = data.data || [];
+      // 如果只有一个比赛，默认选中
+      if (availableCompetitions.value.length === 1) {
+        selectedCompetitionId.value = availableCompetitions.value[0].id;
+      } else {
+        selectedCompetitionId.value = '';
+      }
+    } else {
+      availableCompetitions.value = [];
+      alerts('提示', '未查询到相关比赛信息');
+    }
+  })
+  .catch(error => {
+    console.error('Query competitions error:', error);
+    alerts('警告', '查询比赛信息失败');
+    availableCompetitions.value = [];
+  })
+  .finally(() => {
+    isQueryingCompetitions.value = false;
+  });
+};
+
+watch(volsNumber, (newValue) => {
+  if (debounceTimeout) {
+    clearTimeout(debounceTimeout);
+  }
+  if (newValue && newValue.length === 9) {
+    debounceTimeout = setTimeout(queryCompetitions, 500);
+  } else {
+    availableCompetitions.value = [];
+    selectedCompetitionId.value = '';
+  }
+});
+
 const volsLogin = async () => {
-  // @todo: 实现志愿者登录逻辑
   is_loginning.value = true;
-  alerts('提示', '志愿者登录功能尚未实现');
-  is_loginning.value = false;
+
+  // 构造请求数据
+  const payload = {
+    name: username.value,
+    position: volsPosition.value,
+    studentNumber: volsNumber.value,
+    road: volsTakeRoad.value ? [volsTakeRoad.value] : [], // 转换为数组
+    gameId: selectedCompetitionId.value
+  };
+
+  fetch("/api/volunteer/login", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.statusCode === 200) {
+      alerts('提示', '登录成功，正在跳转');
+      setToken(data.data.token);
+      // 根据返回的数据可能需要做一些处理，比如存储用户信息等
+      // 目前直接跳转
+      router.push('/volunteer'); // 假设志愿者也跳转到 manage 或者其他页面
+    } else {
+      alerts('警告', '登录失败: ' + data.message);
+    }
+  })
+  .catch(e => {
+    console.error('Error:', e);
+    alerts('警告', '登录请求失败，请稍后重试');
+  })
+  .finally(() => {
+    is_loginning.value = false;
+  });
 };
 
 const adminLogin = async () => {
@@ -89,8 +172,12 @@ const handleLogin = async () => {
       alerts('警告', '请输入学号');
       return;
     }
-    if(volsNumber.value.replace(/\d/g, '').length > 0){
-      alerts('警告', '学号只能包含数字');
+    if(volsNumber.value.length !== 9 || volsNumber.value.replace(/\d/g, '').length > 0){
+      alerts('警告', '请输入正确的9位学号');
+      return;
+    }
+    if(!selectedCompetitionId.value){
+      alerts('警告', '请选择一个比赛');
       return;
     }
     if(!volsPosition.value){
@@ -183,7 +270,30 @@ const goToHome = () => {
                   class="w-full"
                   :disabled="is_loginning"
                   :invalid="volsNumber.replace(/\d/g, '').length > 0"
+                  maxlength="9"
                 />
+              </div>
+
+              <div v-if="isVolsLogin" class="p-float-label">
+                <label>选择比赛</label>
+                <Select
+                  v-model="selectedCompetitionId"
+                  :options="availableCompetitions"
+                  option-label="competitionName"
+                  option-value="id"
+                  class="w-full"
+                  :disabled="is_loginning || (availableCompetitions.length === 0 && !isQueryingCompetitions)"
+                  :loading="isQueryingCompetitions"
+                  placeholder="请选择比赛"
+                >
+                  <template #empty>
+                    <div class="p-2">
+                      <span v-if="volsNumber.length === 9 && !isQueryingCompetitions" class="text-red-500">未查询到可参与的比赛</span>
+                      <span v-else-if="isQueryingCompetitions">正在查询比赛信息...</span>
+                      <span v-else>请输入9位学号以获取比赛列表</span>
+                    </div>
+                  </template>
+                </Select>
               </div>
 
               <div v-if="isVolsLogin" class="p-float-label">
