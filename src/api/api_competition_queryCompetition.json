@@ -1,0 +1,23 @@
+{
+    "url": "/api/competition/queryCompetition",
+    "description": "根据志愿者学号，查询比赛列表",
+    "method": ["GET"],
+    "params": {
+        "studentNumber": "字符串类型，9位志愿者学号"
+    },
+    "response": {
+        "message": "成功",
+        "statusCode": 200,
+        "data": [
+            {
+                "id": "uuid",
+                "competitionName": "2025年福州大学振奋杯"
+            }
+        ]
+    },
+    "fail": {
+        "message": "失败",
+        "statusCode": 400,
+        "data": []
+    }
+}
