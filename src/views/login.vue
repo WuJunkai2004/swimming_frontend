@@ -4,6 +4,7 @@ import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
 import { SHA256 } from '@/composables/useHash';
 import { useRouter } from 'vue-router'
+import { saveData } from '@/composables/Storage';
 
 const { setToken } = useToken();
 const { alerts } = useAlert();
@@ -115,9 +116,14 @@ const volsLogin = async () => {
     if (data.statusCode === 200) {
       alerts('提示', '登录成功，正在跳转');
       setToken(data.data.token);
-      // 根据返回的数据可能需要做一些处理，比如存储用户信息等
-      // 目前直接跳转
-      router.push('/volunteer'); // 假设志愿者也跳转到 manage 或者其他页面
+      saveData('gameId', selectedCompetitionId.value);
+      saveData('position', volsPositionMap[volsPosition.value] || '未知职务');
+      if (data.data.road.length) {
+        saveData('road', data.data.road[0]);
+      }
+      saveData('foulEnum', data.data.foulEnum);
+      saveData('permission', data.data.permission);
+      router.push('/volunteer');
     } else {
       alerts('警告', '登录失败: ' + data.message);
     }

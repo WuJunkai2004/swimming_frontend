@@ -15,7 +15,20 @@
         "data": {
             "token": "登录成功返回的token",
             "position": "TECHNICAL_INSPECTION_OF_SWIMMING_IN",
-            "road": "自愿者负责的道，仅有TIMER,REINTAKE_INSPECTION有，其他职位返回空列表[]"
+            "road": "自愿者负责的道，仅有TIMER,REINTAKE_INSPECTION有，其他职位返回空列表[]",
+            "foulEnum": [
+                "FALSE_START",
+                "SWIMMING_INCORRECTLY",
+                "REINTAKE_INCORRECTLY",
+                "OTHER|一个字符串的列表，允许提交的犯规类型"
+            ],
+            "permission": [
+                "INSERT_ACHIVEMENTS_ONLY_1_ROAD",
+                "UPDATE_ALL_ROAD_ACHIVEMENTS",
+                "INSERT_DEPARTURE_FOUL_ONLY_1_ROAD",
+                "UPDATE_ALL_DEPARTURE_FOUL",
+                "一个字符串的列表，允许该志愿者操作的权限"
+            ]
         }
     },
     "fail": {
