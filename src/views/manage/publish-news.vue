@@ -5,6 +5,7 @@ import { useAlert } from '@/composables/useAlert';
 import { useToken } from '@/composables/useToken';
 import { uploadImage, uploadVideo } from '@/composables/uploads';
 import { useRouter } from 'vue-router';
+import { saveData, getData, removeData } from '@/composables/useStorage';
 
 // --- 2. 初始化 ---
 const { alerts, asyncAlert } = useAlert();
@@ -208,19 +209,14 @@ const saveDraft = () => {
     content: contentBlocks.value,
     savedAt: new Date().toISOString()
   };
-  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-  // 自动保存的提示可以考虑移除，避免频繁打扰
+  saveData('draft', draft, 0);
   console.log('草稿已自动保存');
   setTimeout(() => isSaving.value = false, 1000);
 };
 
 const loadDraft = () => {
-  const draftString = localStorage.getItem(DRAFT_KEY);
-  if (!draftString) {
-    return;
-  }
-  const draft = JSON.parse(draftString);
-  if(!draft.content && !draft.title){
+  const draft = getData('draft');
+  if(!draft || (!draft.content && !draft.title)){
     return;
   }
   asyncAlert(
@@ -237,13 +233,13 @@ const loadDraft = () => {
     alerts('成功', '草稿已恢复', {icon: 'pi pi-check-circle'});
   })
   .catch(() => {
-    localStorage.removeItem(DRAFT_KEY);
+    clearDraft();
     alerts('提示', '草稿已放弃', {icon: 'pi pi-exclamation-triangle'});
   })
 };
 
 const clearDraft = () => {
-  localStorage.removeItem(DRAFT_KEY);
+  removeData('draft');
   console.log('本地草稿已清除');
 };
 

@@ -4,7 +4,7 @@ import { useToken } from '@/composables/useToken';
 import { useAlert } from '@/composables/useAlert';
 import { SHA256 } from '@/composables/useHash';
 import { useRouter } from 'vue-router'
-import { saveData } from '@/composables/Storage';
+import { saveData } from '@/composables/useStorage';
 
 const { setToken } = useToken();
 const { alerts } = useAlert();
