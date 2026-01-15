@@ -1,0 +1,30 @@
+{
+    "url": "/api/competition/getGameSchedule",
+    "description": "志愿者获取比赛安排",
+    "method": ["GET"],
+    "params": {
+        "id": "number|true|比赛id"
+    },
+    "response": {
+        "message": "成功",
+        "statusCode": 200,
+        "data": [
+            {
+                "date": "2026-01-01",
+                "time": "MORNING",
+                "total": [
+                    {
+                        "marked": 1,
+                        "program": "MAN_BUTTERFLY_50M",
+                        "totalGroup": 2
+                    }
+                ]
+            }
+        ]
+    },
+    "fail": {
+        "message": "失败",
+        "statusCode": 400,
+        "data": null
+    }
+}
