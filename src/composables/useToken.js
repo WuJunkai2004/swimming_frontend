@@ -1,15 +1,15 @@
-import Cookies from 'js-cookie';
 import { useRouter } from 'vue-router';
+import { saveData, getData, removeData } from './useStorage';
 
 export function useToken() {
     const router = useRouter();
 
     const setToken = (token) => {
-        Cookies.set('token', token, { expires: 1 });
+        saveData('token', token, 24);
     };
 
     const getToken = () => {
-        const token = Cookies.get('token');
+        const token = getData('token');
         if(!token){
             router.push('/login');
         }
@@ -17,9 +17,8 @@ export function useToken() {
     };
 
     const removeToken = (relogin = false) => {
-        Cookies.remove('token');
+        removeData('token');
         if(relogin){
-            console.log(router);
             router.push('/login');
         }
     };
