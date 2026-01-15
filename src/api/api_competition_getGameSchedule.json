@@ -3,7 +3,7 @@
     "description": "志愿者获取比赛安排",
     "method": ["GET"],
     "params": {
-        "id": "number|true|比赛id"
+        "id": "string|true|比赛id"
     },
     "response": {
         "message": "成功",

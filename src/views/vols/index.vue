@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, shallowRef } from 'vue';
 import { useToken } from '@/composables/useToken';
-import { getData } from '@/composables/useStorage';
+import { getData, saveData } from '@/composables/useStorage';
 import loading from '@/views/loading.vue';
 
 const { getToken } = useToken();
@@ -37,8 +37,31 @@ const permissionRoutes = {
 const permissionList = getData('permission') || [];
 const loadedComponents = shallowRef(null);
 
+const loadSchedule = async () => {
+  const gameId = getData('gameId');
+  if (!gameId) {
+    console.error('No gameId found in storage.');
+    return;
+  }
+  fetch(`/api/competition/getGameSchedule?id=${gameId}`)
+  .then(response => response.json())
+  .then (data => {
+    if (data.code === 200) {
+      const schedule = data.data;
+      saveData('schedule', schedule);
+    } else {
+      throw new Error(data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching game schedule:', error);
+    saveData('schedule', []);
+  });
+};
+
 onMounted(async () => {
-  console.log('Permission List:', permissionList);
+  await loadSchedule();
+
   const componentsToLoad = [];
   const alreadyAdded = new Set();
 
@@ -60,6 +83,8 @@ onMounted(async () => {
 </script>
 
 <template>
+  <MobileMenuBar />
+  <ComputerMenuBar />
   <div v-for="currentView in loadedComponents" class="content-window">
     <component :is="currentView" />
   </div>
