@@ -69,7 +69,7 @@ const submitData = async () => {
     };
 
     const res = await fetch(
-      "/api/volunteer/uploadData?type=TECHNICAL_INSPECTION_OF_SWIMMING_IN",
+      "/api/volunteer/uploadData?type=REINTAKE_INSPECTION",
       {
         method: "POST",
         headers: {

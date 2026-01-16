@@ -88,8 +88,13 @@ const updatePage = (page) => {
 };
 
 // 点击卡片时导航到详情页 (注册页)
-const goToDetail = (id) => {
-  router.push(`/register/${id}`);
+// 如果比赛已结束，跳转到成绩页
+const goToDetail = (status, id) => {
+  if (status === 'COMPETITION_FINISHED' ){
+    router.push(`/result/${id}`);
+  } else {
+    router.push(`/register/${id}`);
+  }
 };
 
 // 监听路由参数变化
@@ -149,7 +154,7 @@ onMounted(() => {
 
         <div v-else>
           <div class="competition-list p-3">
-            <Card v-for="item in competitions" :key="item.id" class="mb-3 competition-item" @click="goToDetail(item.id)">
+            <Card v-for="item in competitions" :key="item.id" class="mb-3 competition-item" @click="goToDetail(item.status, item.id)">
               <template #title>
                 <span class="competition-title">{{ item.competitionName }}</span>
               </template>
