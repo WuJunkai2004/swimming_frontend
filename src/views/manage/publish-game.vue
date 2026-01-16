@@ -4,15 +4,16 @@ import { useToken } from "@/composables/useToken";
 import { useAlert } from "@/composables/useAlert";
 import {
   Excetract,
-  getNearestStr,
-  getSwimEvent,
+  getNearestStr
 } from "@/composables/excelUtils";
 import { useCollegeEnum } from "@/composables/collegeMapping";
+import { useEventEnum } from "@/composables/eventMapping";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
 const { alerts } = useAlert();
 const { collegeEnumMap, collegeName, collegeMap } = useCollegeEnum();
+const { eventEnum, eventMap } = useEventEnum();
 
 // --- 2. 状态定义 ---
 // 页面阶段控制: 'upload' 或 'edit'
@@ -20,7 +21,7 @@ const stage = ref("upload");
 // 编辑状态下的活动标签页
 const activeEditTab = ref("athleteList");
 const isPublishing = ref(false);
-const availableActivityTypes = ref([]);
+const availableActivityTypes = ref(eventEnum);
 
 // 存储从 Excel 提取并可编辑的比赛数据
 const gameData = reactive({
@@ -89,9 +90,7 @@ const getExcelFile = async (event) => {
   // 解析比赛信息
   gameData.competitionName = extract.getTitle();
 
-  const events = analyseSportEvent(getSwimEvent(extract.getHead()));
-  availableActivityTypes.value = events;
-  gameData.activityTypes = [...events];
+  gameData.activityTypes = [...eventEnum];
 
   // 提取去重后的学院列表
   const uniqueColleges = new Set(
@@ -159,6 +158,9 @@ const publishGame = async () => {
     }
 
     const result = await response.json();
+    if(result.statusCode){
+      throw new Error(result.message || "发布失败");
+    }
     alerts("成功", "比赛已成功发布！");
     // 成功后可以重置页面状态
     stage.value = "upload";
@@ -174,7 +176,6 @@ const publishGame = async () => {
     gameData.athleteActivityLimits = 2;
     gameData.sameActivityMaxLimit = null;
     sameActivityNoLimit.value = true;
-    availableActivityTypes.value = [];
   } catch (e) {
     console.error(e);
     alerts("失败", `发布失败: ${e.message}`);
@@ -287,7 +288,7 @@ const publishGame = async () => {
                     :value="act"
                     v-model="gameData.activityTypes"
                   />
-                  <label :for="act" class="ml-2">{{ act }}</label>
+                  <label :for="act" class="ml-2">{{ eventMap[act] || act }}</label>
                 </div>
               </div>
             </div>
@@ -308,7 +309,7 @@ const publishGame = async () => {
 
           <div class="field col-12 md:col-6">
             <label for="startTime">报名开始时间</label>
-            <Calendar
+            <DatePicker
               id="startTime"
               v-model="gameData.startTime"
               showIcon
@@ -317,7 +318,7 @@ const publishGame = async () => {
           </div>
           <div class="field col-12 md:col-6">
             <label for="endTime">报名截止时间</label>
-            <Calendar
+            <DatePicker
               id="endTime"
               v-model="gameData.endTime"
               showIcon
