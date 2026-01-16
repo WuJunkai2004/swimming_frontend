@@ -126,7 +126,7 @@ const showPreview = async (game) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         token: getToken(),
-        gameid: game.uuid
+        gameId: game.uuid
       })
     });
     const result = await response.json();

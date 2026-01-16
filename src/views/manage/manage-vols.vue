@@ -163,7 +163,7 @@ const confirmUpload = async () => {
       },
       body: JSON.stringify({
         token: getToken(),
-        gameid: gameId.value,
+        gameId: gameId.value,
         data: data
       })
     });
