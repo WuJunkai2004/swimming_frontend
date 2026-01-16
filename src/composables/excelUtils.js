@@ -1,4 +1,4 @@
-import { read, utils } from 'xlsx';
+import { read, utils } from "xlsx";
 
 /**
  * 一个用于解析 Excel 文件的工具类。
@@ -23,7 +23,7 @@ export class Excetract {
     this.#fileName = fileName;
     this.#worksheet = null;
     this.#data = [];
-    this.#title = '';
+    this.#title = "";
     this.#headers = [];
     this.#headerRowIndex = -1;
 
@@ -39,13 +39,13 @@ export class Excetract {
   static create(file) {
     return new Promise((resolve, reject) => {
       if (!file) {
-        return reject(new Error('未提供文件'));
+        return reject(new Error("未提供文件"));
       }
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
           const data = new Uint8Array(e.target.result);
-          const workbook = read(data, { type: 'array' });
+          const workbook = read(data, { type: "array" });
           // 解析成功后，创建实例并 resolve
           resolve(new Excetract(workbook, file.name));
         } catch (error) {
@@ -65,7 +65,7 @@ export class Excetract {
    */
   _initialize() {
     if (!this.#workbook || !this.#workbook.SheetNames.length) {
-      throw new Error('无效的 Excel 工作簿');
+      throw new Error("无效的 Excel 工作簿");
     }
     // 1. 获取第一个工作表
     const firstSheetName = this.#workbook.SheetNames[0];
@@ -85,7 +85,7 @@ export class Excetract {
   _findTitle() {
     const firstRow = this.#data[0] || [];
     // 过滤掉空单元格后，如果第一行只有一个格子
-    if (firstRow.filter(cell => cell != null && cell !== '').length === 1) {
+    if (firstRow.filter((cell) => cell != null && cell !== "").length === 1) {
       this.#title = firstRow[0];
     } else {
       this.#title = this.#fileName;
@@ -100,11 +100,15 @@ export class Excetract {
     for (let i = 0; i < this.#data.length; i++) {
       const row = this.#data[i] || [];
       // 过滤掉 null, undefined, 空字符串等无效单元格
-      const validCells = row.filter(cell => cell != null && String(cell).trim() !== '');
-      // 条件1: 有超过3个有效格子
-      const hasEnoughCells = validCells.length > 3;
+      const validCells = row.filter(
+        (cell) => cell != null && String(cell).trim() !== "",
+      );
+      // 条件1: 有超过2个有效格子
+      const hasEnoughCells = validCells.length >= 3;
       // 条件2: 某个格子里包含“姓名”二字
-      const hasNameCell = row.some(cell => typeof cell === 'string' && cell.includes('姓名'));
+      const hasNameCell = row.some(
+        (cell) => typeof cell === "string" && cell.includes("姓名"),
+      );
       if (hasEnoughCells && hasNameCell) {
         this.#headers = row;
         this.#headerRowIndex = i;
@@ -135,13 +139,17 @@ export class Excetract {
    * @returns {Array} 该列从表头行之后开始的所有数据
    */
   getCol(colIndex) {
-    if (this.#headerRowIndex === -1 || colIndex < 0 || colIndex >= (this.#headers.length || 0)) {
+    if (
+      this.#headerRowIndex === -1 ||
+      colIndex < 0 ||
+      colIndex >= (this.#headers.length || 0)
+    ) {
       return []; // 如果没找到表头或索引无效，返回空数组
     }
     // 从表头行的下一行开始截取数据
     const dataRows = this.#data.slice(this.#headerRowIndex + 1);
     // 提取每一行中指定索引的单元格数据
-    return dataRows.map(row => row[colIndex] || null); // 如果单元格不存在则返回 null
+    return dataRows.map((row) => row[colIndex] || null); // 如果单元格不存在则返回 null
   }
 
   /**
@@ -154,8 +162,8 @@ export class Excetract {
       return [];
     }
     // 找到第一个包含 colName 的表头的索引
-    const colIndex = this.#headers.findIndex(header => 
-      typeof header === 'string' && header.includes(colName)
+    const colIndex = this.#headers.findIndex(
+      (header) => typeof header === "string" && header.includes(colName),
     );
     if (colIndex !== -1) {
       // 复用 getCol 方法
@@ -163,7 +171,7 @@ export class Excetract {
     }
     return []; // 如果没找到匹配的列名，返回空数组
   }
-    
+
   /**
    * 根据列名完全匹配来获取该列的数据
    * @param {string} colName - 要搜索的列名（完全匹配）
@@ -174,7 +182,7 @@ export class Excetract {
       return [];
     }
     // 找到第一个完全等于 colName 的表头的索引
-    const colIndex = this.#headers.findIndex(header => header === colName);
+    const colIndex = this.#headers.findIndex((header) => header === colName);
     if (colIndex !== -1) {
       // 复用 getCol 方法
       return this.getCol(colIndex);
@@ -183,17 +191,15 @@ export class Excetract {
   }
 }
 
-
 /**
  * @brief 获取游泳项目
  */
 export function getSwimEvent(head) {
-  return head.filter(item => {
+  return head.filter((item) => {
     // 首个字符是数字
-    return typeof item === 'string' && /^\d/.test(item.trim());
+    return typeof item === "string" && /^\d/.test(item.trim());
   });
 }
-
 
 // 缓存对象，用于存储计算结果
 const containScoreCache = new Map();
@@ -251,7 +257,9 @@ export function getNearestStr(name, nameList) {
       return editScoreCache.get(cacheKey);
     }
 
-    const matrix = Array(s2.length + 1).fill(null).map(() => Array(s1.length + 1).fill(null));
+    const matrix = Array(s2.length + 1)
+      .fill(null)
+      .map(() => Array(s1.length + 1).fill(null));
     for (let i = 0; i <= s1.length; i++) matrix[0][i] = i;
     for (let j = 0; j <= s2.length; j++) matrix[j][0] = j;
 
@@ -263,7 +271,7 @@ export function getNearestStr(name, nameList) {
           matrix[j][i] = Math.min(
             matrix[j - 1][i] + 1,
             matrix[j][i - 1] + 1,
-            matrix[j - 1][i - 1] + 1
+            matrix[j - 1][i - 1] + 1,
           );
         }
       }
