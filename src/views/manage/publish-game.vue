@@ -158,7 +158,7 @@ const publishGame = async () => {
     }
 
     const result = await response.json();
-    if(result.statusCode){
+    if(result.statusCode === 200){
       throw new Error(result.message || "发布失败");
     }
     alerts("成功", "比赛已成功发布！");
