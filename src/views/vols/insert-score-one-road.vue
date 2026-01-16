@@ -1,9 +1,11 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { getData } from "@/composables/useStorage";
 import { useAlert } from "@/composables/useAlert";
 import { useToken } from "@/composables/useToken";
 import { useRouter } from "vue-router";
+
+const props = defineProps(['currentProgram']);
 
 const { alerts } = useAlert();
 const { getToken } = useToken();
@@ -12,9 +14,6 @@ const router = useRouter();
 // 状态
 const gameId = ref("");
 const road = ref("");
-const schedule = ref([]);
-const filteredSchedule = ref([]);
-const selectedProgram = ref(null);
 const foulEnum = ref({});
 const submitting = ref(false);
 
@@ -72,65 +71,18 @@ const foulOptions = computed(() => {
   }));
 });
 
-// 获取当前时间段逻辑
-const getCurrentTimePeriod = () => {
-  const hour = new Date().getHours();
-  if (hour >= 6 && hour < 12) return "MORNING";
-  if (hour >= 12 && hour < 17) return "AFTERNOON";
-  return "EVENING"; // 17:00 - 06:00 (次日) - 简化为晚上
-};
-
-const getTodayDateStr = () => {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-};
-
-// 加载赛程
-const loadSchedule = () => {
-  // 直接从本地存储获取赛程 (由父级 index.vue 加载)
-  const storedSchedule = getData('schedule');
-  if (storedSchedule && storedSchedule.length > 0) {
-    schedule.value = storedSchedule;
-    filterSchedule();
-  } else {
-    // 如果没有赛程，提示用户或显示空状态
-    alerts('提示', '暂无赛程信息或赛程加载失败');
-    schedule.value = [];
-    filteredSchedule.value = [];
-  }
-};
-
-const filterSchedule = () => {
-  const today = getTodayDateStr();
-  const period = getCurrentTimePeriod();
-
-  // 查找今日和当前时间段的赛程项
-  const currentSession = schedule.value.find(
-    (item) => item.date === today && item.time === period,
-  );
-
-  if (currentSession && currentSession.total) {
-    // 根据API文档，'total' 包含比赛项目
-    // 我们将其映射为可用结构
-    filteredSchedule.value = currentSession.total.map((item, index) => ({
-      // 假设 'program' 是名称/ID。API文档显示 "program": "MAN_BUTTERFLY_50M"
-      // 我们可能想要构建一个可读的标签，或者直接使用代码
-      label: `${item.program} (组数: ${item.totalGroup})`,
-      value: item, // 存储整个项目对象
-      id: index, // 如果需要，提供临时ID用于选择
-    }));
-  } else {
-    filteredSchedule.value = [];
-    alerts("提示", `未找到今日 ${period} 的比赛安排`);
-  }
-};
+// 监听项目变化，重置表单
+watch(() => props.currentProgram, () => {
+  score1.value = "";
+  score2.value = "";
+  isFoul.value = false;
+  selectedFoulReason.value = "";
+  foulDescription.value = "";
+});
 
 const submitData = async () => {
-  if (!selectedProgram.value) {
-    alerts("警告", "请选择比赛项目");
+  if (!props.currentProgram) {
+    alerts("警告", "请先在上方选择比赛项目");
     return;
   }
 
@@ -150,13 +102,9 @@ const submitData = async () => {
     const token = getToken();
     const payload = {
       token: token,
-      // API文档中的参数: { token: "...", id: "...", gameId: "...", data: {...} }
-      // id: 结果编号
-      // gameId: uuid
-
       gameId: gameId.value,
-      // 使用选定项目的 program 字段作为标识符，因为这是当前唯一的会话标识
-      id: selectedProgram.value.program,
+      // 使用选定项目的 program 字段作为标识符
+      id: props.currentProgram.program,
 
       data: {
         foulOrNot: isFoul.value,
@@ -203,9 +151,7 @@ onMounted(() => {
   if (storedRoad) road.value = storedRoad;
   if (storedFoulEnum) foulEnum.value = storedFoulEnum;
 
-  if (gameId.value) {
-    loadSchedule();
-  } else {
+  if (!gameId.value) {
     alerts("警告", "未找到比赛信息，请重新登录");
     router.push("/login");
   }
@@ -222,18 +168,15 @@ onMounted(() => {
       </template>
       <template #content>
         <div class="flex flex-column gap-4">
-          <!-- 选择比赛项目 -->
+          <!-- 显示当前项目 -->
           <div class="field">
-            <label class="block mb-2 font-bold"
-              >选择比赛项目 (今日 {{ getCurrentTimePeriod() }})</label
-            >
-            <Select
-              v-model="selectedProgram"
-              :options="filteredSchedule"
-              option-label="label"
-              placeholder="请选择当前进行的比赛项目"
-              class="w-full"
-            />
+             <label class="block mb-2 font-bold">当前比赛项目</label>
+             <div v-if="props.currentProgram" class="text-xl text-primary font-bold">
+               {{ props.currentProgram.program }} (组数: {{ props.currentProgram.totalGroup }})
+             </div>
+             <div v-else class="text-xl text-500 font-italic">
+               请在上方选择比赛项目
+             </div>
           </div>
 
           <!-- 成绩输入 -->
@@ -301,7 +244,7 @@ onMounted(() => {
             class="w-full"
             @click="submitData"
             :loading="submitting"
-            :disabled="submitting || !selectedProgram"
+            :disabled="submitting || !props.currentProgram"
           />
         </div>
       </template>
