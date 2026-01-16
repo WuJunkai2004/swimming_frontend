@@ -1,0 +1,23 @@
+{
+    "url": "/api/volunteer/confirmResult",
+    "description": "执行总裁确认成绩",
+    "method": ["POST"],
+    "params": {
+        "token": "登录成功返回的token",
+        "competitionId": "比赛id",
+        "time": "MORNING|AFTERNOON",
+        "program": "MAN_BUTTERFLY_50M，父模块传值获取",
+        "marked": "1，场次，第几场，父模块传值获取",
+        "group": "1，组数，第几组，父模块传值获取"
+    },
+    "response": {
+        "message": "成功",
+        "statusCode": 200,
+        "data": null
+    },
+    "fail": {
+        "message": "失败",
+        "statusCode": 400,
+        "data": null
+    }
+}

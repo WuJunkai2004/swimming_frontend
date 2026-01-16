@@ -1,17 +1,20 @@
 <script setup>
-import { onMounted, shallowRef, ref, watch } from 'vue';
+import { onMounted, shallowRef, ref, watch, computed } from 'vue';
 import { useToken } from '@/composables/useToken';
 import { getData, saveData } from '@/composables/useStorage';
 import { useAlert } from "@/composables/useAlert";
+import { useEventEnum } from '@/composables/eventMapping';
 import loading from '@/views/loading.vue';
 
 const { getToken } = useToken();
 const { alerts } = useAlert();
+const { eventMap } = useEventEnum();
 
 // --- 状态 ---
 const schedule = ref([]);
 const filteredSchedule = ref([]);
 const selectedProgram = ref(null);
+const selectedGroup = ref(null);
 
 // --- 辅助函数 ---
 const getCurrentTimePeriod = () => {
@@ -71,7 +74,7 @@ const filterSchedule = () => {
 
   if (currentSession && currentSession.total) {
     filteredSchedule.value = currentSession.total.map((item, index) => ({
-      label: `${item.program} (组数: ${item.totalGroup})`,
+      label: eventMap[item.program] || item.program,
       value: item,
       id: item.program, // 使用 program 作为唯一标识
     }));
@@ -130,7 +133,19 @@ const syncHash = () => {
   }
 };
 
+const groupOptions = computed(() => {
+  if (!selectedProgram.value || !selectedProgram.value.totalGroup) {
+    return [];
+  }
+  const count = selectedProgram.value.totalGroup;
+  return Array.from({ length: count }, (_, i) => ({
+    label: `第 ${i + 1} 组`,
+    value: i + 1,
+  }));
+});
+
 watch(selectedProgram, (newValue) => {
+  selectedGroup.value = null;
   if (newValue) {
     window.location.hash = newValue.program;
   }
@@ -179,7 +194,7 @@ onMounted(async () => {
       <Card>
         <template #content>
           <div class="field mb-0">
-            <label class="block mb-2 font-bold">当前进行项目 ({{ getCurrentTimePeriod() }})</label>
+            <label class="block mb-2 font-bold">当前进行项目</label>
             <Select
               v-model="selectedProgram"
               :options="filteredSchedule"
@@ -189,12 +204,24 @@ onMounted(async () => {
               class="w-full"
             />
           </div>
+
+          <div class="field mb-0 mt-3" v-if="selectedProgram">
+            <label class="block mb-2 font-bold">当前进行组别</label>
+            <Select
+              v-model="selectedGroup"
+              :options="groupOptions"
+              option-label="label"
+              option-value="value"
+              placeholder="请选择组别"
+              class="w-full"
+            />
+          </div>
         </template>
       </Card>
     </div>
 
     <div v-for="(currentView, index) in loadedComponents" :key="index" class="content-window">
-      <component :is="currentView" :current-program="selectedProgram" />
+      <component :is="currentView" :current-program="selectedProgram" :current-group="selectedGroup" />
     </div>
   </div>
 </template>

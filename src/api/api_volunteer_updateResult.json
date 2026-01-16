@@ -1,0 +1,29 @@
+{
+    "url": "/api/volunteer/updateResult",
+    "description": "执行总裁修改成绩",
+    "method": ["POST"],
+    "params": {
+        "token": "登录成功返回的token",
+        "competitionId": "比赛id",
+        "time": "MORNING|AFTERNOON",
+        "program": "MAN_BUTTERFLY_50M，父模块传值获取",
+        "marked": "1，场次，第几场，父模块传值获取",
+        "group": "1，组数，第几组，父模块传值获取",
+        "data": "列表，里面是修改的成绩",
+        "data[].name": "选手姓名",
+        "data[].achievements": "成绩，单位秒，保留两位小数",
+        "data[].foulOrNot": "是否犯规，true|false",
+        "data[].foulReson": "犯规原因，foulOrNot为true时必填",
+        "data[].foulDescription": "犯规描述，foulOrNot为true时必填"
+    },
+    "response": {
+        "message": "成功",
+        "statusCode": 200,
+        "data": null
+    },
+    "fail": {
+        "message": "失败",
+        "statusCode": 400,
+        "data": null
+    }
+}
