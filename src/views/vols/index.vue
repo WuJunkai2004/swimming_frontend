@@ -40,24 +40,23 @@ onMounted(() => {
 // --- 路由系统 ---
 const routes = {
   'insert_score_one_road': () => import('./insert-score-one-road.vue'),
-  'updata_score_all_road': () => import('./updata-score-all-road.vue'),
   'insert_fouls_one_road': () => import('./insert-fouls-one-road.vue'),
   'insert_fouls_all_road': () => import('./insert-fouls-all-road.vue'),
-  'updata_fouls_all_road': () => import('./updata-fouls-all-road.vue'),
+  'update_infos_all_road': () => import('./update-infos-all-road.vue'),
 };
 
 const permissionRoutes = {
   'INSERT_ACHIVEMENTS_ONLY_1_ROAD': 'insert_score_one_road',
-  'UPDATE_ALL_ROAD_ACHIVEMENTS': 'updata_score_all_road',
+  'UPDATE_ALL_ROAD_ACHIVEMENTS': 'update_info_all_road',
   'INSERT_DEPARTURE_FOUL_ONLY_1_ROAD': 'insert_fouls_one_road',
-  'UPDATE_ALL_DEPARTURE_FOUL': 'updata_fouls_all_road',
+  'UPDATE_ALL_DEPARTURE_FOUL': 'update_infos_all_road',
   'INSERT_ARRIVAL_FOUL_ONLY_1_ROAD': 'insert_fouls_one_road',
-  'UPDATE_ALL_ARRIVAL_FOUL': 'updata_fouls_all_road',
+  'UPDATE_ALL_ARRIVAL_FOUL': 'update_infos_all_road',
   'INSERT_TURN_FOUL_ONLY_1_ROAD': 'insert_fouls_one_road',
   'INSERT_TURN_FOUL_ALL_ROADS': 'insert_fouls_all_road',
-  'UPDATE_ALL_TURN_FOUL': 'updata_fouls_all_road',
+  'UPDATE_ALL_TURN_FOUL': 'update_infos_all_road',
   'INSERT_ALL_SWIM_IN_FOUL': 'insert_fouls_all_road',
-  'UPDATE_ALL_SWIM_IN_FOUL': 'updata_fouls_all_road'
+  'UPDATE_ALL_SWIM_IN_FOUL': 'update_infos_all_road'
 }
 
 const permissionList = getData('permission') || [];
