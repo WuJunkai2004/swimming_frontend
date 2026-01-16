@@ -43,7 +43,7 @@ const copyShareLink = () => {
   if (!shareLink.value){
     return;
   }
-  const text = `${currentGame.value.Name}报名，请访问以下链接：\n${shareLink.value}`;
+  const text = `${currentGame.value.name}报名，请访问以下链接：\n${shareLink.value}`;
   Copying(text)
   .then(() => {
     alerts("提示", "复制成功");
@@ -166,7 +166,7 @@ const exportData = async (game) => {
     const blob = await response.blob();
     // 2. 从响应头中获取文件名 (如果后端设置了的话)
     const disposition = response.headers.get('Content-Disposition');
-    let filename = `${game.Name}_报名表.xlsx`; // 默认文件名
+    let filename = `${game.name}_报名表.xlsx`; // 默认文件名
     if (disposition && disposition.indexOf('attachment') !== -1) {
       const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
       const matches = filenameRegex.exec(disposition);
@@ -246,7 +246,7 @@ onMounted(fetchGamesList);
       >
         <Column expander style="width: 3rem" />
 
-        <Column field="Name" header="比赛名称"></Column>
+        <Column field="name" header="比赛名称"></Column>
 
         <Column header="操作" style="width: 12rem">
           <template #body="slotProps">
@@ -304,7 +304,7 @@ onMounted(fetchGamesList);
     >
       <div v-if="currentGame">
         <div class="share-link-text p-3 mb-4 surface-100 border-round">
-          <p>{{ currentGame.Name }}报名，请访问以下链接：</p>
+          <p>{{ currentGame.name }}报名，请访问以下链接：</p>
           <p>{{ shareLink }}</p>
         </div>
       </div>

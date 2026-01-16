@@ -8,11 +8,11 @@
         "message": "成功",
         "data": [
             {
-                "Name": "2025年冬奥会",
+                "name": "2025年冬奥会",
                 "uuid": "b9bad5922889491ca868ec570bed48fc"
             },
             {
-                "Name": "2025年冬奥会",
+                "name": "2025年冬奥会",
                 "uuid": "b9bad5922889491dssderdfdsafassfc"
             }
         ]
