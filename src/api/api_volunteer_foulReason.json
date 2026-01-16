@@ -1,0 +1,19 @@
+{
+    "url": "/api/volunteer/foulReason",
+    "description": "获取作弊类型的映射",
+    "method": ["GET"],
+    "params": {},
+    "response": {
+        "message": "成功",
+        "statusCode": 200,
+        "data": {
+            "REASON1": "犯规原因1",
+            "REASON2": "犯规原因2"
+        }
+    },
+    "fail": {
+        "message": "失败",
+        "statusCode": 500,
+        "data": null
+    }
+}

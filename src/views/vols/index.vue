@@ -38,6 +38,7 @@ const permissionList = getData('permission') || [];
 const loadedComponents = shallowRef(null);
 
 const loadSchedule = async () => {
+  console.log('load schedule');
   const gameId = getData('gameId');
   if (!gameId) {
     console.error('No gameId found in storage.');
@@ -46,7 +47,7 @@ const loadSchedule = async () => {
   fetch(`/api/competition/getGameSchedule?id=${gameId}`)
   .then(response => response.json())
   .then (data => {
-    if (data.code === 200) {
+    if (data.statusCode === 200) {
       const schedule = data.data;
       saveData('schedule', schedule);
     } else {
