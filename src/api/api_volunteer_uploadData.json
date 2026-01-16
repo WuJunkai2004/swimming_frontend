@@ -1,6 +1,6 @@
 {
-    "url": "/api/volunteer/uploadData?type=TIMER",
-    "description": "获取计时员上传数据统计",
+    "url": "/api/volunteer/uploadData?type={POSITION_TYPE}",
+    "description": "志愿者上传数据",
     "method": ["POST"],
     "params": {
         "token": "登录成功返回的token",
@@ -10,7 +10,7 @@
             "foulOrNot": false,
             "foulReson": "从/api/volunteer/foulReason中选一个,如果foulOrNot为true则必填,否则可不填",
             "foulDescription": "",
-            "achievements": 23.19
+            "achievements": "浮点数类型，保留两位小数。只有当POSITION_TYPE是TIMER时需要"
         }
     },
     "response": {

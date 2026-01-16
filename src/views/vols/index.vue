@@ -89,7 +89,7 @@ const loadSchedule = async () => {
     console.error('No gameId found in storage.');
     return;
   }
-  
+
   // 尝试先从本地读取，以便快速显示
   const storedSchedule = getData('schedule');
   if (storedSchedule && storedSchedule.length > 0) {
@@ -172,7 +172,7 @@ onMounted(async () => {
 <template>
   <MobileMenuBar />
   <ComputerMenuBar />
-  
+
   <div class="main-container flex flex-column align-items-center">
     <!-- 全局比赛选择器 -->
     <div class="w-full header-window" style="max-width: 600px;">
