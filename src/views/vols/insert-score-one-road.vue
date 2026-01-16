@@ -5,7 +5,7 @@ import { useAlert } from "@/composables/useAlert";
 import { useToken } from "@/composables/useToken";
 import { useRouter } from "vue-router";
 
-const props = defineProps(['currentProgram']);
+const props = defineProps(["currentProgram"]);
 
 const { alerts } = useAlert();
 const { getToken } = useToken();
@@ -72,13 +72,16 @@ const foulOptions = computed(() => {
 });
 
 // 监听项目变化，重置表单
-watch(() => props.currentProgram, () => {
-  score1.value = "";
-  score2.value = "";
-  isFoul.value = false;
-  selectedFoulReason.value = "";
-  foulDescription.value = "";
-});
+watch(
+  () => props.currentProgram,
+  () => {
+    score1.value = "";
+    score2.value = "";
+    isFoul.value = false;
+    selectedFoulReason.value = "";
+    foulDescription.value = "";
+  },
+);
 
 const submitData = async () => {
   if (!props.currentProgram) {
@@ -168,17 +171,6 @@ onMounted(() => {
       </template>
       <template #content>
         <div class="flex flex-column gap-4">
-          <!-- 显示当前项目 -->
-          <div class="field">
-             <label class="block mb-2 font-bold">当前比赛项目</label>
-             <div v-if="props.currentProgram" class="text-xl text-primary font-bold">
-               {{ props.currentProgram.program }} (组数: {{ props.currentProgram.totalGroup }})
-             </div>
-             <div v-else class="text-xl text-500 font-italic">
-               请在上方选择比赛项目
-             </div>
-          </div>
-
           <!-- 成绩输入 -->
           <div class="field">
             <label class="block mb-2 font-bold"
