@@ -262,12 +262,6 @@ onMounted(fetchGamesList);
                 @click="showPreview(slotProps.data)"
               />
               <Button
-                label="导出"
-                class="p-button-text p-button-sm"
-                :id="`export-btn-${slotProps.data.uuid}`"
-                @click="exportData(slotProps.data)"
-              />
-              <Button
                 label="志愿者"
                 class="p-button-text p-button-sm p-button-info"
                 @click="jumpVolsManage(slotProps.data)"

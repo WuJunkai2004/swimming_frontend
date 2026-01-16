@@ -126,40 +126,34 @@ const publishGame = async () => {
   isPublishing.value = true;
   console.log("准备发布比赛，提交的数据:", gameData);
 
-  try {
-    const formatDate = (date) => {
-      if (!date) return "";
-      const d = new Date(date);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
+  const formatDate = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
-    const payload = {
-      token: getToken(),
-      ...gameData,
-      leaderPhone: String(gameData.leaderPhone || ""),
-      startTime: formatDate(gameData.startTime),
-      endTime: formatDate(gameData.endTime),
-    };
+  const payload = {
+    token: getToken(),
+    ...gameData,
+    leaderPhone: String(gameData.leaderPhone || ""),
+    startTime: formatDate(gameData.startTime),
+    endTime: formatDate(gameData.endTime),
+  };
 
-    const response = await fetch("/admin/postSignUpList", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "发布请求失败");
-    }
-
-    const result = await response.json();
-    if(result.statusCode === 200){
-      throw new Error(result.message || "发布失败");
+  fetch("/admin/postSignUpList", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+  .then((res) => res.json())
+  .then((data) => {
+    if (data.statusCode !== 200) {
+      throw new Error(data.message || "发布请求失败");
     }
     alerts("成功", "比赛已成功发布！");
     // 成功后可以重置页面状态
@@ -176,12 +170,14 @@ const publishGame = async () => {
     gameData.athleteActivityLimits = 2;
     gameData.sameActivityMaxLimit = null;
     sameActivityNoLimit.value = true;
-  } catch (e) {
-    console.error(e);
-    alerts("失败", `发布失败: ${e.message}`);
-  } finally {
+  })
+  .catch((error) => {
+    console.error(error);
+    alerts("失败", `发布失败: ${error.message}`);
+  })
+  .finally(() => {
     isPublishing.value = false;
-  }
+  });
 };
 </script>
 
