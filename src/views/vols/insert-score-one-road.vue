@@ -5,7 +5,7 @@ import { useAlert } from "@/composables/useAlert";
 import { useToken } from "@/composables/useToken";
 import { useRouter } from "vue-router";
 
-const props = defineProps(["currentProgram"]);
+const props = defineProps(["currentProgram", "currentGroup"]);
 
 const { alerts } = useAlert();
 const { getToken } = useToken();
@@ -16,6 +16,7 @@ const gameId = ref("");
 const road = ref("");
 const foulEnum = ref({});
 const submitting = ref(false);
+const uploadId = ref(null);
 
 // 表单数据
 const score1 = ref("");
@@ -71,21 +72,81 @@ const foulOptions = computed(() => {
   }));
 });
 
-// 监听项目变化，重置表单
+// 获取当前时间段
+const getCurrentTimePeriod = () => {
+  const hour = new Date().getHours();
+  if (hour >= 6 && hour < 12) return "MORNING";
+  if (hour >= 12 && hour < 17) return "AFTERNOON";
+  return "EVENING";
+};
+
+// 获取上传ID
+const fetchUploadId = async () => {
+  uploadId.value = null;
+  if (!props.currentProgram || !props.currentGroup || !gameId.value || !road.value) {
+    return;
+  }
+
+  try {
+    const token = getToken();
+    const time = getCurrentTimePeriod();
+
+    const res = await fetch("/api/volunteer/getCompetitionList", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+        gameId: gameId.value,
+        time: time,
+        marked: props.currentProgram.marked
+      }),
+    });
+
+    const data = await res.json();
+    if (data.statusCode === 200 && data.data && data.data.athleteList) {
+      const found = data.data.athleteList.find(item =>
+        item.group === props.currentGroup &&
+        item.marked === props.currentProgram.marked
+      );
+
+      if (found) {
+        uploadId.value = found.id;
+      }
+    }
+  } catch (e) {
+    console.error("Fetch upload ID error:", e);
+  }
+};
+
+// 监听项目和组别变化
 watch(
-  () => props.currentProgram,
-  () => {
+  [() => props.currentProgram, () => props.currentGroup],
+  async () => {
     score1.value = "";
     score2.value = "";
     isFoul.value = false;
     selectedFoulReason.value = "";
     foulDescription.value = "";
+
+    await fetchUploadId();
   },
 );
 
 const submitData = async () => {
   if (!props.currentProgram) {
     alerts("警告", "请先在上方选择比赛项目");
+    return;
+  }
+
+  if (!props.currentGroup) {
+    alerts("警告", "请先在上方选择组别");
+    return;
+  }
+
+  if (!uploadId.value) {
+    alerts("警告", "无法获取上传ID，请确认选组和泳道信息是否匹配");
     return;
   }
 
@@ -106,8 +167,7 @@ const submitData = async () => {
     const payload = {
       token: token,
       gameId: gameId.value,
-      // 使用选定项目的 program 字段作为标识符
-      id: props.currentProgram.program,
+      id: uploadId.value,
 
       data: {
         foulOrNot: isFoul.value,
@@ -145,7 +205,7 @@ const submitData = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   const storedGameId = getData("gameId");
   const storedRoad = getData("road");
   const storedFoulEnum = getData("foulEnum");
@@ -157,6 +217,8 @@ onMounted(() => {
   if (!gameId.value) {
     alerts("警告", "未找到比赛信息，请重新登录");
     router.push("/login");
+  } else {
+    await fetchUploadId();
   }
 });
 </script>
