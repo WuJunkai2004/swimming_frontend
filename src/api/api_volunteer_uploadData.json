@@ -9,7 +9,7 @@
         "gameId": "uuid",
         "data": "数据字典",
         "data.foulOrNot": "是否犯规，true或false",
-        "data.foulReson": "犯规原因，从/api/volunteer/foulReason中选一个,如果foulOrNot为true则必填,否则可不填",
+        "data.foulReason": "犯规原因，从/api/volunteer/foulReason中选一个,如果foulOrNot为true则必填,否则可不填",
         "data.foulDescription": "犯规描述，非必填",
         "data.achievements": "成绩，浮点数类型，保留两位小数。只有当POSITION_TYPE是TIMER时需要"
     },

@@ -162,6 +162,13 @@ const submitData = async () => {
 
   submitting.value = true;
 
+  const getFoulReason = (index) => {
+    if (!isFoul.value) {
+      return "";
+    }
+    return foulOptions.value[index] ? foulOptions.value[index].label : "";
+  }
+
   try {
     const token = getToken();
     const payload = {
@@ -171,7 +178,7 @@ const submitData = async () => {
 
       data: {
         foulOrNot: isFoul.value,
-        foulReson: isFoul.value ? selectedFoulReason.value : "",
+        foulReason: getFoulReason(selectedFoulReason.value),
         foulDescription: foulDescription.value,
         achievements: parseFloat(finalScore.value),
       },

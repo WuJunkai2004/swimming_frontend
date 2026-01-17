@@ -13,7 +13,7 @@
         "data[].name": "选手姓名",
         "data[].achievements": "成绩，单位秒，保留两位小数",
         "data[].foulOrNot": "是否犯规，true|false",
-        "data[].foulReson": "犯规原因，foulOrNot为true时必填",
+        "data[].foulReason": "犯规原因，foulOrNot为true时必填",
         "data[].foulDescription": "犯规描述，foulOrNot为true时必填"
     },
     "response": {

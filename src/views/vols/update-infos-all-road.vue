@@ -61,7 +61,7 @@ const fetchResults = async () => {
       results.value = (data.data || []).map(item => ({
         ...item,
         // 确保字段存在，防止 undefined
-        foulReson: item.foulReson || "",
+        foulReason: item.foulReason || "",
         foulDescription: item.foulDescription || ""
       }));
     } else {
@@ -86,7 +86,7 @@ const updateResult = async () => {
       name: item.name,
       achievements: Number(item.achievements),
       foulOrNot: item.foulOrNot,
-      foulReson: item.foulOrNot ? item.foulReson : "",
+      foulReason: item.foulOrNot ? item.foulReason : "",
       foulDescription: item.foulOrNot ? item.foulDescription : "",
       road: item.road // API文档没写需要传road，但为了对应选手，通常需要标识。如果后端是按顺序或名字匹配，这里保留road较安全，或者后端只看data列表顺序？假设按顺序或名字。API文档只说了data[]里的字段。
       // 根据 api_volunteer_updateResult.json，data 是一个列表。
@@ -253,7 +253,7 @@ watch(
                   <div v-if="item.foulOrNot">
                     <div class="mb-2">
                       <span class="font-bold text-red-500 mr-2">犯规类型:</span>
-                      <span>{{ getFoulLabel(item.foulReson) }}</span>
+                      <span>{{ getFoulLabel(item.foulReason) }}</span>
                     </div>
                     <div>
                       <span class="font-bold text-red-500 mr-2">备注:</span>
@@ -289,7 +289,7 @@ watch(
                     <label class="col-12 mb-2 md:col-2 md:mb-0">犯规类型</label>
                     <div class="col-12 md:col-10">
                       <Select
-                        v-model="item.foulReson"
+                        v-model="item.foulReason"
                         :options="foulOptions"
                         option-label="label"
                         option-value="value"

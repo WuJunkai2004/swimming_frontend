@@ -73,7 +73,7 @@ const submitData = async () => {
 
       data: {
         foulOrNot: true, // 既然选了泳道并提交，肯定是有犯规
-        foulReson: selectedFoulReason.value,
+        foulReason: selectedFoulReason.value,
         foulDescription: foulDescription.value,
         road: foulOccurred.value, // 必须带上泳道号
       },
