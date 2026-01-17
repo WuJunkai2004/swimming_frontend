@@ -95,7 +95,7 @@ const updateResult = async () => {
 
     const payload = {
       token,
-      competitionId: gameId,
+      gameId: gameId,
       time: getCurrentTimePeriod(),
       program: props.currentProgram.program,
       marked: props.currentProgram.marked,
@@ -135,7 +135,7 @@ const confirmResult = async () => {
 
     const payload = {
       token,
-      competitionId: gameId,
+      gameId: gameId,
       time: getCurrentTimePeriod(),
       program: props.currentProgram.program,
       marked: props.currentProgram.marked,
