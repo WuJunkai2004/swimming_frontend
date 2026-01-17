@@ -86,8 +86,8 @@ watch(volsNumber, (newValue) => {
   if (debounceTimeout) {
     clearTimeout(debounceTimeout);
   }
-  if (newValue && newValue.length === 9) {
-    debounceTimeout = setTimeout(queryCompetitions, 500);
+  if (newValue && newValue.length >= 9) {
+    debounceTimeout = setTimeout(queryCompetitions, 750);
   } else {
     availableCompetitions.value = [];
     selectedCompetitionId.value = "";
@@ -194,10 +194,10 @@ const handleLogin = async () => {
       return;
     }
     if (
-      volsNumber.value.length !== 9 ||
+      volsNumber.value.length < 9 ||
       volsNumber.value.replace(/\d/g, "").length > 0
     ) {
-      alerts("警告", "请输入正确的9位学号");
+      alerts("警告", "请输入正确的学号");
       return;
     }
     if (!selectedCompetitionId.value) {
@@ -301,7 +301,7 @@ const goToHome = () => {
                   class="w-full"
                   :disabled="is_loginning"
                   :invalid="volsNumber.replace(/\d/g, '').length > 0"
-                  maxlength="9"
+                  maxlength="15"
                 />
               </div>
 
@@ -324,16 +324,11 @@ const goToHome = () => {
                   <template #empty>
                     <div class="p-2">
                       <span
-                        v-if="
-                          volsNumber.length === 9 && !isQueryingCompetitions
-                        "
+                        v-if="volsNumber.length >= 9 && !isQueryingCompetitions"
                         class="text-red-500"
-                        >未查询到可参与的比赛</span
-                      >
-                      <span v-else-if="isQueryingCompetitions"
-                        >正在查询比赛信息...</span
-                      >
-                      <span v-else>请输入9位学号以获取比赛列表</span>
+                      >未查询到可参与的比赛</span>
+                      <span v-else-if="isQueryingCompetitions">正在查询比赛信息...</span>
+                      <span v-else>请输入学号以获取比赛列表</span>
                     </div>
                   </template>
                 </Select>
@@ -352,11 +347,9 @@ const goToHome = () => {
               </div>
 
               <div
-                v-if="
-                  isVolsLogin &&
+                v-if="isVolsLogin &&
                   (volsPosition === 'REINTAKE_INSPECTION' ||
-                    volsPosition === 'TIMER')
-                "
+                  volsPosition === 'TIMER')"
                 class="p-float-label"
               >
                 <label>负责泳道</label>
