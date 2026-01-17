@@ -95,12 +95,22 @@ watch(volsNumber, (newValue) => {
 const volsLogin = async () => {
   is_loginning.value = true;
 
+  const getRoadArray = () => {
+    if (['START', 'OTHER'].includes(volsPosition.value)) {
+      return [];
+    }
+    if (['TIMER', 'REINTAKE_INSPECTION'].includes(volsPosition.value)) {
+      return [volsTakeRoad.value];
+    }
+    return [1, 2, 3, 4, 5, 6, 7, 8];
+  };
+
   // 构造请求数据
   const payload = {
     name: username.value,
     position: volsPosition.value,
     studentNumber: volsNumber.value,
-    road: volsTakeRoad.value ? [volsTakeRoad.value] : [], // 转换为数组
+    road: getRoadArray(),
     gameId: selectedCompetitionId.value
   };
 
