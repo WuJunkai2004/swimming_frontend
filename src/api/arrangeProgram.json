@@ -3,7 +3,7 @@
     "description": "管理员安排比赛的顺序",
     "params": {
         "token": "登录成功返回的token",
-        "gameid": "比赛编号",
+        "gameId": "比赛编号",
         "event": "MAN_BUTTERFLY_50M",
         "date": "2026-01-01",
         "time": "MORNING | AFTERNOON | EVENING",

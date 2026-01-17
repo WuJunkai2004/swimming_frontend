@@ -89,7 +89,7 @@ const loadAthletes = async (eventProgram) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         token,
-        gameid: gameId.value,
+        gameId: gameId.value,
         event: eventProgram,
         group: selectedGroup.value.code,
       }),
@@ -189,7 +189,7 @@ const saveHeat = async (heatIdx) => {
     const token = getToken();
     const payload = {
       token,
-      gameid: gameId.value,
+      gameId: gameId.value,
       event: currentEvent.value.program,
       date: eventDate,
       time: eventTime,

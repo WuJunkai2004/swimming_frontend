@@ -3,15 +3,15 @@
     "description": "志愿者上传数据",
     "method": ["POST"],
     "params": {
+        "type": "POSITION_TYPE枚举值，编码进链接中，不在body中传递",
         "token": "登录成功返回的token",
         "id": "结果编号",
         "gameId": "uuid",
-        "data": {
-            "foulOrNot": false,
-            "foulReson": "从/api/volunteer/foulReason中选一个,如果foulOrNot为true则必填,否则可不填",
-            "foulDescription": "",
-            "achievements": "浮点数类型，保留两位小数。只有当POSITION_TYPE是TIMER时需要"
-        }
+        "data": "数据字典",
+        "data.foulOrNot": "是否犯规，true或false",
+        "data.foulReson": "犯规原因，从/api/volunteer/foulReason中选一个,如果foulOrNot为true则必填,否则可不填",
+        "data.foulDescription": "犯规描述，非必填",
+        "data.achievements": "成绩，浮点数类型，保留两位小数。只有当POSITION_TYPE是TIMER时需要"
     },
     "response": {
         "message": "成功",

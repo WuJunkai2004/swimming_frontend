@@ -4,7 +4,7 @@
     "method": ["POST"],
     "params": {
         "token": "登录成功返回的token",
-        "gameid": "比赛编号",
+        "gameId": "比赛编号",
         "event": "MAN_BUTTERFLY_50M，比赛项目的枚举值",
         "group": "组别，仅有AB的区别"
     },
