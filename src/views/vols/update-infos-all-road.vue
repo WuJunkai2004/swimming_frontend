@@ -38,7 +38,7 @@ const fetchResults = async () => {
   try {
     const token = getToken();
     const gameId = getData("gameId");
-    
+
     // 构建请求参数
     const payload = {
       token,
@@ -184,7 +184,7 @@ onMounted(() => {
   if (storedFoulEnum) {
     foulEnum.value = storedFoulEnum;
   }
-  
+
   if (props.currentProgram && props.currentGroup) {
     fetchResults();
   }
@@ -225,18 +225,18 @@ watch(
                   <span class="text-xl w-5rem">第{{ item.road }}道</span>
                   <span class="font-bold text-lg">{{ item.name }}</span>
                 </div>
-                
+
                 <div class="flex align-items-center gap-3">
-                  <span 
-                    class="font-bold text-xl" 
+                  <span
+                    class="font-bold text-xl"
                     :class="{ 'text-red-500': item.foulOrNot && !isEditing }"
                   >
                     {{ item.achievements }}s
                   </span>
-                  <Button 
-                    icon="pi pi-angle-down" 
-                    text 
-                    rounded 
+                  <Button
+                    icon="pi pi-angle-down"
+                    text
+                    rounded
                     @click="toggleExpand(item.road)"
                     :aria-label="expandedRows[item.road] ? '收起' : '展开'"
                     :class="{ 'rotate-180': expandedRows[item.road] }"
@@ -247,7 +247,7 @@ watch(
 
               <!-- 展开内容 -->
               <div v-if="expandedRows[item.road]" class="mt-3 border-top-1 surface-border pt-3">
-                
+
                 <!-- 查看模式 -->
                 <div v-if="!isEditing">
                   <div v-if="item.foulOrNot">
@@ -270,11 +270,11 @@ watch(
                   <div class="field grid">
                     <label class="col-12 mb-2 md:col-2 md:mb-0">成绩</label>
                     <div class="col-12 md:col-10">
-                      <InputNumber 
-                        v-model="item.achievements" 
-                        mode="decimal" 
-                        :minFractionDigits="2" 
-                        :maxFractionDigits="2" 
+                      <InputNumber
+                        v-model="item.achievements"
+                        mode="decimal"
+                        :minFractionDigits="2"
+                        :maxFractionDigits="2"
                         class="w-full"
                       />
                     </div>
@@ -319,28 +319,28 @@ watch(
         <!-- 底部按钮区 -->
         <div class="flex justify-content-between mt-4 gap-3 sticky-bottom">
           <template v-if="!isEditing">
-            <Button 
-              label="修改" 
-              icon="pi pi-pencil" 
-              severity="warning" 
+            <Button
+              label="修改"
+              icon="pi pi-pencil"
+              severity="warning"
               class="flex-1"
               @click="isEditing = true"
               :disabled="loading || submitting"
             />
-            <Button 
-              label="确认" 
-              icon="pi pi-check" 
-              severity="success" 
+            <Button
+              label="确认"
+              icon="pi pi-check"
+              severity="success"
               class="flex-1"
               @click="confirmResult"
               :disabled="loading || submitting"
             />
           </template>
-          
+
           <template v-else>
-            <Button 
-              label="完成修改" 
-              icon="pi pi-save" 
+            <Button
+              label="完成修改"
+              icon="pi pi-save"
               class="w-full"
               @click="updateResult"
               :loading="submitting"
@@ -360,7 +360,7 @@ watch(
 }
 
 .foul-bg {
-  background-color: var(--red-50) !important;
+  background-color: var(--p-red-50) !important;
 }
 
 .rotate-180 {

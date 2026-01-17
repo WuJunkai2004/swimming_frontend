@@ -26,7 +26,7 @@ onMounted(() => {
   });
 });
 watch(
-  () => route.hash, 
+  () => route.hash,
   () => {
     nextTick(() => {
       handleScrollToAnchor();
@@ -173,7 +173,7 @@ const activities = ref([
       <section class="scroll-section contact-section" id="introduction">
         <div class="grid align-items-center h-full w-full justify-content-center">
           <div class="col-12 md:col-8 flex flex-column md:flex-row align-items-center justify-content-center gap-5">
-            
+
             <div class="text-content text-center md:text-right order-2 md:order-1">
               <h2 class="text-3xl md:text-5xl font-light mb-2">欢迎关注公众号</h2>
               <p class="text-sm md:text-xl text-color-secondary">获取最新赛事资讯与活动动态</p>
@@ -306,7 +306,7 @@ const activities = ref([
   height: 200px;
   border-radius: 12px;
   /* 如果二维码是白底，加个边框会让它在浅色背景上更清晰 */
-  border: 1px solid var(--p-surface-border); 
+  border: 1px solid var(--p-card-color);
 }
 
 /* 响应式调整 */

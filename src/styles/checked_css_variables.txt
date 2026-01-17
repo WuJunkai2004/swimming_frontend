@@ -2,6 +2,7 @@
 --p-text-color
 --p-primary-200
 --p-primary-50
+--p-surface-0
 --p-surface-200
 --p-primary-color
 --p-content-border-color
@@ -15,3 +16,4 @@
 --p-inputtext-color
 --p-button-primary-background
 --p-card-shadow
+--p-red-50
