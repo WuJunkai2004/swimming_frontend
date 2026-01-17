@@ -196,7 +196,11 @@ const jumpVolsManage = (game) => {
   window.location.href = `${window.location.href.split("#")[0]}#/manage-vols?game=${game.uuid}`;
 };
 
-// 需求 2.6: 终止比赛报名
+const jumpScheduleManage = (game) => {
+  window.location.href = `${window.location.href.split("#")[0]}#/manage-schedule?game=${game.uuid}`;
+};
+
+// 需求 2.7: 终止比赛报名
 const stopSignup = async (game) => {
   if (
     !(await awaitAlert("确定", `确定终止${game.name}的报名？此操作不可逆！`, {
@@ -278,14 +282,14 @@ onMounted(fetchGamesList);
           <template #body="slotProps">
             <div class="flex gap-2">
               <Button
-                label="分享"
-                class="p-button-text p-button-sm p-button-success"
-                @click="showShareDialog(slotProps.data)"
-              />
-              <Button
                 label="预览"
                 class="p-button-text p-button-sm"
                 @click="showPreview(slotProps.data)"
+              />
+              <Button
+                label="安排"
+                class="p-button-text p-button-sm p-button-success"
+                @click="jumpScheduleManage(slotProps.data)"
               />
               <Button
                 label="志愿者"
@@ -323,7 +327,12 @@ onMounted(fetchGamesList);
                   <span class="font-semibold">项目总数: </span>
                   <span>{{ slotProps.data.details.events.length }} 个</span>
                 </div>
-                <div class="ml-auto">
+                <div class="flex flex-wrap gap-2 ml-auto">
+                  <Button
+                    label="分享"
+                    class="p-button-sm p-button-success"
+                    @click="showShareDialog(slotProps.data)"
+                  />
                   <Button
                     label="终止报名"
                     icon="pi pi-stop"
@@ -358,7 +367,7 @@ onMounted(fetchGamesList);
         />
         <Button label="复制" @click="copyShareLink" icon="pi pi-copy" />
         <a :href="shareLink" target="_blank" rel="noopener noreferrer">
-          <Button label="跳转预览" icon="pi pi-external-link" />
+          <Button label="跳转报名" icon="pi pi-external-link" />
         </a>
       </template>
     </Dialog>

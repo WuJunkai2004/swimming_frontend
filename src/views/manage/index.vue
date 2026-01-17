@@ -103,6 +103,7 @@ const routes = {
   '/manage-leaders': () => import('./manage-leaders.vue'),
   '/manage-admins': () => import('./manage-admins.vue'),
   '/manage-vols': () => import('./manage-vols.vue'),
+  '/manage-schedule': () => import('./manage-schedule.vue'),
 };
 
 const currentPath = ref(window.location.hash.split('?')[0]);

@@ -9,14 +9,11 @@
         "time": "MORNING | AFTERNOON | EVENING",
         "marked": "项目的编号，从1递增，不能重复",
         "group": "组别 A|B",
-        "data": [
-            {
-                "name": "朴国昌",
-                "studentNumber": "102301237",
-                "road": "数字类型，表示泳道",
-                "group": "数字类型，表示组别"
-            }
-        ]
+        "data":"字典的数组，包含参赛选手的信息，里面最多8个元素",
+        "data[].name": "选手姓名",
+        "data[].studentNumber": "选手学号",
+        "data[].road": "选手泳道",
+        "data[].group": "选手组别"
     },
     "method": ["POST"],
     "response": {

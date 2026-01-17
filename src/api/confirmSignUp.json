@@ -1,0 +1,19 @@
+{
+    "url": "/admin/confirmSignUp",
+    "description": "管理员将比赛状态从报名中调整为未开始",
+    "method": ["POST"],
+    "params": {
+        "token": "登录成功返回的token",
+        "gameId": "uuid"
+    },
+    "response": {
+        "statusCode": 200,
+        "message": "操作成功",
+        "data": null
+    },
+    "fail": {
+        "statusCode": 400,
+        "message": "操作失败，比赛不存在或状态不正确",
+        "data": null
+    }
+}
