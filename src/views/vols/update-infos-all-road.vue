@@ -42,7 +42,7 @@ const fetchResults = async () => {
     // 构建请求参数
     const payload = {
       token,
-      competitionId: gameId,
+      gameId: gameId,
       time: getCurrentTimePeriod(),
       program: props.currentProgram.program,
       marked: props.currentProgram.marked,
