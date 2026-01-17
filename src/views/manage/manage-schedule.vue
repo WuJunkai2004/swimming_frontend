@@ -127,8 +127,15 @@ const openArrangeDialog = async (event) => {
 const assignAthlete = (heatIdx, laneIdx) => {
   if (!selectedAthlete.value) return;
 
-  // Check if athlete is already assigned in any heat/lane (optional, but good UX)
-  // For now, just allow re-assignment or check current heat
+  // Check if athlete is already assigned in current heat
+  const isAlreadyAssigned = heatData.value[heatIdx].some(
+    athlete => athlete && athlete.studentNumber === selectedAthlete.value.studentNumber
+  );
+
+  if (isAlreadyAssigned) {
+    alerts('提示', '该运动员已在当前组分配了泳道，不能重复分配');
+    return;
+  }
 
   // Assign
   heatData.value[heatIdx][laneIdx] = { ...selectedAthlete.value };
@@ -399,7 +406,7 @@ onMounted(() => {
                         :class="
                           laneAthlete
                             ? 'border-primary'
-                            : 'border-300 surface-ground cursor-pointer hover:surface-hover'
+                            : 'border-300 surface-ground cursor-pointer hover:surface-200'
                         "
                         style="min-height: 120px"
                         @click="!laneAthlete && assignAthlete(idx, laneIdx)"
@@ -445,7 +452,7 @@ onMounted(() => {
   width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--surface-400);
+  background-color: var(--p-surface-100);
   border-radius: 3px;
 }
 </style>
