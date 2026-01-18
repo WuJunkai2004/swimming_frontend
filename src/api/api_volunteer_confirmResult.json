@@ -4,7 +4,7 @@
     "method": ["POST"],
     "params": {
         "token": "登录成功返回的token",
-        "competitionId": "比赛id",
+        "gameId": "比赛id",
         "time": "MORNING|AFTERNOON",
         "program": "MAN_BUTTERFLY_50M，父模块传值获取",
         "marked": "1，场次，第几场，父模块传值获取",

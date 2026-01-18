@@ -1,0 +1,29 @@
+{
+    "url": "/api/competition/result",
+    "description": "成绩查询接口",
+    "method": ["GET"],
+    "params": {
+        "competitionId": "比赛id，从链接里面拿",
+        "time": "场次, MORNING, AFTERNOON, EVENING",
+        "marked": "第几项，让用户选择",
+        "group": "第几组，让用户选择",
+        "program": "项目枚举"
+    },
+    "response": {
+        "message": "成功",
+        "statusCode": 200,
+        "data": [
+            {
+                "name": "朴国昌",
+                "foulOrNot": false,
+                "achievements": 23.19,
+                "road": 1
+            }
+        ]
+    },
+    "fail": {
+        "message": "失败",
+        "statusCode": 400,
+        "data": null
+    }
+}
