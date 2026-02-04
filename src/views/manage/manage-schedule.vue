@@ -127,13 +127,13 @@ const openArrangeDialog = async (event) => {
 const assignAthlete = (heatIdx, laneIdx) => {
   if (!selectedAthlete.value) return;
 
-  // Check if athlete is already assigned in current heat
-  const isAlreadyAssigned = heatData.value[heatIdx].some(
+  // Check if athlete is already assigned in all heat
+  const isAlreadyAssigned = heatData.value.flat().some(
     athlete => athlete && athlete.studentNumber === selectedAthlete.value.studentNumber
   );
 
   if (isAlreadyAssigned) {
-    alerts('提示', '该运动员已在当前组分配了泳道，不能重复分配');
+    alerts("提示", "该运动员已在比赛分配了泳道，不能重复分配");
     return;
   }
 
