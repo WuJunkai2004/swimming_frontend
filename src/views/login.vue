@@ -51,7 +51,7 @@ const focusPasswordInput = () => {
 let debounceTimeout = null;
 
 const queryCompetitions = async () => {
-  if (!volsNumber.value || volsNumber.value.length !== 9) {
+  if (!volsNumber.value) {
     return;
   }
 
@@ -250,7 +250,7 @@ const goToHome = () => {
         <Button
           label="返回"
           icon="pi pi-arrow-left"
-          class="back-button p-button-secondary"
+          class="back-button p-button-secondary hidden md:inline-flex"
           @click="goToHome"
         />
         <Card class="login-card w-full">

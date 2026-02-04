@@ -1,5 +1,5 @@
 {
-    "url": "/api/volunteer/uploadData?type={POSITION_TYPE}",
+    "url": "/api/volunteer/uploadData",
     "description": "志愿者上传数据",
     "method": ["POST"],
     "params": {

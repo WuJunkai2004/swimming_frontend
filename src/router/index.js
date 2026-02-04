@@ -57,6 +57,11 @@ const routes = [
     component: () => import('@/views/register_gameid.vue')
   },
   {
+    path: "/result/:gameid",    // 访问 /result/:gameid 路径时, :gameid 是动态参数，代表比赛ID
+    name: "Result",
+    component: () => import('@/views/result_gameid.vue')
+  },
+  {
     path: "/volunteer", // 访问 /volunteer 路径时，使用哈希路由模式
     name: "Volunteer",
     component: () => import("@/views/vols/index.vue"),
