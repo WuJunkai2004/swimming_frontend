@@ -10,7 +10,7 @@ const { menuItems } = useMenu();
         <img alt="logo" src="/logo.webp" height="100" class="mr-2 logo-round"/>
         <div>
           <span class="font-bold text-xl block text-center">学生游泳协会</span>
-          <span class="text-sm text-color-secondary block text-center">Fuzhou University Student Swimming Club</span>
+          <span class="text-sm text-color-secondary block text-center">Student Swimming Club</span>
         </div>
       </div>
     </template>
