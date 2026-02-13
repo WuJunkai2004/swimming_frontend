@@ -15,6 +15,7 @@ const schedule = ref([]);
 const filteredSchedule = ref([]);
 const selectedProgram = ref(null);
 const selectedGroup = ref(null);
+const athleteList = ref([]);
 
 // --- 辅助函数 ---
 const getCurrentTimePeriod = () => {
@@ -36,6 +37,43 @@ const getTodayDateStr = () => {
 onMounted(() => {
   getToken();
 });
+
+// --- API 调用 ---
+const fetchCompetitionList = async () => {
+  if (!selectedProgram.value) {
+    athleteList.value = [];
+    return;
+  }
+
+  try {
+    const token = getToken();
+    const gameId = getData('gameId');
+    const time = getCurrentTimePeriod();
+
+    const res = await fetch("/api/volunteer/getCompetitionList", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+        gameId: gameId,
+        time: time,
+        marked: selectedProgram.value.marked
+      }),
+    });
+
+    const data = await res.json();
+    if (data.statusCode === 200) {
+      athleteList.value = data.data?.athleteList || [];
+    } else {
+      athleteList.value = [];
+    }
+  } catch (e) {
+    console.error("Fetch competition list error:", e);
+    athleteList.value = [];
+  }
+};
 
 // --- 路由系统 ---
 const routes = {
@@ -147,6 +185,7 @@ watch(selectedProgram, (newValue) => {
   selectedGroup.value = null;
   if (newValue) {
     window.location.hash = newValue.program;
+    fetchCompetitionList();
   }
 });
 
@@ -220,7 +259,12 @@ onMounted(async () => {
     </div>
 
     <div v-for="(currentView, index) in loadedComponents" :key="index" class="content-window">
-      <component :is="currentView" :current-program="selectedProgram" :current-group="selectedGroup" />
+      <component
+        :is="currentView"
+        :current-program="selectedProgram"
+        :current-group="selectedGroup"
+        :athlete-list="athleteList"
+      />
     </div>
   </div>
 </template>

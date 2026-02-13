@@ -5,7 +5,7 @@ import { useAlert } from "@/composables/useAlert";
 import { useToken } from "@/composables/useToken";
 import { useRouter } from "vue-router";
 
-const props = defineProps(["currentProgram", "currentGroup"]);
+const props = defineProps(["currentProgram", "currentGroup", "athleteList"]);
 
 const { alerts } = useAlert();
 const { getToken } = useToken();
@@ -72,65 +72,34 @@ const foulOptions = computed(() => {
   }));
 });
 
-// 获取当前时间段
-const getCurrentTimePeriod = () => {
-  const hour = new Date().getHours();
-  if (hour >= 6 && hour < 12) return "MORNING";
-  if (hour >= 12 && hour < 17) return "AFTERNOON";
-  return "EVENING";
-};
-
 // 获取上传ID
-const fetchUploadId = async () => {
+const setUploadId = () => {
   uploadId.value = null;
-  if (!props.currentProgram || !props.currentGroup || !gameId.value || !road.value) {
+  if (!props.currentProgram || !props.currentGroup || !props.athleteList) {
     return;
   }
 
-  try {
-    const token = getToken();
-    const time = getCurrentTimePeriod();
+  const found = props.athleteList.find(item =>
+    item.group === props.currentGroup &&
+    item.marked === props.currentProgram.marked
+  );
 
-    const res = await fetch("/api/volunteer/getCompetitionList", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: token,
-        gameId: gameId.value,
-        time: time,
-        marked: props.currentProgram.marked
-      }),
-    });
-
-    const data = await res.json();
-    if (data.statusCode === 200 && data.data && data.data.athleteList) {
-      const found = data.data.athleteList.find(item =>
-        item.group === props.currentGroup &&
-        item.marked === props.currentProgram.marked
-      );
-
-      if (found) {
-        uploadId.value = found.id;
-      }
-    }
-  } catch (e) {
-    console.error("Fetch upload ID error:", e);
+  if (found) {
+    uploadId.value = found.id;
   }
 };
 
-// 监听项目和组别变化
+// 监听项目和组别以及选手列表变化
 watch(
-  [() => props.currentProgram, () => props.currentGroup],
-  async () => {
+  [() => props.currentProgram, () => props.currentGroup, () => props.athleteList],
+  () => {
     score1.value = "";
     score2.value = "";
     isFoul.value = false;
     selectedFoulReason.value = "";
     foulDescription.value = "";
 
-    await fetchUploadId();
+    setUploadId();
   },
 );
 
@@ -212,7 +181,7 @@ const submitData = async () => {
   }
 };
 
-onMounted(async () => {
+onMounted(() => {
   const storedGameId = getData("gameId");
   const storedRoad = getData("road");
   const storedFoulEnum = getData("foulEnum");
@@ -225,7 +194,7 @@ onMounted(async () => {
     alerts("警告", "未找到比赛信息，请重新登录");
     router.push("/login");
   } else {
-    await fetchUploadId();
+    setUploadId();
   }
 });
 </script>
