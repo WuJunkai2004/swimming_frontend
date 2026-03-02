@@ -411,6 +411,7 @@ onMounted(fetchGamesList);
                 label="导出此预览"
                 icon="pi pi-download"
                 class="p-button-sm"
+                :id="`export-btn-${currentGame.uuid}`"
                 @click="exportData(currentGame)"
               />
             </div>
