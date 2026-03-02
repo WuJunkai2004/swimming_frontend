@@ -11,7 +11,7 @@ import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 import { vueApiPlugin, vueApiProxy } from "./src/api/api.js";
 
 const DEV_MODE = process.env.VITE_DEV_MODE;
-const backendTarget = "http://106.15.90.163:10086";
+const backendTarget = "http://124.220.58.44:10086";
 
 if (DEV_MODE) {
   console.log(`Vite 正在以 ${DEV_MODE} 模式启动`);

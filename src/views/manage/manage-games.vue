@@ -3,12 +3,14 @@ import { ref, onMounted, computed } from "vue";
 import { useToken } from "@/composables/useToken";
 import { useAlert } from "@/composables/useAlert";
 import { useCollegeEnum } from "@/composables/collegeMapping";
+import { useEventEnum } from "@/composables/eventMapping";
 import { Copying } from "@/composables/useCopy";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
 const { alerts, awaitAlert } = useAlert();
 const { collegeMap } = useCollegeEnum();
+const { eventMap } = useEventEnum();
 
 // --- 2. 状态定义 ---
 // 列表状态
@@ -428,7 +430,7 @@ onMounted(fetchGamesList);
             </Column>
             <Column field="registerEvents" header="报名项目">
               <template #body="slotProps">
-                {{ slotProps.data.registerEvents.join(", ") }}
+                {{ slotProps.data.registerEvents.map(event => eventMap[event]).join(", ") }}
               </template>
             </Column>
           </DataTable>
