@@ -29,7 +29,6 @@ const fetchTemplate = async () => {
   }
 
   try {
-    // Note: Prompt mentions auto_{type}.html but files are auth_{type}.html
     const response = await fetch(`/auth_${type.value}.html`);
     if (!response.ok) {
       throw new Error(`无法获取模板: ${response.statusText}`);
@@ -38,7 +37,6 @@ const fetchTemplate = async () => {
     parseTemplate(htmlText);
   } catch (err) {
     error.value = "获取模板失败: " + err.message;
-  } finally {
     loading.value = false;
   }
 };
@@ -55,12 +53,27 @@ const parseTemplate = (html) => {
   contractStyle.value = combinedStyle.replace(/body/g, ".contract-body-view");
 
   // Extract wrapper
+  let innerHtml = "";
   const wrapper = doc.querySelector(".contract-wrapper");
   if (wrapper) {
-    contractHtml.value = wrapper.innerHTML;
+    innerHtml = wrapper.innerHTML;
   } else {
-    contractHtml.value = doc.body.innerHTML;
+    innerHtml = doc.body.innerHTML;
   }
+
+  // 功能：将模板中的 "____年__月__日" 替换为北京时间的今天日期
+  const now = new Date();
+  // 计算北京时间 (UTC+8)
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const beijingDate = new Date(utc + 3600000 * 8);
+  const year = beijingDate.getFullYear();
+  const month = beijingDate.getMonth() + 1;
+  const day = beijingDate.getDate();
+  const dateStr = `${year}年${month}月${day}日`;
+
+  // 使用正则匹配可能带有空格或不同下划线数量的日期占位符
+  contractHtml.value = innerHtml.replace(/_+年_+月_+日/g, dateStr);
+  loading.value = false;
 
   nextTick(() => {
     initInteractivity();
@@ -68,15 +81,30 @@ const parseTemplate = (html) => {
 };
 
 const initInteractivity = () => {
-  if (!contractContainer.value) return;
+  if (!contractContainer.value) {
+    console.warn("[SignatureView] 容器尚未就绪，无法初始化交互");
+    return;
+  }
 
   // Make .value fields editable
   const values = contractContainer.value.querySelectorAll(".value");
-  values.forEach((el) => {
+  console.log(`[SignatureView] 找到 ${values.length} 个可填写区域`);
+
+  values.forEach((el, index) => {
     el.setAttribute("contenteditable", "true");
     el.classList.add("editable-field");
     el.style.backgroundColor = "rgba(255, 255, 0, 0.05)";
     el.style.cursor = "text";
+    el.style.minWidth = "40px";
+    el.style.display = "inline-block";
+    el.style.position = "relative";
+    el.style.zIndex = "20"; // 确保在签名层之上
+
+    // 添加点击触发器
+    el.addEventListener("click", () => {
+      console.log("input"); // 点击时 console.log("input")
+      el.focus();
+    });
   });
 
   // Init signature pads on .sig-line
@@ -90,6 +118,7 @@ const initSignaturePad = (line, index) => {
   line.style.position = "relative";
   line.style.minHeight = "60px"; // Give some room for signature
   line.style.cursor = "crosshair";
+  line.style.display = "block";
 
   const canvas = document.createElement("canvas");
   canvas.style.position = "absolute";
@@ -97,12 +126,14 @@ const initSignaturePad = (line, index) => {
   canvas.style.left = "0";
   canvas.style.width = "100%";
   canvas.style.height = "100px";
-  canvas.style.zIndex = "10";
-  canvas.width = line.offsetWidth * 2; // High DPI
-  canvas.height = 100 * 2;
+  canvas.style.zIndex = "10"; // 签名层低于输入层
+
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = line.offsetWidth * ratio;
+  canvas.height = 100 * ratio;
 
   const ctx = canvas.getContext("2d");
-  ctx.scale(2, 2);
+  ctx.scale(ratio, ratio);
   ctx.lineWidth = 2;
   ctx.lineCap = "round";
   ctx.strokeStyle = "black";
@@ -128,21 +159,21 @@ const initSignaturePad = (line, index) => {
   };
 
   const startDraw = (e) => {
-    e.preventDefault();
     pad.isDrawing = true;
     const pos = getPos(e);
     pad.currentStroke = [pos];
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
+    if (e.touches) e.preventDefault();
   };
 
   const draw = (e) => {
     if (!pad.isDrawing) return;
-    e.preventDefault();
     const pos = getPos(e);
     pad.currentStroke.push(pos);
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
+    if (e.touches) e.preventDefault();
   };
 
   const endDraw = () => {
@@ -183,6 +214,7 @@ const clearSignature = () => {
 
 const generateSVG = (pad) => {
   if (pad.strokes.length === 0) return "";
+  const ratio = window.devicePixelRatio || 1;
   const paths = pad.strokes.map((stroke) => {
     if (stroke.length < 2) return "";
     const d = `M ${stroke[0].x} ${stroke[0].y} ${stroke
@@ -193,7 +225,7 @@ const generateSVG = (pad) => {
   });
 
   return `
-    <svg viewBox="0 0 ${pad.canvas.width / 2} ${pad.canvas.height / 2}" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 ${pad.canvas.width / ratio} ${pad.canvas.height / ratio}" xmlns="http://www.w3.org/2000/svg">
       ${paths.join("\n")}
     </svg>
   `;
@@ -209,8 +241,7 @@ const submit = () => {
   // Collect fields
   const values = contractContainer.value.querySelectorAll(".value");
   values.forEach((el, i) => {
-    const label = el.previousElementSibling?.textContent || `field_${i}`;
-    data.fields[label] = el.innerText.trim();
+    data.fields[`field_${i}`] = el.innerText.trim();
   });
 
   // Collect signatures
@@ -272,7 +303,7 @@ onMounted(() => {
         <component :is="'style'">
           {{ contractStyle }}
           .contract-body-view .editable-field:hover {
-            background-color: rgba(0, 123, 255, 0.1) !important;
+            background-color: rgba(255, 255, 0, 0.2) !important;
           }
           .contract-body-view .editable-field:focus {
             background-color: rgba(0, 123, 255, 0.05) !important;
@@ -280,7 +311,7 @@ onMounted(() => {
             outline-offset: 2px;
           }
           .contract-body-view .contract-wrapper {
-            border: none !important; /* Remove border for the document view */
+            border: none !important;
             padding: 30px !important;
           }
           @media (max-width: 600px) {
@@ -313,5 +344,10 @@ onMounted(() => {
 /* Ensure signature canvas is responsive */
 .sig-line canvas {
   width: 100% !important;
+}
+
+/* 确保可编辑字段在所有状态下都可交互 */
+.editable-field {
+  pointer-events: auto !important;
 }
 </style>
