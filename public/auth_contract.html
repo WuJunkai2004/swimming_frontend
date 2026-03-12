@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>委托授权合同</title>
+    <style>
+      /* 基础样式重置 */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #ffffff;
+        color: #000000;
+        font-family: "SimSun", "Songti SC", "STSong", serif;
+        line-height: 1.6;
+        padding: 40px 20px;
+      }
+
+      /* 响应式容器 */
+      .contract-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid #000;
+        padding: 50px 60px;
+      }
+
+      /* 标题样式 */
+      h1 {
+        text-align: center;
+        font-size: 24pt;
+        font-family: "SimHei", "Heiti SC", "STHeiti", sans-serif;
+        margin-bottom: 40px;
+        letter-spacing: 5px;
+      }
+
+      h2 {
+        font-size: 14pt;
+        font-family: "SimHei", "Heiti SC", "STHeiti", sans-serif;
+        margin: 25px 0 15px 0;
+        border-bottom: 1px solid #000;
+        padding-bottom: 5px;
+      }
+
+      h3 {
+        font-size: 12pt;
+        font-family: "SimHei", "Heiti SC", "STHeiti", sans-serif;
+        margin: 15px 0 10px 0;
+      }
+
+      /* 文本段落 */
+      p {
+        margin-bottom: 12px;
+        text-align: justify;
+      }
+
+      .indent {
+        text-indent: 2em;
+      }
+
+      /* 甲乙方信息区 */
+      .parties-info {
+        margin-bottom: 30px;
+      }
+
+      .party-row {
+        display: flex;
+        margin-bottom: 8px;
+      }
+
+      .label {
+        font-weight: bold;
+        min-width: 100px;
+      }
+
+      .value {
+        flex: 1;
+        border-bottom: 1px solid #000;
+        min-height: 1.2em;
+      }
+
+      /* 列表样式 */
+      ol {
+        margin-left: 40px;
+        margin-bottom: 15px;
+      }
+
+      li {
+        margin-bottom: 8px;
+        text-align: justify;
+      }
+
+      /* 签名区 */
+      .signature-section {
+        margin-top: 50px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .sig-block {
+        width: 45%;
+        min-width: 280px;
+        margin-bottom: 30px;
+      }
+
+      .sig-line {
+        margin-top: 20px;
+        display: block;
+        border-bottom: 1px solid #000;
+        height: 30px;
+        width: 100%;
+      }
+
+      /* 分页控制（用于打印） */
+      .page-break {
+        page-break-before: always;
+      }
+
+      /* 移动端适配 */
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+        .contract-wrapper {
+          padding: 20px;
+          border: none;
+        }
+        h1 {
+          font-size: 18pt;
+        }
+        .sig-block {
+          width: 100%;
+        }
+        ol,
+        ol {
+          margin-left: 20px;
+        }
+        .party-row {
+          flex-direction: column;
+        }
+        .label {
+          margin-bottom: 5px;
+        }
+      }
+
+      /* 打印样式优化 */
+      @media print {
+        body {
+          padding: 0;
+        }
+        .contract-wrapper {
+          border: none;
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contract-wrapper">
+      <h1>委托授权合同</h1>
+
+      <div class="parties-info">
+        <div class="party-row">
+          <span class="label">甲方（个人信息主体/委托人）：</span>
+        </div>
+        <div class="party-row">
+          <span class="label">姓名/名称：</span>
+          <span class="value"></span>
+        </div>
+        <div class="party-row">
+          <span class="label">联系电话：</span>
+          <span class="value"></span>
+        </div>
+        <div class="party-row">
+          <span class="label">身份证号：</span>
+          <span class="value"></span>
+        </div>
+        <div class="party-row">
+          <span class="label">联系地址：</span>
+          <span class="value"></span>
+        </div>
+        <br />
+        <div class="party-row">
+          <span class="label">乙方（个人信息处理者/受托人）：</span>
+        </div>
+        <div class="party-row">
+          <span class="label">名称：</span>
+          <span class="value"></span>
+        </div>
+        <div class="party-row">
+          <span class="label">联系方式：</span>
+          <span class="value"></span>
+        </div>
+      </div>
+
+      <p class="indent">
+        根据《中华人民共和国民法典》《中华人民共和国个人信息保护法》等相关法律法规，甲乙双方在平等、自愿的基础上，经友好协商，就甲方委托乙方代为处理相关事宜达成以下协议，以资共同遵守：
+      </p>
+
+      <h2>第一条 委托处理的信息内容与用途</h2>
+      <ol>
+        <li>
+          <strong>信息内容：</strong
+          >甲方授权乙方在本合同约定范围内处理其以下个人信息：
+          <br />个人基本信息：姓名、头像；
+          <br />个人形象信息：由甲方主动提供至乙方网站的个人照片、影像资料。
+        </li>
+        <li>
+          <strong>处理用途：</strong
+          >上述信息仅限用于乙方网站提供的维护网站运营、进行网站展示、新闻宣传及必要的公示等服务。乙方不得用于上述明确列示之外的任何其他目的。
+        </li>
+      </ol>
+
+      <h2>第二条 委托处理方式与授权范围</h2>
+      <ol>
+        <li>
+          <strong>处理方式：</strong
+          >乙方对甲方个人信息的处理活动包括收集、存储、使用、加工、传输、提供、公开、删除等。
+        </li>
+        <li>
+          <strong>授权范围：</strong
+          >甲方授权乙方仅为实现本合同第一条所列之用途，以合法、正当、必要和诚信的方式，在乙方网站平台内部进行相关处理活动。
+        </li>
+        <li>
+          <strong>特别限制：</strong
+          >未经甲方另行单独、书面同意，乙方不得将甲方信息提供给任何第三方，亦不得用于任何商业性推广或营销活动。
+        </li>
+      </ol>
+
+      <h2>第三条 委托期限</h2>
+      <p class="indent">
+        本合同期限自甲方在乙方网站勾选“同意”或类似选项并注册成功之日起生效，至乙方域名ICP备案到期且乙方按规定删除/匿名化甲方信息之日终止。
+      </p>
+
+      <h2>第四条 双方的权利与义务</h2>
+      <h3>一、甲方的权利与义务</h3>
+      <ol>
+        <li>
+          有权在本同意书履行期间，随时通过乙方指定渠道撤回同意，撤回同意不影响撤回前乙方基于本同意书已进行的合法信息处理活动的效力。
+        </li>
+        <li>
+          有权要求乙方说明信息处理的具体情况；查询、复制本人人脸信息处理记录；对错误的信息要求乙方更正；在符合法律法规及网站规则的前提下，有权要求删除其个人信息。
+        </li>
+        <li>
+          若发现乙方存在超范围处理、泄露人脸信息等违法行为，有权向网信、公安等监管部门投诉、举报。
+        </li>
+        <li>
+          有权随时撤回对本合同的授权。撤回授权后，乙方应停止处理并删除已处理的个人信息，法律法规另有规定或本合同另有约定的除外。
+        </li>
+        <li>
+          妥善保管自身身份验证相关信息，因甲方自身过错（如泄露账户信息、冒用他人身份等）导致信息被非法使用的，由甲方自行承担责任。
+        </li>
+        <li>
+          保证向乙方提供的相关信息真实、准确、完整不涉及第三方，若预留联系方式等信息变更，及时告知乙方，否则因信息不实导致的不利后果由甲方自行承担。
+        </li>
+      </ol>
+
+      <h3>二、乙方的义务</h3>
+      <ol>
+        <li>
+          <strong>合法合规义务：</strong
+          >应采取必要措施保障甲方个人信息安全，防止信息泄露、篡改、丢失，不得非法收集、使用、加工、传输他人个人信息，不得非法买卖、提供或者公开他人个人信息。
+        </li>
+        <li>
+          <strong>告知与同意义务：</strong
+          >处理敏感个人信息（如涉及）前，应取得甲方单独同意，并告知处理的必要性及对个人权益的影响。
+        </li>
+        <li>
+          <strong>安全保护义务：</strong
+          >建立个人信息保护制度，采取技术安全措施，合理确定个人信息处理的操作权限，对工作人员进行安全教育与监督。
+        </li>
+        <li>
+          <strong>委托处理监督义务：</strong
+          >若乙方委托第三方（子处理器）协助处理，应保证该第三方具备同等保护水平，并通过合同等方式监督其处理活动。乙方应对第三方的行为向甲方承担责任。
+        </li>
+        <li>
+          <strong>响应请求义务：</strong
+          >建立便捷的申请受理和处理机制，及时响应甲方行使权利的请求。 6.
+        </li>
+        <li>
+          <strong>泄露通知义务：</strong
+          >发生或可能发生个人信息泄露、篡改、丢失的，应立即采取补救措施，并按照规定及时通知甲方及主管部门。
+        </li>
+      </ol>
+
+      <div class="page-break"></div>
+
+      <h2>第五条 违约责任</h2>
+      <ol>
+        <li>任何一方违反本合同的约定，给另一方造成损失的，应承担赔偿责任。</li>
+        <li>
+          因乙方违反法律法规规定或本合同约定，导致甲方个人信息泄露、被非法使用等，给甲方或第三方造成损害的，乙方应依法承担全部法律责任，包括但不限于赔偿损失、消除影响等。
+        </li>
+        <li>
+          若乙方将甲方信息用于本合同约定之外的用途或提供给第三方，甲方有权单方解除合同，并要求乙方承担由此造成的一切损失。
+        </li>
+      </ol>
+
+      <h2>第六条 免责情形</h2>
+      <ol>
+        <li>甲方故意提供虚假信息、冒用他人身份的；</li>
+        <li>
+          因不可抗力（如自然灾害、网络故障、黑客攻击等非乙方可控制因素）导致人脸信息泄露丢失的，乙方已及时采取合理补救措施的；
+        </li>
+        <li>法律法规规定的其他乙方无过错的情形。</li>
+      </ol>
+
+      <h2>第七条 争议解决</h2>
+      <p class="indent">
+        因本合同引起的或与本合同有关的任何争议，双方应友好协商解决；协商不成的，任何一方均有权向乙方所在地有管辖权的人民法院提起诉讼。
+      </p>
+
+      <h2>第八条 其他约定</h2>
+      <ol>
+        <li>
+          本合同构成甲方与乙方就个人信息处理事宜达成的完整协议。乙方网站的《隐私政策》为本合同的有效组成部分，与本合同具有同等法律效力。若《隐私政策》与本合同条款有不一致之处，以对甲方个人信息保护更为有利的约定为准。
+        </li>
+        <li>
+          本合同自甲方在乙方网站勾选“同意”或类似选项并成功注册账户之日起生效。
+        </li>
+        <li>
+          本合同一式两份，甲乙双方各执一份，具有同等法律效力；线上版本以乙方系统留存记录为准，甲方可随时查询、下载。
+        </li>
+        <li>通知送达地址适用于本合同履行及相关争议解决阶段的法律文书送达。</li>
+      </ol>
+
+      <div class="signature-section">
+        <div class="sig-block">
+          <p><strong>甲方（委托人）：</strong></p>
+          <p>（签字）</p>
+          <span class="sig-line"></span>
+          <p style="margin-top: 15px">日期：____年__月__日</p>
+        </div>
+        <div class="sig-block">
+          <p><strong>乙方（受托人）：</strong></p>
+          <p>（公章）</p>
+          <span class="sig-line"></span>
+          <p style="margin-top: 15px">日期：____年__月__日</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 40px; text-align: center; font-size: 10pt">
+        <p>（以下无正文）</p>
+      </div>
+    </div>
+  </body>
+</html>
