@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useAlert } from "@/composables/useAlert";
 
@@ -13,8 +13,13 @@ const contractHtml = ref("");
 const contractStyle = ref("");
 const contractContainer = ref(null);
 
-// 签名数据
-const signaturePads = ref([]); // { canvas, ctx, strokes, rect }
+// 签名相关状态
+const signatureDialogVisible = ref(false);
+const savedCharacterSVGs = ref([]);
+const currentStrokes = ref([]);
+const isDrawing = ref(false);
+const signatureCanvas = ref(null);
+let ctx = null;
 
 const isValidateType = (t) => {
   return ["contract", "letter"].includes(t);
@@ -39,36 +44,33 @@ const fetchTemplate = async () => {
   }
 
   fetch(`/auth_${type.value}.html`)
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`无法获取模板: ${response.statusText}`);
-    }
-    return response.text();
-  })
-  .then((htmlText) => {
-    parseTemplate(htmlText);
-  })
-  .catch((err) => {
-    error.value = "获取模板失败: " + err.message;
-    alerts("错误", error.value);
-  })
-  .finally(() => {
-    loading.value = false;
-  });
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`无法获取模板: ${response.statusText}`);
+      }
+      return response.text();
+    })
+    .then((htmlText) => {
+      parseTemplate(htmlText);
+    })
+    .catch((err) => {
+      error.value = "获取模板失败: " + err.message;
+      alerts("错误", error.value);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 
 const parseTemplate = (html) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
 
-  // Extract style
   const styles = doc.querySelectorAll("style");
   let combinedStyle = "";
   styles.forEach((s) => (combinedStyle += s.textContent));
-  // Scope style to our container
   contractStyle.value = combinedStyle.replace(/body/g, ".contract-body-view");
 
-  // Extract wrapper
   let innerHtml = "";
   const wrapper = doc.querySelector(".contract-wrapper");
   if (wrapper) {
@@ -79,7 +81,6 @@ const parseTemplate = (html) => {
     return;
   }
 
-  // 功能：将模板中的 "____年__月__日" 替换为北京时间的今天日期
   contractHtml.value = innerHtml.replace(/_+年_+月_+日/g, getDateString());
   loading.value = false;
 
@@ -92,7 +93,7 @@ const initInteractivity = () => {
     return;
   }
 
-  // Make .value fields editable
+  // 1. 设置可填写区域
   const values = contractContainer.value.querySelectorAll(".value");
   console.log(`[SignatureView] 找到 ${values.length} 个可填写区域`);
 
@@ -112,135 +113,207 @@ const initInteractivity = () => {
     });
   });
 
-  // Init signature pads on .sig-line
-  const sigLines = contractContainer.value.querySelectorAll(".sig-line");
-  sigLines.forEach((line, index) => {
-    initSignaturePad(line, index);
-  });
+  // 2. 设置用户签名区交互 (只针对 .user-signature)
+  const userSigLine = contractContainer.value.querySelector(".user-signature .sig-line");
+  if (userSigLine) {
+    userSigLine.style.cursor = "pointer";
+    userSigLine.style.position = "relative";
+    userSigLine.style.minHeight = "80px";
+    userSigLine.style.display = "flex";
+    userSigLine.style.alignItems = "center";
+    userSigLine.style.justifyContent = "center";
+    userSigLine.style.backgroundColor = "rgba(0, 100, 255, 0.03)";
+    userSigLine.innerHTML = '<span class="placeholder-text" style="color: #999; font-size: 14px;">点击此处手写签名</span>';
+    
+    userSigLine.addEventListener("click", openSignatureDialog);
+  }
+
+  // 3. 设置乙方公章占位 (放空)
+  const sealSigLine = contractContainer.value.querySelector(".seal-signature .sig-line");
+  if (sealSigLine) {
+    sealSigLine.style.position = "relative";
+    sealSigLine.style.minHeight = "100px";
+    // 添加一个虚线圆圈代表公章位置
+    const sealPlaceholder = document.createElement("div");
+    sealPlaceholder.style.width = "90px";
+    sealPlaceholder.style.height = "90px";
+    sealPlaceholder.style.border = "2px dashed #ccc";
+    sealPlaceholder.style.borderRadius = "50%";
+    sealPlaceholder.style.margin = "5px auto";
+    sealPlaceholder.style.display = "flex";
+    sealPlaceholder.style.alignItems = "center";
+    sealPlaceholder.style.justifyContent = "center";
+    sealPlaceholder.style.color = "#ccc";
+    sealPlaceholder.style.fontSize = "12px";
+    sealPlaceholder.innerText = "乙方公章";
+    sealSigLine.appendChild(sealPlaceholder);
+  }
 };
 
-const initSignaturePad = (line, index) => {
-  line.style.position = "relative";
-  line.style.minHeight = "60px"; // Give some room for signature
-  line.style.cursor = "crosshair";
-  line.style.display = "block";
+// 签名弹窗逻辑
+const openSignatureDialog = () => {
+  signatureDialogVisible.value = true;
+  // 给弹窗动画留一点时间，确保能获取到正确的 DOM 尺寸
+  setTimeout(() => {
+    initCanvas();
+  }, 300);
+};
 
-  const canvas = document.createElement("canvas");
-  canvas.style.position = "absolute";
-  canvas.style.top = "-40px"; // Allow signing above the line
-  canvas.style.left = "0";
-  canvas.style.width = "100%";
-  canvas.style.height = "100px";
-  canvas.style.zIndex = "10"; // 签名层低于输入层
+const initCanvas = () => {
+  const canvas = signatureCanvas.value;
+  if (!canvas) return;
+
+  // 获取显示尺寸
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
 
   const ratio = window.devicePixelRatio || 1;
-  canvas.width = line.offsetWidth * ratio;
-  canvas.height = 100 * ratio;
-
-  const ctx = canvas.getContext("2d");
+  // 设置画布内部分辨率，使其与显示尺寸匹配并支持高清屏
+  canvas.width = rect.width * ratio;
+  canvas.height = rect.height * ratio;
+  
+  ctx = canvas.getContext("2d");
+  // 必须重置变换矩阵再缩放，防止重复调用 initCanvas 导致叠加缩放
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(ratio, ratio);
-  ctx.lineWidth = 2;
+  
+  // 画布状态在重置宽/高后会被清空，需重新设置样式
+  ctx.lineWidth = 3;
   ctx.lineCap = "round";
+  ctx.lineJoin = "round";
   ctx.strokeStyle = "black";
+};
 
-  line.appendChild(canvas);
+const getPos = (e) => {
+  const canvas = signatureCanvas.value;
+  if (!canvas) return { x: 0, y: 0 };
+  
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-  const pad = {
-    canvas,
-    ctx,
-    strokes: [],
-    isDrawing: false,
-    currentStroke: [],
+  // 计算鼠标/手指相对于画布左上角的坐标（CSS 像素）
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top,
   };
+};
 
-  const getPos = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    };
-  };
+const startDraw = (e) => {
+  // 绘制前确保画布已初始化
+  if (!ctx || signatureCanvas.value.width === 0) {
+    initCanvas();
+  }
+  
+  isDrawing.value = true;
+  const pos = getPos(e);
+  currentStrokes.value.push([pos]);
+  ctx.beginPath();
+  ctx.moveTo(pos.x, pos.y);
+  
+  // 阻止触摸时的默认行为（如滚动）
+  if (e.cancelable) e.preventDefault();
+};
 
-  const startDraw = (e) => {
-    pad.isDrawing = true;
-    const pos = getPos(e);
-    pad.currentStroke = [pos];
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
-    if (e.touches) e.preventDefault();
-  };
-
-  const draw = (e) => {
-    if (!pad.isDrawing) return;
-    const pos = getPos(e);
-    pad.currentStroke.push(pos);
+const draw = (e) => {
+  if (!isDrawing.value) return;
+  const pos = getPos(e);
+  const lastStroke = currentStrokes.value[currentStrokes.value.length - 1];
+  if (lastStroke) {
+    lastStroke.push(pos);
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
-    if (e.touches) e.preventDefault();
-  };
-
-  const endDraw = () => {
-    if (!pad.isDrawing) return;
-    pad.isDrawing = false;
-    if (pad.currentStroke.length > 0) {
-      pad.strokes.push([...pad.currentStroke]);
-    }
-  };
-
-  canvas.addEventListener("mousedown", startDraw);
-  canvas.addEventListener("mousemove", draw);
-  window.addEventListener("mouseup", endDraw);
-
-  canvas.addEventListener("touchstart", startDraw, { passive: false });
-  canvas.addEventListener("touchmove", draw, { passive: false });
-  canvas.addEventListener("touchend", endDraw);
-
-  const cleanup = () => {
-    window.removeEventListener("mouseup", endDraw);
-  };
-
-  signaturePads.value.push({ ...pad, cleanup });
+  }
+  if (e.cancelable) e.preventDefault();
 };
 
-onUnmounted(() => {
-  signaturePads.value.forEach((pad) => {
-    if (pad.cleanup) pad.cleanup();
-  });
-});
-
-const clearSignature = () => {
-  signaturePads.value.forEach((pad) => {
-    pad.ctx.clearRect(0, 0, pad.canvas.width, pad.canvas.height);
-    pad.strokes = [];
-  });
+const endDraw = () => {
+  isDrawing.value = false;
 };
 
-const generateSVG = (pad) => {
-  if (pad.strokes.length === 0) return "";
-  const ratio = window.devicePixelRatio || 1;
-  const paths = pad.strokes.map((stroke) => {
+const generateSVGString = (strokes) => {
+  if (strokes.length === 0) return "";
+  const width = signatureCanvas.value.width / (window.devicePixelRatio || 1);
+  const height = signatureCanvas.value.height / (window.devicePixelRatio || 1);
+  
+  const paths = strokes.map(stroke => {
     if (stroke.length < 2) return "";
-    const d = `M ${stroke[0].x} ${stroke[0].y} ${stroke
-      .slice(1)
-      .map((p) => `L ${p.x} ${p.y}`)
-      .join(" ")}`;
-    return `<path d="${d}" fill="none" stroke="black" stroke-width="2" />`;
-  });
+    const d = `M ${stroke[0].x} ${stroke[0].y} ` + stroke.slice(1).map(p => `L ${p.x} ${p.y}`).join(" ");
+    return `<path d="${d}" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />`;
+  }).join("");
 
-  return `
-    <svg viewBox="0 0 ${pad.canvas.width / ratio} ${pad.canvas.height / ratio}" xmlns="http://www.w3.org/2000/svg">
-      ${paths.join("\n")}
-    </svg>
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${paths}</svg>`;
+};
+
+const nextCharacter = () => {
+  if (currentStrokes.value.length === 0) {
+    alerts("提示", "请先书写当前汉字");
+    return;
+  }
+  const svg = generateSVGString(currentStrokes.value);
+  savedCharacterSVGs.value.push(svg);
+  
+  // 重置画布
+  currentStrokes.value = [];
+  ctx.clearRect(0, 0, signatureCanvas.value.width, signatureCanvas.value.height);
+};
+
+const removeCharacter = (index) => {
+  savedCharacterSVGs.value.splice(index, 1);
+};
+
+const completeSignature = () => {
+  // 如果当前还有笔迹未保存
+  if (currentStrokes.value.length > 0) {
+    const svg = generateSVGString(currentStrokes.value);
+    savedCharacterSVGs.value.push(svg);
+  }
+
+  if (savedCharacterSVGs.value.length === 0) {
+    alerts("提示", "请至少书写一个字");
+    return;
+  }
+
+  updateSignaturePreview();
+  signatureDialogVisible.value = false;
+  currentStrokes.value = [];
+};
+
+const updateSignaturePreview = () => {
+  const userSigLine = contractContainer.value.querySelector(".user-signature .sig-line");
+  if (!userSigLine) return;
+
+  // 将所有字的SVG组合在一起展示
+  const combinedHtml = savedCharacterSVGs.value.map(svg => `
+    <div style="height: 60px; width: 60px; margin-right: -10px;">
+      ${svg}
+    </div>
+  `).join("");
+
+  userSigLine.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+      ${combinedHtml}
+    </div>
   `;
+};
+
+const clearAll = () => {
+  savedCharacterSVGs.value = [];
+  currentStrokes.value = [];
+  if (ctx) ctx.clearRect(0, 0, signatureCanvas.value.width, signatureCanvas.value.height);
+  
+  // 恢复预览区提示
+  const userSigLine = contractContainer.value.querySelector(".user-signature .sig-line");
+  if (userSigLine) {
+    userSigLine.innerHTML = '<span class="placeholder-text" style="color: #999; font-size: 14px;">点击此处手写签名</span>';
+  }
 };
 
 const submit = () => {
   const data = {
     type: type.value,
     fields: {},
-    signatures: [],
+    signatures: savedCharacterSVGs.value, // 每个字的SVG字符串数组
   };
 
   // Collect fields
@@ -249,24 +322,13 @@ const submit = () => {
     data.fields[`field_${i}`] = el.innerText.trim();
   });
 
-  // Collect signatures
-  signaturePads.value.forEach((pad, i) => {
-    const svg = generateSVG(pad);
-    if (svg) {
-      data.signatures.push({
-        index: i,
-        svg: svg,
-      });
-    }
-  });
-
   console.log("Submitted Data:", data);
   if (data.signatures.length === 0) {
     alerts("提示", "请先签署您的名字");
     return;
   }
 
-  alerts("提示", "内容已提交，详见控制台输出");
+  alerts("成功", "合同内容及签名SVG已生成，详见控制台");
 };
 
 onMounted(fetchTemplate);
@@ -278,59 +340,40 @@ onMounted(fetchTemplate);
       <Message severity="error">{{ error }}</Message>
     </div>
 
-    <div
-      v-else-if="loading"
-      class="flex flex-column align-items-center justify-content-center p-8"
-    >
+    <div v-else-if="loading" class="flex flex-column align-items-center justify-content-center p-8">
       <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
       <p class="mt-4 text-xl">正在加载合同模板...</p>
     </div>
 
     <div v-else class="max-w-4xl mx-auto">
       <!-- Toolbar -->
-      <div
-        class="sticky top-0 shadow-2 p-3 mb-4 border-round flex flex-wrap gap-2 align-items-center justify-content-between"
         style="
           z-index: 1000;
           background-color: var(--p-content-background, white);
         "
-      >
         <div class="flex align-items-center gap-2">
-          <Button
-            icon="pi pi-arrow-left"
-            severity="secondary"
-            rounded
-            @click="$router.back()"
-          />
-          <h1 class="text-xl font-bold m-0">
-            {{ type === "contract" ? "委托授权合同" : "个人信息授权同意书" }}
-          </h1>
+          <Button icon="pi pi-arrow-left" severity="secondary" rounded @click="$router.back()" />
+          <h1 class="text-xl font-bold m-0">{{ type === 'contract' ? '委托授权合同' : '个人信息授权同意书' }}</h1>
         </div>
         <div class="flex gap-2">
-          <Button
             label="清除签名"
-            icon="pi pi-refresh"
-            severity="warning"
-            outlined
-            @click="clearSignature"
-          />
           <Button label="确认提交" icon="pi pi-check" @click="submit" />
         </div>
       </div>
 
-      <div
-        class="contract-document shadow-6 bg-white border-round mb-8 overflow-hidden"
-      >
         <!-- 注入类型 -->
         <component :is="'style'">
           {{ contractStyle }}
-          .contract-body-view .editable-field:hover { background-color:
-          rgba(255, 255, 0, 0.2) !important; } .contract-body-view
-          .editable-field:focus { background-color: rgba(0, 123, 255, 0.05)
-          !important; outline: 2px solid #007bff; outline-offset: 2px; }
-          .contract-body-view .contract-wrapper { border: none !important;
-          padding: 30px !important; } @media (max-width: 600px) {
-          .contract-body-view .contract-wrapper { padding: 15px !important; } }
+          .contract-body-view .editable-field { 
+            background-color: rgba(255, 255, 0, 0.05); 
+            min-width: 60px; 
+            display: inline-block; 
+            border-bottom: 1px dashed #ccc;
+          }
+          .contract-body-view .editable-field:hover { background-color: rgba(255, 255, 0, 0.15) !important; }
+          .contract-body-view .editable-field:focus { background-color: white !important; outline: 1px solid #007bff; }
+          .contract-body-view .contract-wrapper { border: none !important; padding: 40px !important; }
+          @media (max-width: 600px) { .contract-body-view .contract-wrapper { padding: 20px !important; } }
         </component>
 
         <div class="contract-body-view" ref="contractContainer">
@@ -338,28 +381,64 @@ onMounted(fetchTemplate);
         </div>
       </div>
     </div>
+
+    <!-- 签字弹窗 -->
+    <Dialog v-model:visible="signatureDialogVisible" header="手写签名（请逐字书写）" :modal="true" :draggable="false" 
+            class="signature-dialog" :breakpoints="{'960px': '95vw', '640px': '100vw'}" :style="{width: '450px'}">
+      <div class="flex flex-column align-items-center">
+        <div class="signature-board-container bg-gray-100 border-1 border-300 border-round overflow-hidden" 
+             style="width: 100%; aspect-ratio: 1/1; position: relative; touch-action: none;">
+          <canvas ref="signatureCanvas" 
+                  @mousedown="startDraw" @mousemove="draw" @mouseup="endDraw" @mouseleave="endDraw"
+                  @touchstart="startDraw" @touchmove="draw" @touchend="endDraw"
+                  style="width: 100%; height: 100%; cursor: crosshair;"></canvas>
+          <div class="absolute top-0 right-0 p-2 text-400 pointer-events-none">
+            签字区域
+          </div>
+        </div>
+        
+        <div class="flex w-full mt-4 gap-3">
+          <Button label="下一字" icon="pi pi-plus" class="flex-1" severity="secondary" @click="nextCharacter" />
+          <Button label="完成签名" icon="pi pi-check" class="flex-1" @click="completeSignature" />
+        </div>
+        
+        <div v-if="savedCharacterSVGs.length > 0" class="w-full mt-3 p-2 border-top-1 border-200">
+          <p class="text-sm text-600 m-0 mb-2">预览 (已写 {{savedCharacterSVGs.length}} 字):</p>
+          <div class="flex flex-wrap gap-3 bg-white p-2 border-round">
+            <div v-for="(svg, idx) in savedCharacterSVGs" :key="idx" 
+                 class="relative bg-gray-50 border-1 border-200 border-round p-1" 
+                 style="width: 45px; height: 45px;">
+              <div v-html="svg" class="w-full h-full"></div>
+              <!-- 柔和灰色删除按钮 -->
+              <Button icon="pi pi-times" rounded 
+                      class="absolute p-0 flex align-items-center justify-content-center" 
+                      style="top: -6px; right: -6px; width: 16px; height: 16px; min-width: auto; font-size: 8px; background: #94a3b8; color: #fff; border: none; cursor: pointer; opacity: 0.8;"
+                      @click="removeCharacter(idx)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </Dialog>
   </div>
 </template>
 
-<style>
-/* Global style overrides for the contract view to ensure it looks like a document */
+<style scoped>
 .contract-body-view {
   font-family: "SimSun", "Songti SC", "STSong", serif;
   color: #000;
   line-height: 1.6;
 }
 
-.signature-view-container .p-message {
-  margin-top: 2rem;
+:deep(.signature-dialog .p-dialog-content) {
+  padding-bottom: 2rem;
 }
 
-/* Ensure signature canvas is responsive */
-.sig-line canvas {
-  width: 100% !important;
-}
-
-/* 确保可编辑字段在所有状态下都可交互 */
-.editable-field {
-  pointer-events: auto !important;
+/* 移动端全屏 */
+@media screen and (max-width: 640px) {
+  :deep(.signature-dialog) {
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
 }
 </style>
