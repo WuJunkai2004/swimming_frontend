@@ -64,6 +64,9 @@ watch(
   (newVal) => {
     if (newVal) {
       setTimeout(initCanvas, 300);
+    } else {
+      // 关闭时，发送complete事件
+      emit("complete", [...savedCharacterSVGs.value]);
     }
   },
 );
@@ -76,7 +79,9 @@ onMounted(() => {
 
 const getPos = (e) => {
   const canvas = signatureCanvas.value;
-  if (!canvas) return { x: 0, y: 0 };
+  if (!canvas) {
+    return { x: 0, y: 0 };
+  }
 
   const rect = canvas.getBoundingClientRect();
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -154,7 +159,7 @@ const nextCharacter = () => {
   }
   const svg = generateSVGString(currentStrokes.value);
   savedCharacterSVGs.value.push(svg);
-  
+
   // 重置画布
   currentStrokes.value = [];
   ctx.clearRect(
@@ -190,7 +195,7 @@ const completeSignature = () => {
 const clearSignatures = () => {
   savedCharacterSVGs.value = [];
   currentStrokes.value = [];
-  if (ctx) {
+  if (ctx && signatureCanvas.value) {
     ctx.clearRect(
       0,
       0,
@@ -272,7 +277,7 @@ defineExpose({ clearSignatures, getSignatures });
             v-for="(svg, idx) in savedCharacterSVGs"
             :key="idx"
             class="relative bg-gray-50 border-1 border-200 border-round p-1"
-            style="width: 45px; height: 45px"
+            style="width: 45px; height: 45px;"
           >
             <div v-html="svg" class="w-full h-full"></div>
             <Button
@@ -294,17 +299,17 @@ defineExpose({ clearSignatures, getSignatures });
 }
 
 .close-button {
-  top: -6px;
-  right: -6px;
-  width: 16px;
-  height: 16px;
-  min-width: auto;
-  font-size: 8px;
-  background: #94a3b8;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  opacity: 0.8;
+  top: -6px !important;
+  right: -6px !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: auto !important;
+  font-size: 8px !important;
+  background: #94a3b8 !important;
+  color: #fff !important;
+  border: none !important;
+  cursor: pointer !important;
+  opacity: 0.8 !important;
 }
 
 .close-button:hover {
