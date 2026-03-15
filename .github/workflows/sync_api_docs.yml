@@ -3,9 +3,9 @@ name: 自动生成并同步API文档
 on:
   push:
     branches:
-      - main  # 假设您的主分支是 main，如果是 master，请修改这里
+      - main
     paths:
-      - 'src/api/**.json' # 仅当 src/api/ 目录下的 json 文件发生变化时触发
+      - "src/api/**.json" # 仅当 src/api/ 目录下的 json 文件发生变化时触发
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
       - name: 设置 Python 3
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # 您可以使用 3.x
+          python-version: "3.12"
 
       # 3. 运行 Python 脚本生成 API 文档
       # 该脚本会检查项目根目录的 vite.config.js 文件，必须在根目录运行
