@@ -2,7 +2,6 @@ import { fileURLToPath, URL } from "node:url";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import vueDevTools from "vite-plugin-vue-devtools";
 import { visualizer } from "rollup-plugin-visualizer";
 
 import Components from "unplugin-vue-components/vite";
@@ -26,7 +25,6 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    vueDevTools(),
     ...(DEV_MODE === "mock" ? [vueApiPlugin()] : []),
     Components({
       resolvers: [PrimeVueResolver()],
@@ -52,7 +50,26 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
+        pure_funcs: ["console.log"],
+        passes: 3,
+        unsafe: true,
+        unsafe_arrows: true,
+        unsafe_comps: true,
+        unsafe_math: true,
+        unsafe_methods: true,
+        hoist_funs: true,
+        hoist_vars: true,
       },
+      mangle: {
+        toplevel: true,
+        keep_classnames: false,
+        keep_fnames: false,
+      },
+      format: {
+        comments: false,
+        ascii_only: true,
+      },
+      module: true,
     },
     sourcemap: false,
   },
