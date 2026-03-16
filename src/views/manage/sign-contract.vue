@@ -2,9 +2,11 @@
 import { ref, onMounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useAlert } from "@/composables/useAlert";
+import { useToken } from "@/composables/useToken";
 
 const route = useRoute();
 const { alerts } = useAlert();
+const { getToken } = useToken();
 
 const type = ref("");
 const loading = ref(true);
@@ -201,26 +203,76 @@ const clearAll = () => {
   }
 };
 
-const submit = () => {
-  const data = {
-    type: type.value,
-    fields: {},
-    signatures: signatureRef.value.getSignatures(), // 每个字的SVG字符串数组
-  };
-
-  // Collect fields
+const getFieldsValue = () => {
   const values = contractContainer.value.querySelectorAll(".value");
-  values.forEach((el, i) => {
-    data.fields[`field_${i}`] = el.innerText.trim();
+  const result = {};
+  values.forEach((element, i) => {
+    const key = element.id || `field_${i}`;
+    result[key] = element.innerText.trim();
   });
+  return result;
+};
 
-  console.log("Submitted Data:", data);
-  if (data.signatures.length === 0) {
-    alerts("提示", "请先签署您的名字");
+const postSignature = async () => {
+  const signature = signatureRef.value.getSignatures().join("");
+  const res = await fetch("/api/contract/uploadSignature", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: getToken(),
+      signature: signature,
+      type: type.value.toUpperCase(),
+    }),
+  });
+  const data = await res.json();
+  if (data.statusCode === 200) {
+    return data.data.url;
+  } else {
+    return "";
+  }
+};
+
+const postInfo = async () => {
+  let signatureUrl = "";
+  try {
+    signatureUrl = await postSignature();
+  } catch (err) {
+    alerts("错误", "签名上传异常");
     return;
   }
 
-  alerts("成功", "合同内容及签名SVG已生成，详见控制台");
+  if (!signatureUrl) {
+    alerts("错误", "签名上传失败");
+    return;
+  }
+
+  const payload = {
+    ...getFieldsValue(),
+    url: signatureUrl,
+    token: getToken(),
+  };
+
+  fetch(`/api/contract/uploadInfo?type=${type.value.toUpperCase()}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`上传失败: ${response.statusText}`);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    if (data.statusCode === 200) {
+      alerts("成功", "合同信息上传成功");
+    } else {
+      throw new Error(data.message || "未知错误");
+    }
+  })
+  .catch((err) => {
+    alerts("错误", "合同信息上传失败: " + err.message);
+  });
 };
 
 onMounted(fetchTemplate);
@@ -266,7 +318,7 @@ onMounted(fetchTemplate);
             outlined
             @click="clearAll"
           />
-          <Button label="确认提交" icon="pi pi-check" @click="submit" />
+          <Button label="确认提交" icon="pi pi-check" @click="postInfo" />
         </div>
       </div>
 
