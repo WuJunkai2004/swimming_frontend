@@ -1,0 +1,14 @@
+{
+    "url": "/api/contract/download",
+    "description": "下载合同接口",
+    "method": ["POST"],
+    "params": {
+        "token": "登录后获取的token"
+    },
+    "response": {
+        "NOTE!": "合同二进制文件"
+    },
+    "fail": {
+        "NOTE!": null
+    }
+}

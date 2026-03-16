@@ -20,16 +20,18 @@ if not Path("dist").is_dir():
 
 def PrevLevel(url: str) -> str:
     "优先级"
-    prev = {
-        "/activity": "1",
-        "/leader": "2",
-        "/player": "3",
-        "/admin": "4",
-        "/sport": "5",
-        "/competition": "6",
-        "/volunteer": "7",
-        "/alumnus": "8",
-    }
+    prev_num = ord("1")
+    prev_list = [
+        "/activity",
+        "/leader",
+        "/admin",
+        "/sport",
+        "/competition",
+        "/volunteer",
+        "/alumnus",
+        "/contract",
+    ]
+    prev = {k: chr(prev_num + i) for i, k in enumerate(prev_list)}
     if url.startswith("/api"):
         url = url[4:]
     for k, v in prev.items():

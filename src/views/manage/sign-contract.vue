@@ -21,7 +21,7 @@ const signPlaceholder =
   '<span class="placeholder-text" style="color: #999; font-size: 14px;">点击此处手写签名</span>';
 
 const isValidateType = (t) => {
-  return ["contract", "letter"].includes(t);
+  return ["contract", "consent"].includes(t);
 };
 
 const getDateString = () => {
@@ -37,7 +37,7 @@ const getDateString = () => {
 const fetchTemplate = async () => {
   type.value = route.params.type;
   if (!isValidateType(type.value)) {
-    error.value = "非法的合同类型，仅支持 contract 或 letter";
+    error.value = "非法的合同类型，仅支持 contract 或 consent";
     loading.value = false;
     return;
   }
