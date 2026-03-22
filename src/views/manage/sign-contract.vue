@@ -226,7 +226,7 @@ const postSignature = async () => {
   });
   const data = await res.json();
   if (data.statusCode === 200) {
-    return data.data.url;
+    return data.data;
   } else {
     return "";
   }
@@ -275,6 +275,46 @@ const postInfo = async () => {
   });
 };
 
+const downloadPDF = async () => {
+  try {
+    const response = await fetch(`/api/contract/download?type=${type.value.toUpperCase()}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: getToken(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`下载失败: ${response.statusText}`);
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+
+    // 尝试获取文件名
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let fileName = `${contractTitle.value || "合同"}.pdf`;
+    if (contentDisposition && contentDisposition.includes("filename=")) {
+      const match = contentDisposition.match(/filename=(.+)/);
+      if (match) fileName = match[1].replace(/["']/g, "");
+    }
+
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    alerts("错误", "下载合同失败: " + err.message);
+  }
+};
+
 onMounted(fetchTemplate);
 </script>
 
@@ -311,6 +351,13 @@ onMounted(fetchTemplate);
           <h1 class="text-xl font-bold m-0">{{ contractTitle }}</h1>
         </div>
         <div class="flex gap-2">
+          <Button
+            label="下载合同"
+            icon="pi pi-download"
+            severity="success"
+            outlined
+            @click="downloadPDF"
+          />
           <Button
             label="清除签名"
             icon="pi pi-refresh"

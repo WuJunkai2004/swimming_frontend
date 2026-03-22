@@ -1,5 +1,5 @@
 {
-    "url": "/api/contract/uploadInfo",
+    "url": "/api/contract/uploadSignature",
     "description": "上传签名信息",
     "method": ["POST"],
     "params": {
@@ -10,9 +10,7 @@
     "response": {
         "message": "成功",
         "statusCode": 200,
-        "data": {
-            "url": "上传后签名信息的访问URL"
-        }
+        "data": "上传后签名信息的访问URL"
     },
     "fail": {
         "message": "失败",
