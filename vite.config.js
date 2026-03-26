@@ -1,6 +1,6 @@
 import { fileURLToPath, URL } from "node:url";
 
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { visualizer } from "rollup-plugin-visualizer";
 
@@ -9,23 +9,13 @@ import { PrimeVueResolver } from "@primevue/auto-import-resolver";
 
 import { vueApiPlugin, vueApiProxy } from "./src/api/api.js";
 
-const DEV_MODE = process.env.VITE_DEV_MODE;
-const backendTarget = "http://124.220.58.44:10086";
-
-if (DEV_MODE) {
-  console.log(`Vite 正在以 ${DEV_MODE} 模式启动`);
-} else {
-  console.log("Vite 正在打包编译");
-}
-
 // https://vite.dev/config/
-export default defineConfig({
+const config = {
   css: {
     devSourcemap: false, // 关闭 CSS source map
   },
   plugins: [
     vue(),
-    ...(DEV_MODE === "mock" ? [vueApiPlugin()] : []),
     Components({
       resolvers: [PrimeVueResolver()],
     }),
@@ -40,9 +30,6 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
-  },
-  server: {
-    proxy: DEV_MODE === "proxy" ? vueApiProxy(backendTarget) : null,
   },
   build: {
     minify: "terser",
@@ -65,4 +52,22 @@ export default defineConfig({
     },
     sourcemap: false,
   },
+};
+
+export default defineConfig((mode) => {
+  console.log(`Vite 配置正在以 [${mode.mode}] 模式加载`);
+  let finalConfig = { ...config };
+  if (mode === 'development') {
+    finalConfig.plugins.push(vueApiPlugin());
+  }
+  if (mode.mode === "debug") {
+    const env = loadEnv("production", process.cwd(), "");
+    if (!env.backend) {
+      throw new Error("请在 .env 文件中设置 backend 变量，例如：backend=http://localhost:3000");
+    }
+    finalConfig.server = {
+      proxy: vueApiProxy(env.backend),
+    }
+  }
+  return finalConfig;
 });

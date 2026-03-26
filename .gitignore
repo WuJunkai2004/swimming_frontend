@@ -34,3 +34,6 @@ vercel.json
 
 # zed editor config
 .zed
+
+# development environment files
+.env
