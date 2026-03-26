@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useToken } from "@/composables/useToken";
 import { useAlert } from "@/composables/useAlert";
 import { SHA256 } from "@/composables/useHash";
@@ -15,8 +15,11 @@ const usertype = ref("VOLS");
 const userOptions = [
   { label: "志愿者", value: "VOLS" },
   { label: "管理员", value: "ADMIN" },
+  { label: "校友", value: "ALUMN" },
 ];
 const isVolsLogin = computed(() => usertype.value === "VOLS");
+const enableChangeLoginType = ref(true);
+
 const username = ref("");
 // 志愿者登录所需数据
 const volsNumber = ref(""); // 学号
@@ -57,29 +60,29 @@ const queryCompetitions = async () => {
 
   isQueryingCompetitions.value = true;
   fetch(`/api/competition/queryCompetition?studentNumber=${volsNumber.value}`)
-  .then((response) => response.json())
-  .then((data) => {
-    if (data.statusCode === 200) {
-      availableCompetitions.value = data.data || [];
-      // 如果只有一个比赛，默认选中
-      if (availableCompetitions.value.length === 1) {
-        selectedCompetitionId.value = availableCompetitions.value[0].id;
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.statusCode === 200) {
+        availableCompetitions.value = data.data || [];
+        // 如果只有一个比赛，默认选中
+        if (availableCompetitions.value.length === 1) {
+          selectedCompetitionId.value = availableCompetitions.value[0].id;
+        } else {
+          selectedCompetitionId.value = "";
+        }
       } else {
-        selectedCompetitionId.value = "";
+        availableCompetitions.value = [];
+        alerts("提示", data.message || "未查询到相关比赛信息");
       }
-    } else {
+    })
+    .catch((error) => {
+      console.error("Query competitions error:", error);
+      alerts("警告", "查询比赛信息失败");
       availableCompetitions.value = [];
-      alerts("提示", data.message || "未查询到相关比赛信息");
-    }
-  })
-  .catch((error) => {
-    console.error("Query competitions error:", error);
-    alerts("警告", "查询比赛信息失败");
-    availableCompetitions.value = [];
-  })
-  .finally(() => {
-    isQueryingCompetitions.value = false;
-  });
+    })
+    .finally(() => {
+      isQueryingCompetitions.value = false;
+    });
 };
 
 watch(volsNumber, (newValue) => {
@@ -226,9 +229,26 @@ const handleLogin = async () => {
   }
 };
 
-const goToHome = () => {
-  router.back();
+const autoChangeLoginType = () => {
+  const hash = window.location.hash;
+  if (!hash) {
+    return;
+  }
+  const type = hash.slice(1).toUpperCase();
+  if (userOptions.map((opt) => opt.value).includes(type)) {
+    usertype.value = type;
+    enableChangeLoginType.value = false;
+  }
 };
+
+onMounted(() => {
+  autoChangeLoginType();
+  window.addEventListener("hashchange", autoChangeLoginType);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("hashchange", autoChangeLoginType);
+});
 </script>
 
 <template>
@@ -251,15 +271,21 @@ const goToHome = () => {
           label="返回"
           icon="pi pi-arrow-left"
           class="back-button p-button-secondary hidden md:inline-flex"
-          @click="goToHome"
+          @click="router.back"
         />
         <Card class="login-card w-full">
           <template #title>
-            <h2 class="text-center text-3xl">用户登录</h2>
+            <h2 class="text-center text-3xl">
+              {{
+                userOptions.find((opt) => opt.value === usertype)?.label ||
+                "用户"
+              }}登录
+            </h2>
           </template>
           <template #content>
             <div class="flex flex-column gap-4">
               <SelectButton
+                v-if="enableChangeLoginType"
                 v-model="usertype"
                 :options="userOptions"
                 option-label="label"
@@ -326,8 +352,11 @@ const goToHome = () => {
                       <span
                         v-if="volsNumber.length >= 9 && !isQueryingCompetitions"
                         class="text-red-500"
-                      >未查询到可参与的比赛</span>
-                      <span v-else-if="isQueryingCompetitions">正在查询比赛信息...</span>
+                        >未查询到可参与的比赛</span
+                      >
+                      <span v-else-if="isQueryingCompetitions"
+                        >正在查询比赛信息...</span
+                      >
                       <span v-else>请输入学号以获取比赛列表</span>
                     </div>
                   </template>
@@ -347,9 +376,11 @@ const goToHome = () => {
               </div>
 
               <div
-                v-if="isVolsLogin &&
+                v-if="
+                  isVolsLogin &&
                   (volsPosition === 'REINTAKE_INSPECTION' ||
-                  volsPosition === 'TIMER')"
+                    volsPosition === 'TIMER')
+                "
                 class="p-float-label"
               >
                 <label>负责泳道</label>
