@@ -18,6 +18,7 @@ const userOptions = [
   { label: "校友", value: "ALUMN" },
 ];
 const isVolsLogin = computed(() => usertype.value === "VOLS");
+const isAlumnLogin = computed(() => usertype.value === "ALUMN");
 const enableChangeLoginType = ref(true);
 
 const username = ref("");
@@ -175,6 +176,38 @@ const adminLogin = async () => {
         alerts("提示", "登录成功，正在跳转");
         setToken(data.data.token);
         router.push("/manage");
+      } else {
+        alerts("警告", "登录失败: " + data.message);
+      }
+    })
+    .catch((e) => {
+      console.error("Error:", e);
+      alerts("警告", "登录请求失败，请稍后重试");
+    });
+};
+
+const alumnLogin = async () => {
+  is_loginning.value = true;
+  const pw_sha = await SHA256(password.value);
+  fetch("/alumns/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userName: username.value,
+      password: pw_sha,
+    }),
+  })
+    .then((response) => {
+      is_loginning.value = false;
+      return response.json();
+    })
+    .then((data) => {
+      if (data.statusCode === 200) {
+        alerts("提示", "登录成功，正在跳转");
+        setToken(data.data.token);
+        router.push("/alumn");
       } else {
         alerts("警告", "登录失败: " + data.message);
       }
