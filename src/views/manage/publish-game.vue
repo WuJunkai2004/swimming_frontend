@@ -1,13 +1,13 @@
 <script setup>
 import { ref, reactive, watch } from "vue";
-import { useToken } from "@/composables/useToken";
-import { useAlert } from "@/composables/useAlert";
+import { useToken } from "#/useToken";
+import { useAlert } from "#/useAlert";
 import {
   Excetract,
   getNearestStr
-} from "@/composables/excelUtils";
-import { useCollegeEnum } from "@/composables/collegeMapping";
-import { useEventEnum } from "@/composables/eventMapping";
+} from "#/excelUtils";
+import { useCollegeEnum } from "#/collegeMapping";
+import { useEventEnum } from "#/eventMapping";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();

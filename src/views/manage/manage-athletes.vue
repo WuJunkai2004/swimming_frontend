@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useToken } from '@/composables/useToken';
-import { useAlert } from '@/composables/useAlert';
-import { uploadImage } from '@/composables/uploads';
+import { useToken } from '#/useToken';
+import { useAlert } from '#/useAlert';
+import { uploadImage } from '#/uploads';
 
 const { getToken } = useToken(); // 获取 Token 的函数
 const { alerts, awaitAlert } = useAlert(); // 弹窗提示服务

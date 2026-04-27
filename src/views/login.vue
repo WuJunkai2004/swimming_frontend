@@ -1,10 +1,10 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { useToken } from "@/composables/useToken";
-import { useAlert } from "@/composables/useAlert";
-import { SHA256 } from "@/composables/useHash";
+import { useToken } from "#/useToken";
+import { useAlert } from "#/useAlert";
+import { SHA256 } from "#/useHash";
 import { useRouter } from "vue-router";
-import { saveData } from "@/composables/useStorage";
+import { saveData } from "#/useStorage";
 
 const { setToken } = useToken();
 const { alerts } = useAlert();

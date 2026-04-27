@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, shallowRef } from 'vue';
-import { useToken } from '@/composables/useToken'
+import { useToken } from '#/useToken'
 
 import loading from '@/views/loading.vue';
 

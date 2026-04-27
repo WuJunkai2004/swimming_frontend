@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
-import { useAlert } from "@/composables/useAlert";
-import { useToken } from "@/composables/useToken";
-import { useEventEnum } from "@/composables/eventMapping";
+import { useAlert } from "#/useAlert";
+import { useToken } from "#/useToken";
+import { useEventEnum } from "#/eventMapping";
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();

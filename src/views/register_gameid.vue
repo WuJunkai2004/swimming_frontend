@@ -2,11 +2,11 @@
 // --- 1. 核心依赖导入 ---
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAlert } from '@/composables/useAlert';
+import { useAlert } from '#/useAlert';
 
 // --- 2. 静态资源导入 ---;
 // 导入学院枚举数据
-import { useCollegeEnum } from '@/composables/collegeMapping';
+import { useCollegeEnum } from '#/collegeMapping';
 
 // --- 3. 初始化 ---
 const route = useRoute();      // 用于获取路由参数

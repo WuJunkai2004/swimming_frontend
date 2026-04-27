@@ -1,11 +1,11 @@
 <script setup>
 // --- 1. 核心依赖导入 ---
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useAlert } from '@/composables/useAlert';
-import { useToken } from '@/composables/useToken';
-import { uploadImage, uploadVideo } from '@/composables/uploads';
+import { useAlert } from '#/useAlert';
+import { useToken } from '#/useToken';
+import { uploadImage, uploadVideo } from '#/uploads';
 import { useRouter } from 'vue-router';
-import { saveData, getData, removeData } from '@/composables/useStorage';
+import { saveData, getData, removeData } from '#/useStorage';
 
 // --- 2. 初始化 ---
 const { alerts, asyncAlert } = useAlert();

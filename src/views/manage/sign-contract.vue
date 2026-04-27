@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
-import { useAlert } from "@/composables/useAlert";
-import { useToken } from "@/composables/useToken";
+import { useAlert } from "#/useAlert";
+import { useToken } from "#/useToken";
 
 const route = useRoute();
 const { alerts } = useAlert();

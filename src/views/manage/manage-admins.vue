@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useToken } from '@/composables/useToken';
-import { useAlert } from '@/composables/useAlert';
-import { SHA256 } from '@/composables/useHash';
+import { useToken } from '#/useToken';
+import { useAlert } from '#/useAlert';
+import { SHA256 } from '#/useHash';
 
 const { getToken } = useToken(); // 获取 Token 的函数
 const { alerts, awaitAlert } = useAlert(); // 弹窗提示服务

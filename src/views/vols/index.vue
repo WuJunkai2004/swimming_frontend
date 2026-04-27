@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, shallowRef, ref, watch, computed } from 'vue';
-import { useToken } from '@/composables/useToken';
-import { getData, saveData } from '@/composables/useStorage';
-import { useAlert } from "@/composables/useAlert";
-import { useEventEnum } from '@/composables/eventMapping';
+import { useToken } from '#/useToken';
+import { getData, saveData } from '#/useStorage';
+import { useAlert } from "#/useAlert";
+import { useEventEnum } from '#/eventMapping';
 import loading from '@/views/loading.vue';
 
 const { getToken } = useToken();

@@ -1,5 +1,5 @@
 <script setup>
-import { useMenu } from '@/composables/useMenu';
+import { useMenu } from '#/useMenu';
 const { menuItems } = useMenu();
 </script>
 

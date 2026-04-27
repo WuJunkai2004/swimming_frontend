@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
-import { useAlert } from "@/composables/useAlert";
+import { useAlert } from "#/useAlert";
 
 const props = defineProps({
   placeholder: {

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useAlert } from '@/composables/useAlert';
-import { Excetract } from '@/composables/excelUtils';
-import { useToken } from '@/composables/useToken';
+import { useAlert } from '#/useAlert';
+import { Excetract } from '#/excelUtils';
+import { useToken } from '#/useToken';
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();

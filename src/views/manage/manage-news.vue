@@ -1,8 +1,8 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useToken } from '@/composables/useToken';
-import { useAlert } from '@/composables/useAlert';
+import { useToken } from '#/useToken';
+import { useAlert } from '#/useAlert';
 
 const router = useRouter();
 const { alerts, asyncAlert } = useAlert();

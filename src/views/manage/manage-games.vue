@@ -1,10 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { useToken } from "@/composables/useToken";
-import { useAlert } from "@/composables/useAlert";
-import { useCollegeEnum } from "@/composables/collegeMapping";
-import { useEventEnum } from "@/composables/eventMapping";
-import { Copying } from "@/composables/useCopy";
+import { useToken } from "#/useToken";
+import { useAlert } from "#/useAlert";
+import { useCollegeEnum } from "#/collegeMapping";
+import { useEventEnum } from "#/eventMapping";
+import { Copying } from "#/useCopy";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();

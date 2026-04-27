@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
-import { getData } from "@/composables/useStorage";
-import { useAlert } from "@/composables/useAlert";
-import { useToken } from "@/composables/useToken";
+import { getData } from "#/useStorage";
+import { useAlert } from "#/useAlert";
+import { useToken } from "#/useToken";
 import { useRouter } from "vue-router";
 
 const props = defineProps(["currentProgram"]);

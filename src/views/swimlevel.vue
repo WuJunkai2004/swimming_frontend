@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
-import { useAlert } from "@/composables/useAlert";
-import { swimLevels } from "@/composables/swimmingLevel";
+import { useAlert } from "#/useAlert";
+import { swimLevels } from "#/swimmingLevel";
 
 // 1. 状态管理：定义所有需要的数据
 // ========================================================================
