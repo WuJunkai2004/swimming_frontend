@@ -133,6 +133,11 @@ const submitData = async () => {
   }
 };
 
+// 暴露submitData 为 submit
+defineExpose({
+  submit: submitData,
+});
+
 onMounted(() => {
   const storedGameId = getData("gameId");
   const storedRoad = getData("road");
@@ -190,16 +195,6 @@ onMounted(() => {
               :disabled="!isFoul"
             />
           </div>
-
-          <!-- 提交按钮 -->
-          <Button
-            label="提交"
-            icon="pi pi-check"
-            class="w-full"
-            @click="submitData"
-            :loading="submitting"
-            :disabled="submitting || !props.currentProgram"
-          />
         </div>
       </template>
     </Card>

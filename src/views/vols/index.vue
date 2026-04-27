@@ -181,6 +181,16 @@ const groupOptions = computed(() => {
   }));
 });
 
+const submitAll = () => {
+  for(let component of loadedComponents.value) {
+    if (component && component.submit) {
+      component.submit();
+    } else {
+      console.warn('Component does not have submit method:', component);
+    }
+  }
+};
+
 watch(selectedProgram, (newValue) => {
   selectedGroup.value = null;
   if (newValue) {
@@ -266,6 +276,15 @@ onMounted(async () => {
         :athlete-list="athleteList"
       />
     </div>
+
+    <!-- 提交按钮 -->
+    <Button
+      id="submit-all-btn"
+      label="提交"
+      icon="pi pi-check"
+      class="w-full"
+      @click="submitAll"
+    />
   </div>
 </template>
 
@@ -276,6 +295,11 @@ onMounted(async () => {
 
 .header-window {
   padding: 1.5rem 1.5rem 0 1.5rem;
+}
+
+#submit-all-btn {
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 .content-window {

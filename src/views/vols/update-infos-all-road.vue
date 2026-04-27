@@ -4,6 +4,7 @@ import { useToken } from "#/useToken";
 import { getData } from "#/useStorage";
 import { useAlert } from "#/useAlert";
 import { useRouter } from "vue-router";
+import { updatePrimaryPalette } from "@primeuix/themes";
 
 const props = defineProps([
   "currentProgram",
@@ -125,6 +126,12 @@ const updateResult = async () => {
     submitting.value = false;
   }
 };
+
+// 暴露submitData 为 submit
+defineExpose({
+  submit: updateResult,
+});
+
 
 const confirmResult = async () => {
   // 确认前可能需要简单的校验？或者直接确认
@@ -334,16 +341,6 @@ watch(
               class="flex-1"
               @click="confirmResult"
               :disabled="loading || submitting"
-            />
-          </template>
-
-          <template v-else>
-            <Button
-              label="完成修改"
-              icon="pi pi-save"
-              class="w-full"
-              @click="updateResult"
-              :loading="submitting"
             />
           </template>
         </div>
