@@ -47,8 +47,8 @@ async function generateDocs() {
     console.log("Generating Markdown...");
     const markdown = await createMarkdownFromOpenApi(openApiData);
 
-    await fs.writeFile("api.md", markdown, "utf8");
-    console.log("Successfully generated api.md");
+    await fs.writeFile("src/api/API_docs.md", markdown, "utf8");
+    console.log("Successfully generated API_docs.md");
   } catch (error) {
     console.error("Error generating docs:", error);
     process.exit(1);
