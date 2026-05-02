@@ -23,6 +23,7 @@
     },
     "devDependencies": {
         "@primevue/auto-import-resolver": "^4.5.4",
+        "@scalar/openapi-to-markdown": "^0.5.12",
         "@vitejs/plugin-vue": "^6.0.5",
         "rollup-plugin-visualizer": "^7.0.1",
         "terser": "^5.46.0",
