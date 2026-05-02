@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "src/api/**.json" # 仅当 src/api/ 目录下的 json 文件发生变化时触发
+      - "src/api/API_docs.md" # 当 API 文档发生变化时触发
 
 permissions:
   contents: read
@@ -19,38 +19,24 @@ jobs:
       - name: 检出当前仓库
         uses: actions/checkout@v4
 
-      # 2. 设置 Python 3 环境
-      # generate_apidoc.py 脚本需要 Python 3
-      - name: 设置 Python 3
-        uses: actions/setup-python@v5
+      # 2. 设置 Node.js 环境
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: "3.12"
+          node-version: "22"
 
-      # 3. 运行 Python 脚本生成 API 文档
-      # 该脚本会检查项目根目录的 vite.config.js 文件，必须在根目录运行
-      # 脚本会将文档输出到 dist/接口文档.auto.md
-      - name: 运行 API 文档生成器
-        run: python src/api/generate_apidoc.py
+      # 3. 运行脚本生成 API 列表 (api.txt)
+      - name: 运行 API 列表生成器
+        run: node scripts/gen_apilist.js
 
-      # 4. 验证生成的文档是否存在
-      - name: 检查生成的文件
-        run: |
-          echo "检查 'dist' 目录内容..."
-          ls -l ./dist/
-          if [ ! -f "dist/接口文档.auto.md" ]; then
-            echo "错误: 文档 'dist/接口文档.auto.md' 未能成功生成。"
-            exit 1
-          fi
-          echo "文档已成功生成。"
-
-      # 5. 加载 Gitee 部署私钥
+      # 4. 加载 Gitee 部署私钥
       # 使用 SSH-Agent Action 来安全地加载我们存储在 Secrets 中的私钥
       - name: 加载 Gitee SSH 部署密钥
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.GITEE_DEPLOY_PRIVATE_KEY }}
 
-      # 6. 克隆 Gitee 仓库 (已更新为 SSH 方式)
+      # 5. 克隆 Gitee 仓库 (已更新为 SSH 方式)
       - name: 克隆 Gitee 文档仓库 (使用 SSH)
         run: |
           # SSH 需要严格的主机密钥检查，Gitee的主机密钥需要被接受
@@ -61,29 +47,26 @@ jobs:
           # 使用 SSH URL 克隆
           git clone git@gitee.com:murphy_955/fzu_swim_association_web.git gitee_docs_repo
 
-      # 7. 将新文档复制到 Gitee 仓库的 docs 文件夹
+      # 6. 将新文档复制到 Gitee 仓库的 docs 文件夹
       - name: 复制并准备提交
         run: |
           echo "正在复制文档..."
           # 确保目标仓库的 docs 目录存在
           mkdir -p gitee_docs_repo/docs/
           # 复制文件，覆盖旧文件
-          cp -f dist/接口文档.auto.md gitee_docs_repo/docs/接口文档.auto.md
+          cp -f src/api/API_docs.md gitee_docs_repo/docs/接口文档.auto.md
+          cp -f src/api/API_list.txt gitee_docs_repo/docs/接口文档列表.txt
           echo "复制完成。"
 
-      # 8. 提交并推送到 Gitee
+      # 7. 提交并推送到 Gitee
       - name: 提交并推送到 Gitee
         run: |
           cd gitee_docs_repo
-
-          # 配置 Git 用户信息
           git config user.name "GitHub Action Bot"
           git config user.email "action-bot@github.com"
 
-          # 添加更改并检查是否有实际变动
-          git add docs/接口文档.auto.md
+          git add docs/接口文档.auto.md docs/接口文档列表.txt
 
-          # 检查是否有文件被暂存（即有变动）
           if git diff --staged --quiet; then
             echo "API文档没有变化，无需推送。"
           else
