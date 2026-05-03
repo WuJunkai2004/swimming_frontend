@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import loginRoutes from './login'
 
 const routes = [
+  ...loginRoutes,
   {
     path: '/',              // 访问根路径 / 时
     name: 'Home',
