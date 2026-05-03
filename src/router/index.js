@@ -74,6 +74,11 @@ const routes = [
     component: () => import("@/views/vols/index.vue"),
   },
   {
+    path: "/fun-volunteer", // 访问 /fun-volunteer 路径时
+    name: "FunVolunteer",
+    component: () => import("@/views/funs/index.vue"),
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/error.vue')
