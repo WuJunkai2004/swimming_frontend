@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import VolsLogin from "@/components/login/VolsLogin.vue";
 import AdminLogin from "@/components/login/AdminLogin.vue";
 import AlumnLogin from "@/components/login/AlumnLogin.vue";
+import FunVolsLogin from "@/components/login/FunVolsLogin.vue";
 
 const router = useRouter();
 
@@ -13,6 +14,10 @@ const userOptions = [
   { label: "管理员", value: "ADMIN" },
   { label: "校友", value: "ALUMN" },
 ];
+const extraUserOptions = [{ label: "趣味志愿者", value: "FUNVOLS" }];
+const allowLoginOptions = userOptions
+  .map((opt) => opt.value)
+  .concat(extraUserOptions.map((opt) => opt.value));
 
 const username = ref("");
 const is_loginning = ref(false);
@@ -24,7 +29,7 @@ const autoChangeLoginType = () => {
     return;
   }
   const type = hash.slice(1).toUpperCase();
-  if (userOptions.map((opt) => opt.value).includes(type)) {
+  if (allowLoginOptions.includes(type)) {
     usertype.value = type;
     enableChangeLoginType.value = false;
   }
@@ -66,7 +71,7 @@ onUnmounted(() => {
           <template #title>
             <h2 class="text-center text-3xl">
               {{
-                userOptions.find((opt) => opt.value === usertype)?.label ||
+                userOptions.concat(extraUserOptions).find((opt) => opt.value === usertype)?.label ||
                 "用户"
               }}登录
             </h2>
@@ -95,6 +100,11 @@ onUnmounted(() => {
               />
               <AlumnLogin
                 v-else-if="usertype === 'ALUMN'"
+                v-model:username="username"
+                v-model:is-loginning="is_loginning"
+              />
+              <FunVolsLogin
+                v-else-if="usertype === 'FUNVOLS'"
                 v-model:username="username"
                 v-model:is-loginning="is_loginning"
               />

@@ -3,7 +3,7 @@ export default [
     path: "/login/:type",
     redirect: (to) => {
       const type = to.params.type.toLowerCase();
-      const validTypes = ["admin", "vols", "alumn"];
+      const validTypes = ["admin", "vols", "alumn", "funvols"];
       if (validTypes.includes(type)) {
         // 将匹配到的类型转换为大写 hash，例如 /login/admin -> /login#ADMIN
         return { path: "/login", hash: `#${type.toUpperCase()}` };
