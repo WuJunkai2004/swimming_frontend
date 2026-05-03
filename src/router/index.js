@@ -1,72 +1,72 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import loginRoutes from './login'
+import { createRouter, createWebHistory } from "vue-router";
+import loginRoutes from "./login";
 
 const routes = [
   ...loginRoutes,
   {
-    path: '/',              // 访问根路径 / 时
-    name: 'Home',
-    component: () => import('@/views/index.vue')
+    path: "/", // 访问根路径 / 时
+    name: "Home",
+    component: () => import("@/views/index.vue"),
   },
   {
-    path: '/index.html',    // 访问 /index.html 路径时, 与根路径相同
-    name: 'Index',
-    component: () => import('@/views/index.vue')
+    path: "/index.html", // 访问 /index.html 路径时, 与根路径相同
+    name: "Index",
+    component: () => import("@/views/index.vue"),
   },
   {
-    path: '/swimlevel',   // 访问 /swimlevel 路径时
-    name: 'LevelQuery',
-    component: () => import('@/views/swimlevel.vue')
+    path: "/swimlevel", // 访问 /swimlevel 路径时
+    name: "LevelQuery",
+    component: () => import("@/views/swimlevel.vue"),
   },
   {
-    path: '/activity',          // 访问 /activity 路径时
-    name: 'Activity',
-    component: () => import('@/views/activity.vue')
+    path: "/activity", // 访问 /activity 路径时
+    name: "Activity",
+    component: () => import("@/views/activity.vue"),
   },
   {
-    path: '/activity/:id',      // 访问 /activity/:id 路径时, :id 是动态参数
-    name: 'ActivityDetail',
-    component: () => import('@/views/activity_id.vue')
+    path: "/activity/:id", // 访问 /activity/:id 路径时, :id 是动态参数
+    name: "ActivityDetail",
+    component: () => import("@/views/activity_id.vue"),
   },
   {
     path: "/competition",
     name: "Competition",
-    component: () => import('@/views/competition.vue')
+    component: () => import("@/views/competition.vue"),
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/views/login.vue')
+    path: "/login",
+    name: "Login",
+    component: () => import("@/views/login.vue"),
   },
   {
-    path: '/manage',
-    name: 'Manage',
-    component: () => import('@/views/manage/index.vue')
+    path: "/manage",
+    name: "Manage",
+    component: () => import("@/views/manage/index.vue"),
   },
   {
     path: "/leaders",
     name: "Leaders",
-    component: () => import('@/views/leaders.vue')
+    component: () => import("@/views/leaders.vue"),
   },
   {
-    path: "/alumnus",        // 访问 /alumnus 路径时，优秀运动员展示
+    path: "/alumnus", // 访问 /alumnus 路径时，优秀运动员展示
     name: "Alumnus",
-    component: () => import('@/views/alumnus.vue')
+    component: () => import("@/views/alumnus.vue"),
   },
   {
-    path: "/register/:gameid",  // 访问 /register/:gameid 路径时, :gameid 是动态参数，代表比赛ID
+    path: "/register/:gameid", // 访问 /register/:gameid 路径时, :gameid 是动态参数，代表比赛ID
     name: "Register",
-    component: () => import('@/views/register_gameid.vue')
+    component: () => import("@/views/register_gameid.vue"),
   },
   {
     path: "/sign/:type",
     name: "Sign Contract",
-    component: () => import('@/views/manage/sign-contract.vue')
+    component: () => import("@/views/manage/sign-contract.vue"),
   },
   {
-    path: "/result/:gameid",    // 访问 /result/:gameid 路径时, :gameid 是动态参数，代表比赛ID
+    path: "/result/:gameid", // 访问 /result/:gameid 路径时, :gameid 是动态参数，代表比赛ID
     name: "Result",
-    component: () => import('@/views/result_gameid.vue')
+    component: () => import("@/views/result_gameid.vue"),
   },
   {
     path: "/volunteer", // 访问 /volunteer 路径时，使用哈希路由模式
@@ -79,15 +79,15 @@ const routes = [
     component: () => import("@/views/funs/index.vue"),
   },
   {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('@/views/error.vue')
-  }
-]
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("@/views/error.vue"),
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-})
+});
 
-export default router
+export default router;
