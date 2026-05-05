@@ -1,8 +1,15 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch, shallowRef } from 'vue';
-import { useToken } from '#/useToken'
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  watch,
+  shallowRef,
+} from "vue";
+import { useToken } from "#/useToken";
 
-import loading from '@/views/loading.vue';
+import loading from "@/views/loading.vue";
 
 // --- 2. 鉴权与导航 ---
 const { getToken, removeToken } = useToken();
@@ -29,44 +36,45 @@ const isMobileSidebarVisible = ref(false);
 // 我们使用 PanelMenu 的数据格式来创建带分组的菜单
 const menuModel = ref([
   {
-    key: 'games',
-    label: '比赛管理',
-    icon: 'pi pi-calendar',
+    key: "games",
+    label: "比赛管理",
+    icon: "pi pi-calendar",
     items: [
-      { label: '发布比赛', icon: 'pi pi-plus', url: '#/publish-game' },
-      { label: '管理比赛', icon: 'pi pi-list', url: '#/manage-games' },
-    ]
+      { label: "发布比赛", icon: "pi pi-plus", url: "#/publish-game" },
+      { label: "管理比赛", icon: "pi pi-list", url: "#/manage-games" },
+      { label: "趣味赛管理", icon: "pi pi-star", url: "#/manage-fun-games" },
+    ],
   },
   {
-    separator: true
+    separator: true,
   },
   {
-    key: 'news',
-    label: '新闻管理',
-    icon: 'pi pi-book',
+    key: "news",
+    label: "新闻管理",
+    icon: "pi pi-book",
     items: [
-      { label: '发布新闻', icon: 'pi pi-plus', url: '#/publish-news' },
-      { label: '管理新闻', icon: 'pi pi-list', url: '#/manage-news' },
-    ]
+      { label: "发布新闻", icon: "pi pi-plus", url: "#/publish-news" },
+      { label: "管理新闻", icon: "pi pi-list", url: "#/manage-news" },
+    ],
   },
   {
-    separator: true
+    separator: true,
   },
   {
-    key: 'users',
-    label: '人员管理',
-    icon: 'pi pi-users',
+    key: "users",
+    label: "人员管理",
+    icon: "pi pi-users",
     items: [
-      { label: '优秀运动员', icon: 'pi pi-user',      url: '#/manage-athletes' },
-      { label: '负责人管理', icon: 'pi pi-user-edit', url: '#/manage-leaders' },
-      { label: '管理员管理', icon: 'pi pi-shield',    url: '#/manage-admins' },
-    ]
+      { label: "优秀运动员", icon: "pi pi-user", url: "#/manage-athletes" },
+      { label: "负责人管理", icon: "pi pi-user-edit", url: "#/manage-leaders" },
+      { label: "管理员管理", icon: "pi pi-shield", url: "#/manage-admins" },
+    ],
   },
 ]);
 
 const computedMenuModel = computed(() => {
   const processItems = (items) => {
-    return items.map(item => {
+    return items.map((item) => {
       if (item.separator) {
         return item;
       }
@@ -74,10 +82,10 @@ const computedMenuModel = computed(() => {
       const newItem = { ...item };
       // 检查当前项的 url 是否与 URL hash 匹配
       if (newItem.url === currentPath.value) {
-        newItem.class = 'active-menu-item';
+        newItem.class = "active-menu-item";
       }
-      if (newItem.url){
-        newItem.command = () =>  {
+      if (newItem.url) {
+        newItem.command = () => {
           isMobileSidebarVisible.value = false;
         };
       }
@@ -94,48 +102,52 @@ const computedMenuModel = computed(() => {
 // --- 5. 子路由系统 (需求 2.3) ---
 // 完全按照您提供的示例，使用 hash 路由
 const routes = {
-  '/': () => import('./manage-games.vue'),
-  '/publish-game': () => import('./publish-game.vue'),
-  '/manage-games': () => import('./manage-games.vue'),
-  '/publish-news': () => import('./publish-news.vue'),
-  '/manage-news': () => import('./manage-news.vue'),
-  '/manage-athletes': () => import('./manage-athletes.vue'),
-  '/manage-leaders': () => import('./manage-leaders.vue'),
-  '/manage-admins': () => import('./manage-admins.vue'),
-  '/manage-vols': () => import('./manage-vols.vue'),
-  '/manage-schedule': () => import('./manage-schedule.vue'),
+  "/": () => import("./manage-games.vue"),
+  "/publish-game": () => import("./publish-game.vue"),
+  "/manage-games": () => import("./manage-games.vue"),
+  "/publish-news": () => import("./publish-news.vue"),
+  "/manage-news": () => import("./manage-news.vue"),
+  "/manage-athletes": () => import("./manage-athletes.vue"),
+  "/manage-leaders": () => import("./manage-leaders.vue"),
+  "/manage-admins": () => import("./manage-admins.vue"),
+  "/manage-vols": () => import("./manage-vols.vue"),
+  "/manage-schedule": () => import("./manage-schedule.vue"),
 };
 
-const currentPath = ref(window.location.hash.split('?')[0]);
-const loadedComponent = shallowRef(null)
+const currentPath = ref(window.location.hash.split("?")[0]);
+const loadedComponent = shallowRef(null);
 
 const updateCurrentPath = () => {
-  currentPath.value = window.location.hash.split('?')[0];
+  currentPath.value = window.location.hash.split("?")[0];
 };
 
 const loadComponent = async (path) => {
   const page = routes[path];
-  if(page){
+  if (page) {
     const component = await page();
     return component.default;
   } else {
     return loading;
   }
-}
+};
 
 // 监听 hash 变化
-window.addEventListener('hashchange', updateCurrentPath);
+window.addEventListener("hashchange", updateCurrentPath);
 
 // 当组件卸载时，移除监听器，防止内存泄漏
 onBeforeUnmount(() => {
-  window.removeEventListener('hashchange', updateCurrentPath);
+  window.removeEventListener("hashchange", updateCurrentPath);
 });
 
 // 监听 currentPath 变化
-watch(currentPath, async (newPath) => {
-  const path = newPath.slice(1) || '/';
-  loadedComponent.value = await loadComponent(path);
-}, { immediate: true });
+watch(
+  currentPath,
+  async (newPath) => {
+    const path = newPath.slice(1) || "/";
+    loadedComponent.value = await loadComponent(path);
+  },
+  { immediate: true },
+);
 
 // 计算当前应该显示的组件
 const currentView = computed(() => {
@@ -145,7 +157,6 @@ const currentView = computed(() => {
 
 <template>
   <div class="manage-view-wrapper">
-
     <Toolbar class="top-toolbar">
       <template #start>
         <Button
@@ -166,7 +177,8 @@ const currentView = computed(() => {
           severity="danger"
           class="md:hidden"
           @click="handleLogout"
-          aria-label="退出登录" />
+          aria-label="退出登录"
+        />
 
         <Button
           label="退出登录"
@@ -179,7 +191,6 @@ const currentView = computed(() => {
     </Toolbar>
 
     <div class="main-content-area">
-
       <Drawer v-model:visible="isMobileSidebarVisible" header="导航菜单">
         <Menu :model="computedMenuModel" class="w-full" />
       </Drawer>
@@ -191,7 +202,6 @@ const currentView = computed(() => {
       <div class="content-window">
         <component :is="currentView" />
       </div>
-
     </div>
   </div>
 </template>
