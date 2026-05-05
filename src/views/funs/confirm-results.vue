@@ -12,22 +12,20 @@ const results = ref([]);
 const loading = ref(false);
 
 const fetchResults = async () => {
-  if (!props.currentEvent) return;
+  if (!props.currentEvent) {
+    return;
+  }
 
   loading.value = true;
-  try {
-    const res = await fetch(
-      `/api/funVolunteer/getReviewedResults?eventId=${props.currentEvent.id}`,
-    );
-    const data = await res.json();
-    if (data.statusCode === 200) {
-      results.value = data.data || [];
-    }
-  } catch (e) {
-    console.error("Fetch reviewed results error:", e);
-  } finally {
-    loading.value = false;
-  }
+  fetch(`/api/funVolunteer/getReviewedResults?eventId=${props.currentEvent.id}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.statusCode === 200) {
+        results.value = data.data || [];
+      }
+    })
+    .catch((e) => console.error("Fetch reviewed results error:", e))
+    .finally(() => (loading.value = false));
 };
 
 watch(() => props.currentEvent, fetchResults);
@@ -38,24 +36,25 @@ const submitData = async () => {
     return;
   }
 
-  try {
-    const res = await fetch("/api/funVolunteer/confirmResults", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: getToken(),
-        eventId: props.currentEvent.id,
-      }),
+  fetch("/api/funVolunteer/confirmResults", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: getToken(),
+      eventId: props.currentEvent.id,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.statusCode === 200) {
+        alerts("提示", "成绩已最终确认");
+      } else {
+        alerts("错误", data.message);
+      }
+    })
+    .catch((e) => {
+      alerts("错误", "提交失败");
     });
-    const data = await res.json();
-    if (data.statusCode === 200) {
-      alerts("提示", "成绩已最终确认");
-    } else {
-      alerts("错误", data.message);
-    }
-  } catch (e) {
-    alerts("错误", "提交失败");
-  }
 };
 
 defineExpose({ submit: submitData });
