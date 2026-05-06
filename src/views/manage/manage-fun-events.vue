@@ -72,7 +72,6 @@ const openCreateDialog = () => {
     eventName: "",
     rules: "",
     unit: "",
-    sortOrder: eventsList.value.length + 1,
     sortDirection: 0,
   };
   isEditDialogVisible.value = true;
@@ -89,8 +88,7 @@ const openEditDialog = (event) => {
 const saveEvent = () => {
   if (
     !editForm.value.eventName ||
-    !editForm.value.unit ||
-    editForm.value.sortOrder === null
+    !editForm.value.unit
   ) {
     alerts("警告", "请填写完整信息");
     return;
@@ -204,7 +202,6 @@ onMounted(() => {
     </div>
 
     <DataTable v-else :value="eventsList" responsiveLayout="scroll" stripedRows>
-      <Column field="sortOrder" header="显示顺序" sortable style="width: 100px"></Column>
       <Column field="eventName" header="项目名称" sortable></Column>
       <Column field="unit" header="单位" style="width: 100px"></Column>
       <Column field="sortDirection" header="排名规则">
@@ -260,10 +257,6 @@ onMounted(() => {
         <div class="flex flex-column gap-1">
           <label for="unit" class="font-bold">计量单位</label>
           <InputText id="unit" v-model="editForm.unit" placeholder="例如：秒、分、个" />
-        </div>
-        <div class="flex flex-column gap-1">
-          <label for="sortOrder" class="font-bold">显示顺序</label>
-          <InputNumber id="sortOrder" v-model="editForm.sortOrder" showButtons :min="0" fluid />
         </div>
         <div class="flex flex-column gap-1">
           <label for="sortDirection" class="font-bold">排名规则</label>
