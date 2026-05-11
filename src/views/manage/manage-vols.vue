@@ -1,21 +1,21 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useAlert } from '#/useAlert';
-import { Excetract } from '#/excelUtils';
-import { useToken } from '#/useToken';
+import { ref, onMounted, computed } from "vue";
+import { useAlert } from "#/useAlert";
+import { Excetract } from "#/excelUtils";
+import { useToken } from "#/useToken";
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();
 
 const gameId = ref(null);
 const gameInfo = ref({});
-const stage = ref('upload');  // 'upload' or 'manage'
+const stage = ref("upload"); // 'upload' or 'manage'
 const volunteerList = ref([]);
 
 const isLoading = ref(false);
 
 const isOverEnd = computed(() => {
-  if (!gameInfo.value.endTime || gameInfo.value.endTime === '1970-01-01'){
+  if (!gameInfo.value.endTime || gameInfo.value.endTime === "1970-01-01") {
     return false;
   }
   const now = new Date();
@@ -28,16 +28,16 @@ const addPreviewLine = (name, studentId, position, lane) => {
     name,
     studentId,
     position,
-    lane
+    lane,
   });
 };
 
 const downloadVolunteerList = () => {
   // 表格是 /public/志愿者填写表.xlsx
   // 使用浏览器下载该文件
-  const link = document.createElement('a');
-  link.href = '/志愿者填写表.xlsx';
-  link.download = '志愿者填写表.xlsx';
+  const link = document.createElement("a");
+  link.href = "/志愿者填写表.xlsx";
+  link.download = "志愿者填写表.xlsx";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -45,58 +45,59 @@ const downloadVolunteerList = () => {
 
 const resetAll = async () => {
   const confirm_reset = await awaitAlert(
-    '确认',
-    '确定要返回上传页面吗？所有数据将会丢失。',
+    "确认",
+    "确定要返回上传页面吗？所有数据将会丢失。",
     {
-      accept: '确认',
-      reject: '取消'
-    });
+      accept: "确认",
+      reject: "取消",
+    },
+  );
   if (!confirm_reset) {
     return;
   }
   volunteerList.value = [];
-  stage.value = 'upload';
-}
+  stage.value = "upload";
+};
 
 // 获取比赛信息
 const loadGameInfo = () => {
   if (!gameId.value) {
-    alerts('错误', '请从比赛管理页面进入该页。或咨询其他管理员。')
+    alerts("错误", "请从比赛管理页面进入该页。或咨询其他管理员。");
     return;
   }
 
   isLoading.value = true;
   fetch(`/sport/getGameInfo?game=${gameId.value}`)
-  .then(response => response.json())
-  .then(result => {
-    if (result.statusCode === 200) {
-      gameInfo.value = result.data;
-    } else {
-      alerts('错误', result.message || '无法加载赛事信息，请稍后重试');
-    }
-  })
-  .catch(() => {
-    alerts('错误', '网络异常，无法加载赛事信息，请稍后重试');
-  })
-  .finally(() => {
-    isLoading.value = false;
-  });
-}
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.statusCode === 200) {
+        gameInfo.value = result.data;
+      } else {
+        alerts("错误", result.message || "无法加载赛事信息，请稍后重试");
+      }
+    })
+    .catch(() => {
+      alerts("错误", "网络异常，无法加载赛事信息，请稍后重试");
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
+};
 
 // 处理上传的Excel文件
 const getExcelFile = async (event) => {
   const file = event.files[0];
   if (!file) {
-    alerts('错误', '未选择文件，请重新选择');
+    alerts("错误", "未选择文件，请重新选择");
     return;
   }
   const content = await Excetract.create(file);
-  const vol_name = content.getColOf('姓名');
-  const vol_id = content.getColOf('学号');
-  const vol_position = content.getColOf('职务');
-  const take_road = content.getColOf('泳道');
+  const vol_name = content.getColOf("姓名");
+  const vol_id = content.getColOf("学号");
+  const vol_position = content.getColOf("职务");
+  const take_road = content.getColOf("泳道");
   if (!vol_name.length || !vol_id.length || !vol_position.length) {
-    alerts('错误', '上传的表格格式不正确，请使用指定的志愿者填写表');
+    alerts("错误", "上传的表格格式不正确，请使用指定的志愿者填写表");
     return;
   }
   volunteerList.value = [];
@@ -104,24 +105,24 @@ const getExcelFile = async (event) => {
     const name = vol_name[i];
     const studentId = vol_id[i];
     const position = vol_position[i];
-    const road = take_road[i] || '';
+    const road = take_road[i] || "";
     addPreviewLine(name, studentId, position, road);
   }
-  stage.value = 'manage';
-}
+  stage.value = "manage";
+};
 
 const positionMap = {
-  "执行总裁": "EXECUTIVE_PRESIDENT",
-  "发令员": "STARTER",
-  "计时员": "TIMER",
-  "游进技术检查": "TECHNICAL_INSPECTION_OF_SWIMMING_IN",
-  "转身检查": "REINTAKE_INSPECTION",
-  "转身检查长": "REBORN_INSPECTOR",
-  "其他": "OTHER"
+  执行总裁: "EXECUTIVE_PRESIDENT",
+  发令员: "STARTER",
+  计时员: "TIMER",
+  游进技术检查: "TECHNICAL_INSPECTION_OF_SWIMMING_IN",
+  转身检查: "REINTAKE_INSPECTION",
+  转身检查长: "REBORN_INSPECTOR",
+  其他: "OTHER",
 };
 
 const confirmUpload = async () => {
-  if (volunteerList.value.length === 0){
+  if (volunteerList.value.length === 0) {
     return;
   }
 
@@ -129,18 +130,18 @@ const confirmUpload = async () => {
   for (const vol of volunteerList.value) {
     const code = positionMap[vol.position];
     if (!code) {
-      alerts('错误', `未知职务: ${vol.position} (姓名: ${vol.name})`);
+      alerts("错误", `未知职务: ${vol.position} (姓名: ${vol.name})`);
       return;
     }
-    let road = '';
-    if (code === 'TIMER' || code === 'REINTAKE_INSPECTION') {
+    let road = "";
+    if (code === "TIMER" || code === "REINTAKE_INSPECTION") {
       if (!vol.lane) {
-        alerts('错误', `${vol.name} (${vol.position}) 需要填写泳道`);
+        alerts("错误", `${vol.name} (${vol.position}) 需要填写泳道`);
         return;
       }
       road = String(vol.lane);
-      if (!['1', '2', '3', '4', '5', '6', '7', '8'].includes(road)) {
-        alerts('错误', `泳道必须是 1-8: ${vol.lane} (姓名: ${vol.name})`);
+      if (!["1", "2", "3", "4", "5", "6", "7", "8"].includes(road)) {
+        alerts("错误", `泳道必须是 1-8: ${vol.lane} (姓名: ${vol.name})`);
         return;
       }
     }
@@ -149,57 +150,55 @@ const confirmUpload = async () => {
       name: vol.name,
       studentNumber: String(vol.studentId),
       position: code,
-      road: road
+      road: road,
     });
   }
 
   isLoading.value = true;
 
   try {
-    const response = await fetch('/admin/uploadVolunteer', {
-      method: 'POST',
+    const response = await fetch("/admin/uploadVolunteer", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         token: getToken(),
         gameId: gameId.value,
-        data: data
-      })
+        data: data,
+      }),
     });
     const result = await response.json();
     if (result.statusCode === 200) {
-      alerts('成功', '上传成功');
+      alerts("成功", "上传成功");
       volunteerList.value = [];
-      stage.value = 'upload';
+      stage.value = "upload";
     } else {
-      alerts('错误', result.message || '上传失败');
+      alerts("错误", result.message || "上传失败");
     }
   } catch (e) {
     console.error(e);
-    alerts('错误', '网络异常，请稍后重试');
+    alerts("错误", "网络异常，请稍后重试");
   } finally {
     isLoading.value = false;
   }
 };
 
 onMounted(() => {
-  const params = window.location.href.split('?')[1];
-  if (!params){
-    alerts('错误', '请从比赛管理页面进入该页。或咨询其他管理员。')
+  const params = window.location.href.split("?")[1];
+  if (!params) {
+    alerts("错误", "请从比赛管理页面进入该页。或咨询其他管理员。");
     return;
   }
   const urlParams = new URLSearchParams(params);
-  gameId.value = urlParams.get('game');
+  gameId.value = urlParams.get("game");
 
   loadGameInfo();
-})
-
+});
 </script>
 
 <template>
   <div class="p-4 surface-card shadow-3 border-round">
-
     <div class="flex justify-content-between align-items-center mb-4">
       <h1 class="text-3xl font-bold m-0">志愿者管理</h1>
       <Button
@@ -231,8 +230,14 @@ onMounted(() => {
       </template>
       <template #content>
         <div class="flex align-items-center gap-2">
-          <i class="pi pi-calendar text-xl" :class="isOverEnd ? 'text-red-500' : 'text-primary'"></i>
-          <span class="text-xl" :class="{ 'text-red-500 font-bold': isOverEnd }">
+          <i
+            class="pi pi-calendar text-xl"
+            :class="isOverEnd ? 'text-red-500' : 'text-primary'"
+          ></i>
+          <span
+            class="text-xl"
+            :class="{ 'text-red-500 font-bold': isOverEnd }"
+          >
             截止时间：{{ gameInfo.endTime }}
             <span v-if="isOverEnd">已截止</span>
           </span>
@@ -256,9 +261,15 @@ onMounted(() => {
             :showCancelButton="false"
           >
             <template #empty>
-              <div class="flex align-items-center justify-content-center flex-column p-5">
-                <i class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400" />
-                <p class="mt-4 mb-0 text-xl">将志愿者信息表 (Excel) 拖拽到此处</p>
+              <div
+                class="flex align-items-center justify-content-center flex-column p-5"
+              >
+                <i
+                  class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400"
+                />
+                <p class="mt-4 mb-0 text-xl">
+                  将志愿者信息表 (Excel) 拖拽到此处
+                </p>
                 <p class="mt-2 text-color-secondary">或点击选择文件</p>
               </div>
             </template>
@@ -268,7 +279,12 @@ onMounted(() => {
     </div>
 
     <div v-if="stage === 'manage'">
-      <DataTable :value="volunteerList" showGridlines stripedRows responsiveLayout="scroll">
+      <DataTable
+        :value="volunteerList"
+        showGridlines
+        stripedRows
+        responsiveLayout="scroll"
+      >
         <template #header>
           <div class="flex justify-content-between align-items-center">
             <span class="text-xl font-bold">预览上传结果</span>
@@ -280,9 +296,7 @@ onMounted(() => {
         <Column field="lane" header="泳道"></Column>
       </DataTable>
     </div>
-
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
