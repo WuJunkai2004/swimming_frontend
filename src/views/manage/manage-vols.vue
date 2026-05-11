@@ -154,10 +154,31 @@ const generateRandomPassword = () => {
   return password;
 };
 
+const exportPasswordsToCsv = (passwords, gameName) => {
+  const csvContent =
+    "\ufeff姓名,学号,初始密码\n" +
+    passwords
+      .map((p) => `${p.name},${p.studentNumber},${p.rawPassword}`)
+      .join("\n");
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = `${gameName || "趣味赛"}-志愿者密码.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
 const confirmUpload = async () => {
   if (volunteerList.value.length === 0) {
     return;
   }
+
+  const funPlainPasswords = [];
 
   const getCommonFields = async (vol) => {
     const code = positionMap[vol.position];
@@ -214,6 +235,12 @@ const confirmUpload = async () => {
       }
       road = [r];
     }
+
+    funPlainPasswords.push({
+      name: vol.name,
+      studentNumber: vol.studentId,
+      rawPassword,
+    });
 
     return {
       name: vol.name,
