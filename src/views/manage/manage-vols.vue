@@ -3,11 +3,13 @@ import { ref, onMounted, computed } from "vue";
 import { useAlert } from "#/useAlert";
 import { Excetract } from "#/excelUtils";
 import { useToken } from "#/useToken";
+import { SHA256 } from "#/useHash";
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();
 
 const gameId = ref(null);
+const isFun = ref(false);
 const gameInfo = ref({});
 const stage = ref("upload"); // 'upload' or 'manage'
 const volunteerList = ref([]);
@@ -15,7 +17,11 @@ const volunteerList = ref([]);
 const isLoading = ref(false);
 
 const isOverEnd = computed(() => {
-  if (!gameInfo.value.endTime || gameInfo.value.endTime === "1970-01-01") {
+  if (
+    isFun.value ||
+    !gameInfo.value.endTime ||
+    gameInfo.value.endTime === "1970-01-01"
+  ) {
     return false;
   }
   const now = new Date();
@@ -34,10 +40,15 @@ const addPreviewLine = (name, studentId, position, lane) => {
 
 const downloadVolunteerList = () => {
   // 表格是 /public/志愿者填写表.xlsx
+  // 或 /public/志愿者填写表-趣味赛.xlse
   // 使用浏览器下载该文件
+  const fileName = "志愿者填写表.xlsx";
+  if (isFun.value) {
+    fileName = "志愿者填写表-趣味赛.xlsx";
+  }
   const link = document.createElement("a");
-  link.href = "/志愿者填写表.xlsx";
-  link.download = "志愿者填写表.xlsx";
+  link.href = `/${fileName}`;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -63,6 +74,11 @@ const resetAll = async () => {
 const loadGameInfo = () => {
   if (!gameId.value) {
     alerts("错误", "请从比赛管理页面进入该页。或咨询其他管理员。");
+    return;
+  }
+
+  if (isFun.value) {
+    // 趣味赛无需拉取额外信息
     return;
   }
 
@@ -119,6 +135,23 @@ const positionMap = {
   转身检查: "REINTAKE_INSPECTION",
   转身检查长: "REBORN_INSPECTOR",
   其他: "OTHER",
+};
+
+const positionMapFun = {
+  审核员: "EXECUTIVE_PRESIDENT",
+  执行总裁: "EXECUTIVE_PRESIDENT",
+  录入员: "TIMER",
+  计时员: "TIMER",
+};
+
+const generateRandomPassword = () => {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let password = "";
+  for (let i = 0; i < 12; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
 };
 
 const confirmUpload = async () => {
@@ -192,6 +225,15 @@ onMounted(() => {
   }
   const urlParams = new URLSearchParams(params);
   gameId.value = urlParams.get("game");
+  isFun.value = urlParams.get("isFun") === "true";
+
+  if (isFun.value) {
+    if (urlParams.has("gameName")) {
+      gameInfo.value = { name: urlParams.get("gameName") };
+    } else {
+      gameInfo.value = { name: "趣味赛" };
+    }
+  }
 
   loadGameInfo();
 });
@@ -200,7 +242,17 @@ onMounted(() => {
 <template>
   <div class="p-4 surface-card shadow-3 border-round">
     <div class="flex justify-content-between align-items-center mb-4">
-      <h1 class="text-3xl font-bold m-0">志愿者管理</h1>
+      <div class="flex align-items-center gap-3">
+        <Button
+          icon="pi pi-arrow-left"
+          class="p-button-text p-button-rounded"
+          @click="$router.back()"
+        />
+        <h1 class="text-3xl font-bold m-0">
+          志愿者管理
+          <span v-if="isFun" class="text-primary text-2xl">(趣味赛)</span>
+        </h1>
+      </div>
       <Button
         v-if="stage === 'upload'"
         label="下载志愿者填写表"
@@ -224,11 +276,15 @@ onMounted(() => {
     </div>
     <Divider />
 
-    <Card class="mb-4" :class="{ 'border-1 border-red-500': isOverEnd }">
+    <Card
+      class="mb-4"
+      :class="{ 'border-1 border-red-500': isOverEnd }"
+      v-if="gameInfo.name"
+    >
       <template #title>
         <div :class="{ 'text-red-500': isOverEnd }">{{ gameInfo.name }}</div>
       </template>
-      <template #content>
+      <template #content v-if="!isFun && gameInfo.endTime">
         <div class="flex align-items-center gap-2">
           <i
             class="pi pi-calendar text-xl"

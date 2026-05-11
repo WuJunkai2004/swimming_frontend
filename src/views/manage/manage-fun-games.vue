@@ -193,7 +193,7 @@ const jumpFunTeamsManage = (game) => {
 };
 
 const jumpVolsManage = (game) => {
-  window.location.href = `${window.location.href.split("#")[0]}#/manage-vols?game=${game.competitionId}&isFun=true`;
+  window.location.href = `${window.location.href.split("#")[0]}#/manage-vols?game=${game.competitionId}&isFun=true&gameName=${encodeURIComponent(game.gameName)}`;
 };
 
 const jumpFunScheduleManage = (game) => {
