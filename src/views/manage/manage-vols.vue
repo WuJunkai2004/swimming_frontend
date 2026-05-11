@@ -42,7 +42,7 @@ const downloadVolunteerList = () => {
   // 表格是 /public/志愿者填写表.xlsx
   // 或 /public/志愿者填写表-趣味赛.xlse
   // 使用浏览器下载该文件
-  const fileName = "志愿者填写表.xlsx";
+  let fileName = "志愿者填写表.xlsx";
   if (isFun.value) {
     fileName = "志愿者填写表-趣味赛.xlsx";
   }
@@ -159,8 +159,7 @@ const confirmUpload = async () => {
     return;
   }
 
-  const data = [];
-  for (const vol of volunteerList.value) {
+  const getCommonFields = async (vol) => {
     const code = positionMap[vol.position];
     if (!code) {
       alerts("错误", `未知职务: ${vol.position} (姓名: ${vol.name})`);
@@ -179,42 +178,102 @@ const confirmUpload = async () => {
       }
     }
 
-    data.push({
+    return {
       name: vol.name,
       studentNumber: String(vol.studentId),
       position: code,
       road: road,
-    });
+    };
+  };
+
+  const getFunsFields = async (vol) => {
+    const code = positionMapFun[vol.position];
+    if (!code) {
+      alerts(
+        "错误",
+        `未知职务: ${vol.position} (姓名: ${vol.name})。趣味赛仅支持：审核员(执行总裁)、录入员(计时员)`,
+      );
+      return;
+    }
+
+    const rawPassword = generateRandomPassword();
+    const hashedPassword = await SHA256(rawPassword);
+
+    let road = [];
+    if (code === "EXECUTIVE_PRESIDENT") {
+      road = [1, 2, 3, 4, 5, 6, 7, 8];
+    } else if (code === "TIMER") {
+      if (!vol.lane) {
+        alerts("错误", `${vol.name} (${vol.position}) 需要填写泳道`);
+        return;
+      }
+      const r = parseInt(vol.lane);
+      if (isNaN(r) || r < 1 || r > 8) {
+        alerts("错误", `泳道必须是 1-8: ${vol.lane} (姓名: ${vol.name})`);
+        return;
+      }
+      road = [r];
+    }
+
+    return {
+      name: vol.name,
+      studentNumber: String(vol.studentId),
+      position: code,
+      password: hashedPassword,
+      road: road,
+    };
+  };
+
+  const data = [];
+  let getFieldFunc = getCommonFields;
+  if (isFun.value) {
+    getFieldFunc = getFunsFields;
+  }
+  for (const vol of volunteerList.value) {
+    data.push(await getFieldFunc(vol));
   }
 
   isLoading.value = true;
 
-  try {
-    const response = await fetch("/admin/uploadVolunteer", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+  const apiPath = isFun.value
+    ? "/admin/fun/importVolunteers"
+    : "/admin/uploadVolunteer";
+  const body = isFun.value
+    ? {
+        token: getToken(),
+        competitionId: gameId.value,
+        volunteers: data,
+      }
+    : {
         token: getToken(),
         gameId: gameId.value,
         data: data,
-      }),
+      };
+
+  fetch(apiPath, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.statusCode === 200) {
+        alerts("成功", "上传成功");
+        volunteerList.value = [];
+        stage.value = "upload";
+      } else {
+        alerts("错误", data.message || "上传失败");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      alerts("错误", "网络异常，请稍后重试");
+    })
+    .finally(() => {
+      isLoading.value = false;
     });
-    const result = await response.json();
-    if (result.statusCode === 200) {
-      alerts("成功", "上传成功");
-      volunteerList.value = [];
-      stage.value = "upload";
-    } else {
-      alerts("错误", result.message || "上传失败");
-    }
-  } catch (e) {
-    console.error(e);
-    alerts("错误", "网络异常，请稍后重试");
-  } finally {
-    isLoading.value = false;
-  }
 };
 
 onMounted(() => {
