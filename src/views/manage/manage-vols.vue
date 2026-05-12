@@ -16,6 +16,9 @@ const volunteerList = ref([]);
 
 const isLoading = ref(false);
 
+const isPasswordDialogVisible = ref(false);
+const processedPasswords = ref([]);
+
 const isOverEnd = computed(() => {
   if (
     isFun.value ||
@@ -178,7 +181,7 @@ const confirmUpload = async () => {
     return;
   }
 
-  const funPlainPasswords = [];
+  processedPasswords.value = [];
 
   const getCommonFields = async (vol) => {
     const code = positionMap[vol.position];
@@ -236,9 +239,9 @@ const confirmUpload = async () => {
       road = [r];
     }
 
-    funPlainPasswords.push({
+    processedPasswords.value.push({
       name: vol.name,
-      studentNumber: vol.studentId,
+      studentNumber: String(vol.studentId),
       rawPassword,
     });
 
@@ -287,7 +290,11 @@ const confirmUpload = async () => {
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
-        alerts("成功", "上传成功");
+        if (isFun.value && processedPasswords.value.length > 0) {
+          isPasswordDialogVisible.value = true;
+        } else {
+          alerts("成功", "上传成功");
+        }
         volunteerList.value = [];
         stage.value = "upload";
       } else {
@@ -438,6 +445,55 @@ onMounted(() => {
         <Column field="lane" header="泳道"></Column>
       </DataTable>
     </div>
+
+    <!-- 密码预览与下载弹窗 -->
+    <Dialog
+      v-model:visible="isPasswordDialogVisible"
+      modal
+      header="上传成功 - 志愿者初始密码对照表"
+      :style="{ width: '600px' }"
+      :closable="false"
+    >
+      <div class="flex flex-column gap-3 mt-2">
+        <Message
+          severity="warn"
+          icon="pi pi-exclamation-triangle"
+          :closable="false"
+        >
+          请立即下载或记录下方密码。关闭此窗口后，明文密码数据将无法找回。
+        </Message>
+        <DataTable
+          :value="processedPasswords"
+          scrollable
+          scrollHeight="300px"
+          stripedRows
+          size="small"
+        >
+          <Column field="name" header="姓名"></Column>
+          <Column field="studentNumber" header="学号"></Column>
+          <Column field="rawPassword" header="初始密码">
+            <template #body="slotProps">
+              <code class="font-bold text-primary">{{
+                slotProps.data.rawPassword
+              }}</code>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+      <template #footer>
+        <Button
+          label="关闭"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="isPasswordDialogVisible = false"
+        />
+        <Button
+          label="下载 CSV 对照表"
+          icon="pi pi-download"
+          @click="exportPasswordsToCsv(processedPasswords, gameInfo.name)"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
