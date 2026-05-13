@@ -1377,6 +1377,10 @@ token+项目id
 
   **Items:**
 
+  - **`dbRoad`**
+
+    `integer`, format: `int32`
+
   - **`name`**
 
     `string`
@@ -1390,6 +1394,10 @@ token+项目id
     `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
 
   - **`road`**
+
+    `array`
+
+    **Items:**
 
     `integer`, format: `int32`
 
@@ -1417,7 +1425,10 @@ token+项目id
       "studentNumber": "",
       "position": "EXECUTIVE_PRESIDENT",
       "password": "",
-      "road": 1
+      "road": [
+        1
+      ],
+      "dbRoad": 1
     }
   ]
 }
@@ -1977,6 +1988,86 @@ token+项目id
 {}
 ```
 
+### 更新志愿者
+
+- **Method:** `POST`
+- **Path:** `/admin/fun/updateVolunteer`
+- **Tags:** 趣味运动会管理员相关接口
+
+管理员更新志愿者信息
+
+#### Parameters
+
+##### `dto`
+
+- **In:** `query`
+
+管理员token+志愿者ID+更新字段
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`token` (required)**
+
+  `string`
+
+- **`volunteerId` (required)**
+
+  `integer`, format: `int64`
+
+- **`name`**
+
+  `string`
+
+- **`password`**
+
+  `string`
+
+- **`position`**
+
+  `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
+
+- **`road`**
+
+  `array`
+
+  **Items:**
+
+  `integer`, format: `int32`
+
+- **`studentNumber`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "volunteerId": 1,
+  "name": "",
+  "studentNumber": "",
+  "position": "EXECUTIVE_PRESIDENT",
+  "password": "",
+  "road": [
+    1
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 OK
+
+###### Content-Type: \*/\*
+
+**Example:**
+
+```json
+{}
+```
+
 ### 更新参赛队伍
 
 - **Method:** `POST`
@@ -2327,6 +2418,10 @@ token+项目id
 
   **Items:**
 
+  - **`dbRoad`**
+
+    `integer`, format: `int32`
+
   - **`name`**
 
     `string`
@@ -2340,6 +2435,10 @@ token+项目id
     `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
 
   - **`road`**
+
+    `array`
+
+    **Items:**
 
     `integer`, format: `int32`
 
@@ -2359,9 +2458,61 @@ token+项目id
       "studentNumber": "",
       "position": "EXECUTIVE_PRESIDENT",
       "password": "",
-      "road": 1
+      "road": [
+        1
+      ],
+      "dbRoad": 1
     }
   ]
+}
+```
+
+#### Responses
+
+##### Status: 200 OK
+
+###### Content-Type: \*/\*
+
+**Example:**
+
+```json
+{}
+```
+
+### 获取志愿者列表
+
+- **Method:** `POST`
+- **Path:** `/admin/fun/getVolunteerList`
+- **Tags:** 趣味运动会管理员相关接口
+
+管理员获取某活动下的志愿者列表
+
+#### Parameters
+
+##### `dto`
+
+- **In:** `query`
+
+管理员token+比赛ID
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`competitionId` (required)**
+
+  `string`
+
+- **`token` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "competitionId": ""
 }
 ```
 
@@ -2578,6 +2729,55 @@ token+项目id
 {}
 ```
 
+### 删除志愿者
+
+- **Method:** `POST`
+- **Path:** `/admin/fun/deleteVolunteer`
+- **Tags:** 趣味运动会管理员相关接口
+
+管理员删除志愿者
+
+#### Parameters
+
+##### `dto`
+
+- **In:** `query`
+
+管理员token+志愿者ID
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`token` (required)**
+
+  `string`
+
+- **`volunteerId` (required)**
+
+  `integer`, format: `int64`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "volunteerId": 1
+}
+```
+
+#### Responses
+
+##### Status: 200 OK
+
+###### Content-Type: \*/\*
+
+**Example:**
+
+```json
+{}
+```
+
 ### 删除参赛队伍
 
 - **Method:** `POST`
@@ -2710,6 +2910,86 @@ token+项目id
 {
   "token": "",
   "eventId": ""
+}
+```
+
+#### Responses
+
+##### Status: 200 OK
+
+###### Content-Type: \*/\*
+
+**Example:**
+
+```json
+{}
+```
+
+### 新增志愿者
+
+- **Method:** `POST`
+- **Path:** `/admin/fun/createVolunteer`
+- **Tags:** 趣味运动会管理员相关接口
+
+管理员新增单个志愿者
+
+#### Parameters
+
+##### `dto`
+
+- **In:** `query`
+
+管理员token+志愿者信息
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`competitionId` (required)**
+
+  `string`
+
+- **`name` (required)**
+
+  `string`
+
+- **`password` (required)**
+
+  `string`
+
+- **`position` (required)**
+
+  `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
+
+- **`road` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`, format: `int32`
+
+- **`studentNumber` (required)**
+
+  `string`
+
+- **`token` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "competitionId": "",
+  "name": "",
+  "studentNumber": "",
+  "position": "EXECUTIVE_PRESIDENT",
+  "password": "",
+  "road": [
+    1
+  ]
 }
 ```
 
@@ -5154,6 +5434,10 @@ token+项目id
 
   **Items:**
 
+  - **`dbRoad`**
+
+    `integer`, format: `int32`
+
   - **`name`**
 
     `string`
@@ -5167,6 +5451,10 @@ token+项目id
     `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
 
   - **`road`**
+
+    `array`
+
+    **Items:**
 
     `integer`, format: `int32`
 
@@ -5194,7 +5482,10 @@ token+项目id
       "studentNumber": "",
       "position": "EXECUTIVE_PRESIDENT",
       "password": "",
-      "road": 1
+      "road": [
+        1
+      ],
+      "dbRoad": 1
     }
   ]
 }
@@ -5203,6 +5494,10 @@ token+项目id
 ### VolunteerDto
 
 - **Type:**`object`
+
+* **`dbRoad`**
+
+  `integer`, format: `int32`
 
 * **`name`**
 
@@ -5218,6 +5513,10 @@ token+项目id
 
 * **`road`**
 
+  `array`
+
+  **Items:**
+
   `integer`, format: `int32`
 
 * **`studentNumber`**
@@ -5232,7 +5531,10 @@ token+项目id
   "studentNumber": "",
   "position": "EXECUTIVE_PRESIDENT",
   "password": "",
-  "road": 1
+  "road": [
+    1
+  ],
+  "dbRoad": 1
 }
 ```
 
@@ -5661,6 +5963,60 @@ token+项目id
 }
 ```
 
+### FunUpdateVolunteerDto
+
+- **Type:**`object`
+
+管理员token+志愿者ID+更新字段
+
+- **`token` (required)**
+
+  `string`
+
+- **`volunteerId` (required)**
+
+  `integer`, format: `int64`
+
+- **`name`**
+
+  `string`
+
+- **`password`**
+
+  `string`
+
+- **`position`**
+
+  `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
+
+- **`road`**
+
+  `array`
+
+  **Items:**
+
+  `integer`, format: `int32`
+
+- **`studentNumber`**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "volunteerId": 1,
+  "name": "",
+  "studentNumber": "",
+  "position": "EXECUTIVE_PRESIDENT",
+  "password": "",
+  "road": [
+    1
+  ]
+}
+```
+
 ### FunTeamDto
 
 - **Type:**`object`
@@ -5919,6 +6275,10 @@ token+项目id
 
   **Items:**
 
+  - **`dbRoad`**
+
+    `integer`, format: `int32`
+
   - **`name`**
 
     `string`
@@ -5932,6 +6292,10 @@ token+项目id
     `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
 
   - **`road`**
+
+    `array`
+
+    **Items:**
 
     `integer`, format: `int32`
 
@@ -5951,9 +6315,35 @@ token+项目id
       "studentNumber": "",
       "position": "EXECUTIVE_PRESIDENT",
       "password": "",
-      "road": 1
+      "road": [
+        1
+      ],
+      "dbRoad": 1
     }
   ]
+}
+```
+
+### FunGetVolunteerListDto
+
+- **Type:**`object`
+
+管理员token+比赛ID
+
+- **`competitionId` (required)**
+
+  `string`
+
+- **`token` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "competitionId": ""
 }
 ```
 
@@ -6054,6 +6444,29 @@ token+项目id
 }
 ```
 
+### FunDeleteVolunteerDto
+
+- **Type:**`object`
+
+管理员token+志愿者ID
+
+- **`token` (required)**
+
+  `string`
+
+- **`volunteerId` (required)**
+
+  `integer`, format: `int64`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "volunteerId": 1
+}
+```
+
 ### FunDeleteTeamDto
 
 - **Type:**`object`
@@ -6097,6 +6510,60 @@ token+项目id
 {
   "token": "",
   "competitionId": ""
+}
+```
+
+### FunCreateVolunteerDto
+
+- **Type:**`object`
+
+管理员token+志愿者信息
+
+- **`competitionId` (required)**
+
+  `string`
+
+- **`name` (required)**
+
+  `string`
+
+- **`password` (required)**
+
+  `string`
+
+- **`position` (required)**
+
+  `string`, possible values: `"EXECUTIVE_PRESIDENT", "STARTER", "TIMER", "TECHNICAL_INSPECTION_OF_SWIMMING_IN", "REINTAKE_INSPECTION", "REBORN_INSPECTOR", "OTHER"`
+
+- **`road` (required)**
+
+  `array`
+
+  **Items:**
+
+  `integer`, format: `int32`
+
+- **`studentNumber` (required)**
+
+  `string`
+
+- **`token` (required)**
+
+  `string`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "competitionId": "",
+  "name": "",
+  "studentNumber": "",
+  "position": "EXECUTIVE_PRESIDENT",
+  "password": "",
+  "road": [
+    1
+  ]
 }
 ```
 
