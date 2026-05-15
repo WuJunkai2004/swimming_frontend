@@ -31,7 +31,6 @@ const directionOptions = [
   { label: "数值越大排名越靠前 (如分数 - 降序)", value: 1 },
 ];
 
-
 // --- 3. API 调用与数据处理 ---
 
 // 获取项目列表
@@ -86,10 +85,7 @@ const openEditDialog = (event) => {
 
 // 保存项目 (创建或更新)
 const saveEvent = () => {
-  if (
-    !editForm.value.eventName ||
-    !editForm.value.unit
-  ) {
+  if (!editForm.value.eventName || !editForm.value.unit) {
     alerts("警告", "请填写完整信息");
     return;
   }
@@ -98,6 +94,10 @@ const saveEvent = () => {
   const apiPath = isNew.value
     ? "/admin/fun/createEvent"
     : "/admin/fun/updateEvent";
+  if (isNew.value) {
+    // 创建时不需要 eventId
+    delete editForm.value.eventId;
+  }
 
   fetch(apiPath, {
     method: "POST",
@@ -190,10 +190,18 @@ onMounted(() => {
 
     <div v-if="isLoading">
       <DataTable :value="[{}, {}, {}]" class="p-datatable-striped">
-        <Column header="项目名称"><template #body><Skeleton /></template></Column>
-        <Column header="单位"><template #body><Skeleton /></template></Column>
-        <Column header="排序"><template #body><Skeleton /></template></Column>
-        <Column header="操作"><template #body><Skeleton height="2rem" width="6rem" /></template></Column>
+        <Column header="项目名称"
+          ><template #body><Skeleton /></template
+        ></Column>
+        <Column header="单位"
+          ><template #body><Skeleton /></template
+        ></Column>
+        <Column header="排序"
+          ><template #body><Skeleton /></template
+        ></Column>
+        <Column header="操作"
+          ><template #body><Skeleton height="2rem" width="6rem" /></template
+        ></Column>
       </DataTable>
     </div>
 
@@ -207,7 +215,9 @@ onMounted(() => {
       <Column field="sortDirection" header="排名规则">
         <template #body="slotProps">
           <Tag
-            :value="slotProps.data.sortDirection === 0 ? '数值小优先' : '数值大优先'"
+            :value="
+              slotProps.data.sortDirection === 0 ? '数值小优先' : '数值大优先'
+            "
             :severity="slotProps.data.sortDirection === 0 ? 'info' : 'success'"
           />
         </template>
@@ -233,7 +243,7 @@ onMounted(() => {
       <template #expansion="slotProps">
         <div class="p-3">
           <h5>规则说明</h5>
-          <p>{{ slotProps.data.rules || '暂无规则说明' }}</p>
+          <p>{{ slotProps.data.rules || "暂无规则说明" }}</p>
         </div>
       </template>
     </DataTable>
@@ -256,7 +266,11 @@ onMounted(() => {
         </div>
         <div class="flex flex-column gap-1">
           <label for="unit" class="font-bold">计量单位</label>
-          <InputText id="unit" v-model="editForm.unit" placeholder="例如：秒、分、个" />
+          <InputText
+            id="unit"
+            v-model="editForm.unit"
+            placeholder="例如：秒、分、个"
+          />
         </div>
         <div class="flex flex-column gap-1">
           <label for="sortDirection" class="font-bold">排名规则</label>
@@ -281,7 +295,12 @@ onMounted(() => {
           class="p-button-text"
           @click="isEditDialogVisible = false"
         />
-        <Button label="保存" icon="pi pi-check" :loading="isSaving" @click="saveEvent" />
+        <Button
+          label="保存"
+          icon="pi pi-check"
+          :loading="isSaving"
+          @click="saveEvent"
+        />
       </template>
     </Dialog>
   </div>
