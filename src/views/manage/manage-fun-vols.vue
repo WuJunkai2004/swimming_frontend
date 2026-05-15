@@ -21,7 +21,7 @@ const processedPasswords = ref([]);
 
 const isEditDialogVisible = ref(false);
 const editForm = ref({
-  id: null,
+  volunteerId: null,
   name: "",
   studentNumber: "",
   position: "",
@@ -98,24 +98,10 @@ const resetAll = async () => {
   stage.value = "upload";
 };
 
-const goToUpload = async () => {
-  const confirm_go = await awaitAlert(
-    "确认",
-    "确定要前往上传页面吗？现有的志愿者数据将保留在数据库中，除非您之后进行了覆盖操作。",
-    {
-      accept: "确认",
-      reject: "取消",
-    },
-  );
-  if (confirm_go) {
-    stage.value = "upload";
-  }
-};
-
 const openAddDialog = () => {
   isAdding.value = true;
   editForm.value = {
-    id: null,
+    volunteerId: null,
     name: "",
     studentNumber: "",
     position: "TIMER",
@@ -128,7 +114,7 @@ const openAddDialog = () => {
 const openEditDialog = (vol) => {
   isAdding.value = false;
   editForm.value = {
-    id: vol.id,
+    volunteerId: vol.volunteerId,
     name: vol.name,
     studentNumber: vol.studentNumber,
     position: vol.position,
@@ -138,7 +124,7 @@ const openEditDialog = (vol) => {
   isEditDialogVisible.value = true;
 };
 
-const deleteVolunteer = async (id) => {
+const deleteVolunteer = async (volId) => {
   const confirm = await awaitAlert("确认", "确定要删除该志愿者吗？", {
     accept: "确认",
     reject: "取消",
@@ -153,7 +139,7 @@ const deleteVolunteer = async (id) => {
     },
     body: JSON.stringify({
       token: getToken(),
-      volunteerId: id,
+      volunteerId: volId,
     }),
   })
     .then((res) => res.json())
@@ -196,6 +182,7 @@ const saveVolunteer = async () => {
 
   if (isAdding.value) {
     body.competitionId = gameId.value;
+    delete body.volunteerId; // 新增不需要传 volunteerId
     if (!body.password) {
       body.password = generateRandomPassword();
       const rawPassword = body.password;
@@ -211,9 +198,7 @@ const saveVolunteer = async () => {
     } else {
       body.password = await SHA256(body.password);
     }
-  } else {
-    body.volunteerId = editForm.value.id;
-    if (body.password) {
+  } else {    if (body.password) {
       body.password = await SHA256(body.password);
     } else {
       delete body.password; // 不更新密码
@@ -444,12 +429,6 @@ onMounted(() => {
         @click="downloadVolunteerList"
       />
       <div v-if="stage === 'modify'" class="flex gap-2">
-        <Button
-          label="批量上传"
-          icon="pi pi-upload"
-          @click="goToUpload"
-          class="p-button-secondary"
-        />
         <Button label="添加志愿者" icon="pi pi-plus" @click="openAddDialog" />
       </div>
       <div v-if="stage === 'manage'" class="flex gap-2">
@@ -552,7 +531,7 @@ onMounted(() => {
               <Button
                 icon="pi pi-trash"
                 class="p-button-rounded p-button-text p-button-danger"
-                @click="deleteVolunteer(slotProps.data.id)"
+                @click="deleteVolunteer(slotProps.data.volunteerId)"
               />
             </div>
           </template>
