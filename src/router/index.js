@@ -79,6 +79,21 @@ const routes = [
     component: () => import("@/views/funs/index.vue"),
   },
   {
+    path: "/fun",
+    name: "Fun",
+    redirect: "/fun/list", // 访问 /fun 路径时，重定向到 /fun/list
+  },
+  {
+    path: "/fun/games",
+    name: "FunList",
+    component: () => import("@/views/funs/list.vue"),
+  },
+  {
+    path: "/fun/results",
+    name: "FunResults",
+    component: () => import("@/views/funs/results.vue"),
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: () => import("@/views/error.vue"),
