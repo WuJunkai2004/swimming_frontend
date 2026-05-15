@@ -111,6 +111,7 @@ const routes = {
   "/manage-leaders": () => import("./manage-leaders.vue"),
   "/manage-admins": () => import("./manage-admins.vue"),
   "/manage-vols": () => import("./manage-vols.vue"),
+  "/manage-fun-vols": () => import("./manage-fun-vols.vue"),
   "/manage-schedule": () => import("./manage-schedule.vue"),
   "/manage-fun-games": () => import("./manage-fun-games.vue"),
   "/manage-fun-events": () => import("./manage-fun-events.vue"),

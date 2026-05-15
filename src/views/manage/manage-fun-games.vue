@@ -162,23 +162,28 @@ const deleteGame = async (game) => {
     },
   );
 
-  if (!confirm) {return};
+  if (!confirm) {
+    return;
+  }
 
   fetch("/admin/fun/deleteGame", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: getToken(),
-        competitionId: game.competitionId,
-      }),
-  }).then(res => res.json()).then(data => {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: getToken(),
+      competitionId: game.competitionId,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
       if (data.statusCode === 200) {
         alerts("成功", "删除成功");
         fetchGamesList();
       } else {
         alerts("错误", data.message || "删除失败");
       }
-    }).catch(e => {
+    })
+    .catch((e) => {
       alerts("错误", "网络异常，请稍后重试");
     });
 };
@@ -193,7 +198,7 @@ const jumpFunTeamsManage = (game) => {
 };
 
 const jumpVolsManage = (game) => {
-  window.location.href = `${window.location.href.split("#")[0]}#/manage-vols?game=${game.competitionId}&isFun=true&gameName=${encodeURIComponent(game.gameName)}`;
+  window.location.href = `${window.location.href.split("#")[0]}#/manage-fun-vols?game=${game.competitionId}&gameName=${encodeURIComponent(game.gameName)}`;
 };
 
 const jumpFunScheduleManage = (game) => {

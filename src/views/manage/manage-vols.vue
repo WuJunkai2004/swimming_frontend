@@ -3,28 +3,19 @@ import { ref, onMounted, computed } from "vue";
 import { useAlert } from "#/useAlert";
 import { Excetract } from "#/excelUtils";
 import { useToken } from "#/useToken";
-import { SHA256 } from "#/useHash";
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();
 
 const gameId = ref(null);
-const isFun = ref(false);
 const gameInfo = ref({});
 const stage = ref("upload"); // 'upload' or 'manage'
 const volunteerList = ref([]);
 
 const isLoading = ref(false);
 
-const isPasswordDialogVisible = ref(false);
-const processedPasswords = ref([]);
-
 const isOverEnd = computed(() => {
-  if (
-    isFun.value ||
-    !gameInfo.value.endTime ||
-    gameInfo.value.endTime === "1970-01-01"
-  ) {
+  if (!gameInfo.value.endTime || gameInfo.value.endTime === "1970-01-01") {
     return false;
   }
   const now = new Date();
@@ -42,13 +33,7 @@ const addPreviewLine = (name, studentId, position, lane) => {
 };
 
 const downloadVolunteerList = () => {
-  // 表格是 /public/志愿者填写表.xlsx
-  // 或 /public/志愿者填写表-趣味赛.xlse
-  // 使用浏览器下载该文件
-  let fileName = "志愿者填写表.xlsx";
-  if (isFun.value) {
-    fileName = "志愿者填写表-趣味赛.xlsx";
-  }
+  const fileName = "志愿者填写表.xlsx";
   const link = document.createElement("a");
   link.href = `/${fileName}`;
   link.download = fileName;
@@ -77,11 +62,6 @@ const resetAll = async () => {
 const loadGameInfo = () => {
   if (!gameId.value) {
     alerts("错误", "请从比赛管理页面进入该页。或咨询其他管理员。");
-    return;
-  }
-
-  if (isFun.value) {
-    // 趣味赛无需拉取额外信息
     return;
   }
 
@@ -140,48 +120,10 @@ const positionMap = {
   其他: "OTHER",
 };
 
-const positionMapFun = {
-  审核员: "EXECUTIVE_PRESIDENT",
-  执行总裁: "EXECUTIVE_PRESIDENT",
-  录入员: "TIMER",
-  计时员: "TIMER",
-};
-
-const generateRandomPassword = () => {
-  const chars =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let password = "";
-  for (let i = 0; i < 12; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-};
-
-const exportPasswordsToCsv = (passwords, gameName) => {
-  const csvContent =
-    "\ufeff姓名,学号,初始密码\n" +
-    passwords
-      .map((p) => `${p.name},${p.studentNumber},${p.rawPassword}`)
-      .join("\n");
-  const blob = new Blob([csvContent], {
-    type: "text/csv;charset=utf-8;",
-  });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.href = url;
-  link.download = `${gameName || "趣味赛"}-志愿者密码.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-};
-
 const confirmUpload = async () => {
   if (volunteerList.value.length === 0) {
     return;
   }
-
-  processedPasswords.value = [];
 
   const getCommonFields = async (vol) => {
     const code = positionMap[vol.position];
@@ -210,77 +152,22 @@ const confirmUpload = async () => {
     };
   };
 
-  const getFunsFields = async (vol) => {
-    const code = positionMapFun[vol.position];
-    if (!code) {
-      alerts(
-        "错误",
-        `未知职务: ${vol.position} (姓名: ${vol.name})。趣味赛仅支持：审核员(执行总裁)、录入员(计时员)`,
-      );
-      return;
-    }
-
-    const rawPassword = generateRandomPassword();
-    const hashedPassword = await SHA256(rawPassword);
-
-    let road = [];
-    if (code === "EXECUTIVE_PRESIDENT") {
-      road = [1, 2, 3, 4, 5, 6, 7, 8];
-    } else if (code === "TIMER") {
-      if (!vol.lane) {
-        alerts("错误", `${vol.name} (${vol.position}) 需要填写泳道`);
-        return;
-      }
-      const r = parseInt(vol.lane);
-      if (isNaN(r) || r < 1 || r > 8) {
-        alerts("错误", `泳道必须是 1-8: ${vol.lane} (姓名: ${vol.name})`);
-        return;
-      }
-      road = [r];
-    }
-
-    processedPasswords.value.push({
-      name: vol.name,
-      studentNumber: String(vol.studentId),
-      rawPassword,
-    });
-
-    return {
-      name: vol.name,
-      studentNumber: String(vol.studentId),
-      position: code,
-      password: hashedPassword,
-      road: road,
-    };
-  };
-
   const data = [];
-  let getFieldFunc = getCommonFields;
-  if (isFun.value) {
-    getFieldFunc = getFunsFields;
-  }
   for (const vol of volunteerList.value) {
-    data.push(await getFieldFunc(vol));
+    const fields = await getCommonFields(vol);
+    if (!fields) return;
+    data.push(fields);
   }
 
   isLoading.value = true;
 
-  const apiPath = isFun.value
-    ? "/admin/fun/importVolunteers"
-    : "/admin/uploadVolunteer";
-  const body = isFun.value
-    ? {
-        token: getToken(),
-        competitionId: gameId.value,
-        volunteers: data,
-      }
-    : {
-        token: getToken(),
-        gameId: gameId.value,
-        data: data,
-      };
+  const body = {
+    token: getToken(),
+    gameId: gameId.value,
+    data: data,
+  };
 
-  fetch(apiPath, {
+  fetch("/admin/uploadVolunteer", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -290,11 +177,7 @@ const confirmUpload = async () => {
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
-        if (isFun.value && processedPasswords.value.length > 0) {
-          isPasswordDialogVisible.value = true;
-        } else {
-          alerts("成功", "上传成功");
-        }
+        alerts("成功", "上传成功");
         volunteerList.value = [];
         stage.value = "upload";
       } else {
@@ -311,22 +194,13 @@ const confirmUpload = async () => {
 };
 
 onMounted(() => {
-  const params = window.location.href.split("?")[1];
+  const params = window.location.hash.split("?")[1];
   if (!params) {
     alerts("错误", "请从比赛管理页面进入该页。或咨询其他管理员。");
     return;
   }
   const urlParams = new URLSearchParams(params);
   gameId.value = urlParams.get("game");
-  isFun.value = urlParams.get("isFun") === "true";
-
-  if (isFun.value) {
-    if (urlParams.has("gameName")) {
-      gameInfo.value = { name: urlParams.get("gameName") };
-    } else {
-      gameInfo.value = { name: "趣味赛" };
-    }
-  }
 
   loadGameInfo();
 });
@@ -341,10 +215,7 @@ onMounted(() => {
           class="p-button-text p-button-rounded"
           @click="$router.back()"
         />
-        <h1 class="text-3xl font-bold m-0">
-          志愿者管理
-          <span v-if="isFun" class="text-primary text-2xl">(趣味赛)</span>
-        </h1>
+        <h1 class="text-3xl font-bold m-0">志愿者管理</h1>
       </div>
       <Button
         v-if="stage === 'upload'"
@@ -377,7 +248,7 @@ onMounted(() => {
       <template #title>
         <div :class="{ 'text-red-500': isOverEnd }">{{ gameInfo.name }}</div>
       </template>
-      <template #content v-if="!isFun && gameInfo.endTime">
+      <template #content v-if="gameInfo.endTime">
         <div class="flex align-items-center gap-2">
           <i
             class="pi pi-calendar text-xl"
@@ -445,55 +316,6 @@ onMounted(() => {
         <Column field="lane" header="泳道"></Column>
       </DataTable>
     </div>
-
-    <!-- 密码预览与下载弹窗 -->
-    <Dialog
-      v-model:visible="isPasswordDialogVisible"
-      modal
-      header="上传成功 - 志愿者初始密码对照表"
-      :style="{ width: '600px' }"
-      :closable="false"
-    >
-      <div class="flex flex-column gap-3 mt-2">
-        <Message
-          severity="warn"
-          icon="pi pi-exclamation-triangle"
-          :closable="false"
-        >
-          请立即下载或记录下方密码。关闭此窗口后，明文密码数据将无法找回。
-        </Message>
-        <DataTable
-          :value="processedPasswords"
-          scrollable
-          scrollHeight="300px"
-          stripedRows
-          size="small"
-        >
-          <Column field="name" header="姓名"></Column>
-          <Column field="studentNumber" header="学号"></Column>
-          <Column field="rawPassword" header="初始密码">
-            <template #body="slotProps">
-              <code class="font-bold text-primary">{{
-                slotProps.data.rawPassword
-              }}</code>
-            </template>
-          </Column>
-        </DataTable>
-      </div>
-      <template #footer>
-        <Button
-          label="关闭"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="isPasswordDialogVisible = false"
-        />
-        <Button
-          label="下载 CSV 对照表"
-          icon="pi pi-download"
-          @click="exportPasswordsToCsv(processedPasswords, gameInfo.name)"
-        />
-      </template>
-    </Dialog>
   </div>
 </template>
 
