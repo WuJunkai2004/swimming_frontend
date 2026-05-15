@@ -71,6 +71,7 @@ const openCreateDialog = () => {
     eventName: "",
     rules: "",
     unit: "",
+    sortOrder: eventsList.value.length + 1,
     sortDirection: 0,
   };
   isEditDialogVisible.value = true;
@@ -190,13 +191,13 @@ onMounted(() => {
 
     <div v-if="isLoading">
       <DataTable :value="[{}, {}, {}]" class="p-datatable-striped">
+        <Column header="#"
+          ><template #body><Skeleton /></template
+        ></Column>
         <Column header="项目名称"
           ><template #body><Skeleton /></template
         ></Column>
         <Column header="单位"
-          ><template #body><Skeleton /></template
-        ></Column>
-        <Column header="排序"
           ><template #body><Skeleton /></template
         ></Column>
         <Column header="操作"
@@ -210,6 +211,7 @@ onMounted(() => {
     </div>
 
     <DataTable v-else :value="eventsList" responsiveLayout="scroll" stripedRows>
+      <Column field="sortOrder" header="#" sortable></Column>
       <Column field="eventName" header="项目名称" sortable></Column>
       <Column field="unit" header="单位" style="width: 100px"></Column>
       <Column field="sortDirection" header="排名规则">
@@ -270,6 +272,16 @@ onMounted(() => {
             id="unit"
             v-model="editForm.unit"
             placeholder="例如：秒、分、个"
+          />
+        </div>
+        <div class="flex flex-column gap-1">
+          <label for="sortOrder" class="font-bold">显示顺序</label>
+          <InputNumber
+            id="sortOrder"
+            v-model="editForm.sortOrder"
+            showButtons
+            :min="0"
+            fluid
           />
         </div>
         <div class="flex flex-column gap-1">
