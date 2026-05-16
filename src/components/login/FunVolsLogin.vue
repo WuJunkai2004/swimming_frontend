@@ -34,7 +34,7 @@ const queryCompetitions = async () => {
   if (!studentNumber.value) return;
 
   isQueryingCompetitions.value = true;
-  fetch(`/api/competition/queryCompetition?studentNumber=${studentNumber.value}`)
+  fetch(`/api/funVolunteer/queryCompetition?studentNumber=${studentNumber.value}`)
     .then((response) => response.json())
     .then((data) => {
       if (data.statusCode === 200) {
