@@ -70,6 +70,7 @@
 /leader/getLeaderDetail
 /athlete/login
 /athlete/getSessionId
+/api/funVolunteer/queryCompetition
 /api/funGame/list
 /api/funGame/getTotalPoints
 /api/funGame/getEventResults

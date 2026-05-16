@@ -4059,6 +4059,36 @@ token+项目id
 {}
 ```
 
+### 根据学号查询志愿者参与活动列表
+
+- **Method:** `GET`
+- **Path:** `/api/funVolunteer/queryCompetition`
+- **Tags:** fun-volunteer-controller
+
+根据志愿者学号查询其参与的所有趣味运动会活动
+
+#### Parameters
+
+##### `studentNumber` required
+
+- **In:** `query`
+
+志愿者学号
+
+`string`
+
+#### Responses
+
+##### Status: 200 OK
+
+###### Content-Type: \*/\*
+
+**Example:**
+
+```json
+{}
+```
+
 ### 公众查询活动列表
 
 - **Method:** `GET`
