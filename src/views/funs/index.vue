@@ -22,9 +22,16 @@ const fetchEventList = async () => {
   if (!gameId) return;
 
   try {
-    const res = await fetch(
-      `/api/funVolunteer/getEventList?competitionId=${gameId}`,
-    );
+    const res = await fetch("/api/funVolunteer/getEventList", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: getToken(),
+        competitionId: gameId,
+      }),
+    });
     const data = await res.json();
     if (data.statusCode === 200) {
       eventList.value = data.data.map((item) => ({
