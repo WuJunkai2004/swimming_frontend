@@ -606,6 +606,10 @@ token+比赛id+道数+成绩
 
   `number`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
@@ -613,6 +617,7 @@ token+比赛id+道数+成绩
   "token": "",
   "eventId": 1,
   "road": 1,
+  "round": 1,
   "rawScore": 1,
   "isValid": true,
   "invalidType": "FALSE_START",
@@ -660,12 +665,17 @@ token+项目id
 
   `string`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
 {
   "token": "",
-  "eventId": 1
+  "eventId": 1,
+  "round": 1
 }
 ```
 
@@ -768,12 +778,17 @@ token+比赛id
 
   `string`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
 {
   "token": "",
-  "competitionId": ""
+  "competitionId": "",
+  "round": 1
 }
 ```
 
@@ -817,12 +832,17 @@ token+项目id
 
   `string`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
 {
   "token": "",
-  "eventId": 1
+  "eventId": 1,
+  "round": 1
 }
 ```
 
@@ -3294,6 +3314,10 @@ token+项目id
 
     `integer`, format: `int64`
 
+  - **`round`**
+
+    `integer`, format: `int32`
+
 **Example:**
 
 ```json
@@ -3303,7 +3327,8 @@ token+项目id
   "teamRoads": [
     {
       "teamId": 1,
-      "road": 1
+      "road": 1,
+      "round": 1
     }
   ]
 }
@@ -4166,6 +4191,12 @@ token+项目id
 - **In:** `query`
 
 `integer`, format: `int64`
+
+##### `round`
+
+- **In:** `query`
+
+`integer`, format: `int32`
 
 #### Responses
 
@@ -5161,6 +5192,10 @@ token+比赛id+道数+成绩
 
   `number`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
@@ -5168,6 +5203,7 @@ token+比赛id+道数+成绩
   "token": "",
   "eventId": 1,
   "road": 1,
+  "round": 1,
   "rawScore": 1,
   "isValid": true,
   "invalidType": "FALSE_START",
@@ -5189,12 +5225,17 @@ token+项目id
 
   `string`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
 {
   "token": "",
-  "eventId": 1
+  "eventId": 1,
+  "round": 1
 }
 ```
 
@@ -5245,12 +5286,17 @@ token+比赛id
 
   `string`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
 {
   "token": "",
-  "competitionId": ""
+  "competitionId": "",
+  "round": 1
 }
 ```
 
@@ -5268,12 +5314,17 @@ token+项目id
 
   `string`
 
+- **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
 {
   "token": "",
-  "eventId": 1
+  "eventId": 1,
+  "round": 1
 }
 ```
 
@@ -6625,6 +6676,10 @@ token+项目id
 
     `integer`, format: `int64`
 
+  - **`round`**
+
+    `integer`, format: `int32`
+
 **Example:**
 
 ```json
@@ -6634,7 +6689,8 @@ token+项目id
   "teamRoads": [
     {
       "teamId": 1,
-      "road": 1
+      "road": 1,
+      "round": 1
     }
   ]
 }
@@ -6652,12 +6708,17 @@ token+项目id
 
   `integer`, format: `int64`
 
+* **`round`**
+
+  `integer`, format: `int32`
+
 **Example:**
 
 ```json
 {
   "teamId": 1,
-  "road": 1
+  "road": 1,
+  "round": 1
 }
 ```
 
