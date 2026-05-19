@@ -280,7 +280,7 @@ onMounted(fetchGamesList);
               @click="jumpVolsManage(slotProps.data)"
             />
             <Button
-              label="分道/成绩"
+              label="成绩管理"
               class="p-button-outlined p-button-sm p-button-warning"
               @click="jumpFunScheduleManage(slotProps.data)"
             />

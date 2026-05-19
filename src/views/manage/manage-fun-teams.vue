@@ -1,3 +1,8 @@
+<script>
+// 页面打开期间持续保存在全局变量
+const globalTeamsPool = new Map();
+</script>
+
 <script setup>
 import { ref, onMounted } from "vue";
 import { useToken } from "#/useToken";
@@ -15,6 +20,7 @@ const eventId = ref("");
 const teamsList = ref([]);
 const eventsOptions = ref([]); // 项目选项列表
 const isLoading = ref(true);
+const isSavingLanes = ref(false);
 const error = ref(null);
 
 // 编辑/创建 弹窗状态
@@ -80,17 +86,128 @@ const fetchTeamsList = () => {
   })
     .then((res) => res.json())
     .then((data) => {
-      if (data.statusCode === 200) {
-        teamsList.value = data.data || [];
-      } else {
+      if (data.statusCode !== 200) {
         error.value = data.message || "无法加载队伍列表";
+        return;
       }
+      const fetchedTeams = data.data || [];
+
+      // 1. 将本次获取到的队伍合并到全局队伍池
+      fetchedTeams.forEach((t) => {
+        if (t.college) {
+          globalTeamsPool.set(t.college, {
+            teamId: t.teamId,
+            college: t.college,
+            members: t.members || [],
+          });
+        }
+      });
+
+      // 2. 构造当前项目的队伍列表
+      const currentEventTeams = [];
+      for (const [college, teamInfo] of globalTeamsPool.entries()) {
+        const fetchedTeam = fetchedTeams.find((t) => t.college === college);
+        currentEventTeams.push({
+          ...teamInfo,
+          round: fetchedTeam ? fetchedTeam.round || 0 : 0,
+          road: fetchedTeam ? fetchedTeam.road || 0 : 0,
+        });
+      }
+
+      teamsList.value = currentEventTeams;
     })
     .catch((e) => {
       error.value = "网络错误，请稍后重试";
     })
     .finally(() => {
       isLoading.value = false;
+    });
+};
+
+// 保存分道
+const saveLanes = () => {
+  const teamRoads = teamsList.value.map((t) => ({
+    teamId: t.teamId,
+    road: Number(t.road) || 0,
+    round: Number(t.round) || 0,
+  }));
+
+  // 1. 基础校验
+  for (const tr of teamRoads) {
+    if ((tr.road > 0 && tr.round === 0) || (tr.road === 0 && tr.round > 0)) {
+      alerts("警告", "请同时设置轮次和道次，或都设置为 0");
+      return;
+    }
+  }
+
+  // 2. 统计各轮次情况
+  const roundMap = {}; // round -> Set of roads
+  for (const tr of teamRoads) {
+    if (tr.round > 0) {
+      if (!roundMap[tr.round]) {
+        roundMap[tr.round] = new Set();
+      }
+      if (roundMap[tr.round].has(tr.road)) {
+        alerts("警告", `轮次 ${tr.round} 中存在重复的道次 ${tr.road}`);
+        return;
+      }
+      if (tr.road > 8) {
+        alerts(
+          "警告",
+          `每轮最多 8 条泳道 (检测到轮次 ${tr.round} 道次 ${tr.road})`,
+        );
+        return;
+      }
+      roundMap[tr.round].add(tr.road);
+    }
+  }
+
+  // 3. 校验轮次排满逻辑
+  const rounds = Object.keys(roundMap)
+    .map(Number)
+    .sort((a, b) => a - b);
+  for (let i = 0; i < rounds.length; i++) {
+    const r = rounds[i];
+    if (r !== i + 1) {
+      alerts("警告", "轮次必须从 1 开始且连续（例如：1, 2, 3...）");
+      return;
+    }
+    // 如果不是最后一轮，必须排满 8 道
+    if (i < rounds.length - 1) {
+      if (roundMap[r].size < 8) {
+        alerts(
+          "警告",
+          `轮次 ${r} 尚未排满（当前仅 ${roundMap[r].size}/8），不能开启新轮次`,
+        );
+        return;
+      }
+    }
+  }
+
+  isSavingLanes.value = true;
+  fetch("/admin/fun/assignRoad", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: getToken(),
+      eventId: eventId.value,
+      teamRoads,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.statusCode === 200) {
+        alerts("成功", "分道信息已保存");
+        fetchTeamsList();
+      } else {
+        alerts("错误", data.message || "保存失败");
+      }
+    })
+    .catch((e) => {
+      alerts("错误", "网络连接异常");
+    })
+    .finally(() => {
+      isSavingLanes.value = false;
     });
 };
 
@@ -220,6 +337,7 @@ const deleteTeam = (team) => {
       .then((data) => {
         if (data.statusCode === 200) {
           alerts("成功", "删除成功");
+          globalTeamsPool.delete(team.college);
           fetchTeamsList();
         } else {
           alerts("错误", data.message || "删除失败");
@@ -266,6 +384,13 @@ onMounted(() => {
           class="w-15rem"
           @change="fetchTeamsList"
         />
+        <Button
+          label="保存分道"
+          icon="pi pi-save"
+          class="p-button-secondary"
+          :loading="isSavingLanes"
+          @click="saveLanes"
+        />
         <Button label="添加队伍" icon="pi pi-plus" @click="openCreateDialog" />
       </div>
     </div>
@@ -275,6 +400,12 @@ onMounted(() => {
     <div v-if="isLoading">
       <DataTable :value="[{}, {}, {}]" class="p-datatable-striped">
         <Column header="所属学院"
+          ><template #body><Skeleton /></template
+        ></Column>
+        <Column header="轮次"
+          ><template #body><Skeleton /></template
+        ></Column>
+        <Column header="道次"
           ><template #body><Skeleton /></template
         ></Column>
         <Column header="队员人数"
@@ -294,6 +425,30 @@ onMounted(() => {
       <Column field="college" header="所属学院" sortable>
         <template #body="slotProps">
           {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+        </template>
+      </Column>
+      <Column header="轮次" style="width: 120px">
+        <template #body="slotProps">
+          <InputNumber
+            v-model="slotProps.data.round"
+            :min="0"
+            :max="20"
+            showButtons
+            fluid
+            size="small"
+          />
+        </template>
+      </Column>
+      <Column header="道次" style="width: 120px">
+        <template #body="slotProps">
+          <InputNumber
+            v-model="slotProps.data.road"
+            :min="0"
+            :max="8"
+            showButtons
+            fluid
+            size="small"
+          />
         </template>
       </Column>
       <Column header="队员列表">

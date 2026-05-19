@@ -16,11 +16,9 @@ const gameId = ref("");
 const eventId = ref("");
 const eventsOptions = ref([]);
 
-const teamsList = ref([]); // 用于分道
 const resultsList = ref([]); // 用于成绩管理
 
 const isLoading = ref(false);
-const isSavingLanes = ref(false);
 const error = ref(null);
 
 // 成绩编辑弹窗
@@ -79,32 +77,19 @@ const fetchEventsOptions = () => {
     });
 };
 
-// 获取分道和成绩数据
+// 获取成绩数据
 const fetchAllData = () => {
   if (!eventId.value) return;
   isLoading.value = true;
   error.value = null;
 
-  // 并行获取队伍列表和成绩列表
-  Promise.all([
-    fetch("/admin/fun/getTeamList", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: getToken(), eventId: eventId.value }),
-    }).then((res) => res.json()),
-    fetch("/admin/fun/getResults", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: getToken(), eventId: eventId.value }),
-    }).then((res) => res.json()),
-  ])
-    .then(([teamsData, resultsData]) => {
-      if (teamsData.statusCode === 200) {
-        teamsList.value = teamsData.data || [];
-      } else {
-        alerts("错误", "获取队伍列表失败: " + teamsData.message);
-      }
-
+  fetch("/admin/fun/getResults", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: getToken(), eventId: eventId.value }),
+  })
+    .then((res) => res.json())
+    .then((resultsData) => {
       if (resultsData.statusCode === 200) {
         resultsList.value = resultsData.data || [];
       } else {
@@ -116,48 +101,6 @@ const fetchAllData = () => {
     })
     .finally(() => {
       isLoading.value = false;
-    });
-};
-
-// 保存分道
-const saveLanes = () => {
-  const teamRoads = teamsList.value.map((t) => ({
-    teamId: t.teamId,
-    road: t.road || 0,
-  }));
-
-  // 校验是否有重复道次 (除了0)
-  const roads = teamRoads.map((tr) => tr.road).filter((r) => r > 0);
-  const uniqueRoads = new Set(roads);
-  if (roads.length !== uniqueRoads.size) {
-    alerts("警告", "存在重复的道次，请检查");
-    return;
-  }
-
-  isSavingLanes.value = true;
-  fetch("/admin/fun/assignRoad", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      eventId: eventId.value,
-      teamRoads,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.statusCode === 200) {
-        alerts("成功", "道次分配成功");
-        fetchAllData();
-      } else {
-        alerts("错误", data.message || "分道失败");
-      }
-    })
-    .catch((e) => {
-      alerts("错误", "网络异常");
-    })
-    .finally(() => {
-      isSavingLanes.value = false;
     });
 };
 
@@ -226,7 +169,7 @@ onMounted(() => {
           class="p-button-text p-button-rounded"
           @click="$router.back()"
         />
-        <h1 class="text-3xl font-bold m-0">趣味赛成绩与分道</h1>
+        <h1 class="text-3xl font-bold m-0">趣味赛成绩管理</h1>
       </div>
       <div class="flex align-items-center gap-3">
         <Select
@@ -247,103 +190,48 @@ onMounted(() => {
       <Message severity="error" :closable="false">{{ error }}</Message>
     </div>
 
-    <Tabs value="0">
-      <TabList>
-        <Tab value="0">道次分配</Tab>
-        <Tab value="1">成绩管理</Tab>
-      </TabList>
-      <TabPanels>
-        <TabPanel value="0">
-          <div class="flex flex-column gap-3">
-            <div class="flex justify-content-between align-items-center">
-              <span class="text-500 text-sm"
-                >在这里为各参赛队伍分配泳道。设置为 0 表示未分配。</span
-              >
-              <Button
-                label="保存道次"
-                icon="pi pi-save"
-                :loading="isSavingLanes"
-                @click="saveLanes"
-              />
-            </div>
-
-            <DataTable
-              :value="teamsList"
-              :loading="isLoading"
-              stripedRows
-              responsiveLayout="scroll"
-            >
-              <Column field="college" header="学院/队伍">
-                <template #body="slotProps">
-                  {{
-                    collegeMap[slotProps.data.college] || slotProps.data.college
-                  }}
-                </template>
-              </Column>
-              <Column header="道次" style="width: 150px">
-                <template #body="slotProps">
-                  <InputNumber
-                    v-model="slotProps.data.road"
-                    :min="0"
-                    :max="10"
-                    showButtons
-                  />
-                </template>
-              </Column>
-              <Column header="成员人数">
-                <template #body="slotProps">
-                  {{ slotProps.data.members?.length || 0 }} 人
-                </template>
-              </Column>
-            </DataTable>
-          </div>
-        </TabPanel>
-
-        <TabPanel value="1">
-          <DataTable
-            :value="resultsList"
-            :loading="isLoading"
-            stripedRows
-            responsiveLayout="scroll"
-          >
-            <Column field="college" header="学院/队伍">
-              <template #body="slotProps">
-                {{
-                  collegeMap[slotProps.data.college] || slotProps.data.college
-                }}
-              </template>
-            </Column>
-            <Column field="road" header="道次" style="width: 80px"></Column>
-            <Column field="rawScore" header="成绩">
-              <template #body="slotProps">
-                <span :class="{ 'text-red-500': !slotProps.data.isValid }">
-                  {{ slotProps.data.rawScore || "--" }}
-                </span>
-              </template>
-            </Column>
-            <Column field="isValid" header="状态">
-              <template #body="slotProps">
-                <Tag
-                  v-if="slotProps.data.isValid"
-                  value="有效"
-                  severity="success"
-                />
-                <Tag v-else value="犯规" severity="danger" />
-              </template>
-            </Column>
-            <Column header="操作" style="width: 100px">
-              <template #body="slotProps">
-                <Button
-                  icon="pi pi-pencil"
-                  class="p-button-text"
-                  @click="openEditResultDialog(slotProps.data)"
-                />
-              </template>
-            </Column>
-          </DataTable>
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+    <div class="flex flex-column gap-3">
+      <DataTable
+        :value="resultsList"
+        :loading="isLoading"
+        stripedRows
+        responsiveLayout="scroll"
+      >
+        <Column field="college" header="学院/队伍">
+          <template #body="slotProps">
+            {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+          </template>
+        </Column>
+        <Column field="round" header="轮次" style="width: 80px"></Column>
+        <Column field="road" header="道次" style="width: 80px"></Column>
+        <Column field="rawScore" header="成绩">
+          <template #body="slotProps">
+            <span :class="{ 'text-red-500': !slotProps.data.isValid }">
+              {{ slotProps.data.rawScore || "--" }}
+            </span>
+          </template>
+        </Column>
+        <Column field="isValid" header="状态">
+          <template #body="slotProps">
+            <Tag
+              v-if="slotProps.data.isValid"
+              value="有效"
+              severity="success"
+            />
+            <Tag v-else value="犯规" severity="danger" />
+          </template>
+        </Column>
+        <Column header="操作" style="width: 100px">
+          <template #body="slotProps">
+            <Button
+              icon="pi pi-pencil"
+              class="p-button-text"
+              @click="openEditResultDialog(slotProps.data)"
+            />
+          </template>
+        </Column>
+      </DataTable>
+    </div>
 
     <!-- 编辑成绩弹窗 -->
     <Dialog
