@@ -14,6 +14,7 @@ const foulState = useFoulEnum();
 // --- 2. 状态定义 ---
 const gameId = ref("");
 const eventId = ref("");
+const currentRound = ref(1);
 const eventsOptions = ref([]);
 
 const teamsList = ref([]); // 用于分道
@@ -39,6 +40,13 @@ const foulOptions = computed(() => {
   return Object.entries(foulState.foulMap).map(([value, label]) => ({
     label,
     value,
+  }));
+});
+
+const roundOptions = computed(() => {
+  return Array.from({ length: 10 }, (_, i) => ({
+    label: `第 ${i + 1} 组`,
+    value: i + 1,
   }));
 });
 
@@ -100,7 +108,10 @@ const fetchAllData = () => {
   ])
     .then(([teamsData, resultsData]) => {
       if (teamsData.statusCode === 200) {
-        teamsList.value = teamsData.data || [];
+        teamsList.value = (teamsData.data || []).map((t) => ({
+          ...t,
+          _originalRoad: t.road,
+        }));
       } else {
         alerts("错误", "获取队伍列表失败: " + teamsData.message);
       }
@@ -119,23 +130,27 @@ const fetchAllData = () => {
     });
 };
 
-// 保存分道
-const saveLanes = () => {
-  const teamRoads = teamsList.value.map((t) => ({
-    teamId: t.teamId,
-    road: t.road || 0,
-  }));
-
-  // 校验是否有重复道次 (除了0)
-  const roads = teamRoads.map((tr) => tr.road).filter((r) => r > 0);
-  const uniqueRoads = new Set(roads);
-  if (roads.length !== uniqueRoads.size) {
-    alerts("警告", "存在重复的道次，请检查");
+// 保存单支队伍道次
+const saveSingleLane = (team) => {
+  if (!team.road || team.road <= 0) {
+    alerts("警告", "请先输入有效的道次（1-8）");
     return;
   }
 
+  const isNew = !team._originalRoad || team._originalRoad === 0;
+  const apiPath = isNew ? "/admin/fun/assignRoad" : "/admin/fun/updateRoad";
+  const actionText = isNew ? "上传" : "修改";
+
+  const teamRoads = [
+    {
+      teamId: team.teamId,
+      road: team.road,
+      round: currentRound.value,
+    },
+  ];
+
   isSavingLanes.value = true;
-  fetch("/admin/fun/assignRoad", {
+  fetch(apiPath, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -147,10 +162,11 @@ const saveLanes = () => {
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
-        alerts("成功", "道次分配成功");
+        const collegeName = collegeMap[team.college] || team.college;
+        alerts("成功", `${collegeName} 第 ${currentRound.value} 组道次${actionText}成功`);
         fetchAllData();
       } else {
-        alerts("错误", data.message || "分道失败");
+        alerts("错误", data.message || `道次${actionText}失败`);
       }
     })
     .catch((e) => {
@@ -255,15 +271,17 @@ onMounted(() => {
       <TabPanels>
         <TabPanel value="0">
           <div class="flex flex-column gap-3">
-            <div class="flex justify-content-between align-items-center">
+            <div class="flex align-items-center gap-3">
               <span class="text-500 text-sm"
-                >在这里为各参赛队伍分配泳道。设置为 0 表示未分配。</span
+                >在这里为各参赛队伍分配泳道。</span
               >
-              <Button
-                label="保存道次"
-                icon="pi pi-save"
-                :loading="isSavingLanes"
-                @click="saveLanes"
+              <Select
+                v-model="currentRound"
+                :options="roundOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="选择组别"
+                class="w-10rem"
               />
             </div>
 
@@ -285,7 +303,7 @@ onMounted(() => {
                   <InputNumber
                     v-model="slotProps.data.road"
                     :min="0"
-                    :max="10"
+                    :max="8"
                     showButtons
                   />
                 </template>
@@ -293,6 +311,26 @@ onMounted(() => {
               <Column header="成员人数">
                 <template #body="slotProps">
                   {{ slotProps.data.members?.length || 0 }} 人
+                </template>
+              </Column>
+              <Column header="操作" style="width: 120px">
+                <template #body="slotProps">
+                  <Button
+                    v-if="!slotProps.data._originalRoad || slotProps.data._originalRoad === 0"
+                    label="上传道次"
+                    icon="pi pi-upload"
+                    class="p-button-sm p-button-outlined"
+                    :loading="isSavingLanes"
+                    @click="saveSingleLane(slotProps.data)"
+                  />
+                  <Button
+                    v-else
+                    label="修改道次"
+                    icon="pi pi-pencil"
+                    class="p-button-sm p-button-outlined"
+                    :loading="isSavingLanes"
+                    @click="saveSingleLane(slotProps.data)"
+                  />
                 </template>
               </Column>
             </DataTable>

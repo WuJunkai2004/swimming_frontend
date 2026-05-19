@@ -88,3 +88,4 @@
 /activity/getVideo
 /activity/getNewsDetail
 /activity/getImage
+/admin/fun/updateRoad

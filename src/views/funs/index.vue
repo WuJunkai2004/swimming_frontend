@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, shallowRef, ref, watch, computed } from "vue";
 import { useToken } from "#/useToken";
-import { getData } from "#/useStorage";
+import { getData, saveData } from "#/useStorage";
 import { useAlert } from "#/useAlert";
 import loading from "@/views/loading.vue";
 
@@ -11,10 +11,21 @@ const { getToken } = useToken();
 const eventList = ref([]);
 const selectedEvent = ref(null);
 
-// --- 鉴权 ---
-onMounted(() => {
-  getToken();
-});
+// --- 权限映射 ---
+// 趣味志愿者 position -> 组件映射
+const position = getData("funPosition") || "";
+const positionRoutes = {
+  TIMER: ["insert_score"],
+  EXECUTIVE_PRESIDENT: ["review_results", "confirm_results"],
+};
+
+const routes = {
+  insert_score: () => import("./insert-score.vue"),
+  review_results: () => import("./review-results.vue"),
+  confirm_results: () => import("./confirm-results.vue"),
+};
+
+const loadedComponents = shallowRef([]);
 
 // --- API 调用 ---
 const fetchEventList = async () => {
@@ -34,10 +45,10 @@ const fetchEventList = async () => {
     });
     const data = await res.json();
     if (data.statusCode === 200) {
-      eventList.value = data.data.map((item) => ({
-        label: item.eventName,
+      eventList.value = (data.data || []).map((item) => ({
+        label: `${item.eventName} - 第${item.round || 1}组`,
         value: item,
-        id: item.id,
+        id: `${item.eventId}_${item.round || 1}`,
       }));
     }
   } catch (e) {
@@ -45,23 +56,7 @@ const fetchEventList = async () => {
   }
 };
 
-// --- 路由系统 (根据趣味赛需求调整) ---
-const routes = {
-  insert_score: () => import("./insert-score.vue"),
-  review_results: () => import("./review-results.vue"),
-  confirm_results: () => import("./confirm-results.vue"),
-};
-
-// 假设的权限映射，实际需根据后端返回调整
-const permissionRoutes = {
-  UPLOAD_FUN_RESULT: "insert_score",
-  REVIEW_FUN_RESULT: "review_results",
-  CONFIRM_FUN_RESULT: "confirm_results",
-};
-
-const permissionList = getData("permission") || [];
-const loadedComponents = shallowRef([]);
-
+// --- 路由系统 ---
 const syncHash = () => {
   const hash = window.location.hash.slice(1);
   if (hash) {
@@ -82,7 +77,7 @@ const submitAll = () => {
 
 watch(selectedEvent, (newValue) => {
   if (newValue) {
-    window.location.hash = newValue.id;
+    window.location.hash = `${newValue.eventId}_${newValue.round || 1}`;
   }
 });
 
@@ -94,8 +89,8 @@ onMounted(async () => {
   const componentsToLoad = [];
   const alreadyAdded = new Set();
 
-  for (const permission of permissionList) {
-    const routeName = permissionRoutes[permission];
+  const allowedRoutes = positionRoutes[position] || [];
+  for (const routeName of allowedRoutes) {
     if (routeName && routes[routeName] && !alreadyAdded.has(routeName)) {
       const componentModule = await routes[routeName]();
       componentsToLoad.push(componentModule.default);
@@ -143,6 +138,7 @@ onMounted(async () => {
     </div>
 
     <Button
+      v-if="loadedComponents.length > 0 && loadedComponents[0] !== loading"
       id="submit-all-btn"
       label="提交"
       icon="pi pi-check"
