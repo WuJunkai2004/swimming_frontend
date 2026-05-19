@@ -17,14 +17,27 @@ const fetchResults = async () => {
   }
 
   loading.value = true;
-  fetch(`/api/funVolunteer/getReviewedResults?eventId=${props.currentEvent.id}`)
+  fetch(`/api/funVolunteer/getReviewedResults`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: getToken(),
+      eventId: props.currentEvent.eventId,
+      round: props.currentEvent.round || 1,
+    }),
+  })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
         results.value = data.data || [];
+      } else {
+        result.value = [];
       }
     })
-    .catch((e) => console.error("Fetch reviewed results error:", e))
+    .catch((e) => {
+      console.error("Fetch reviewed results error:", e);
+      result.value = [];
+    })
     .finally(() => (loading.value = false));
 };
 
@@ -42,12 +55,14 @@ const submitData = async () => {
     body: JSON.stringify({
       token: getToken(),
       eventId: props.currentEvent.id,
+      round: props.currentEvent.round || 1,
     }),
   })
     .then((res) => res.json())
-    .then((data) => {
+    .then(async (data) => {
       if (data.statusCode === 200) {
         alerts("提示", "成绩已最终确认");
+        await fetchResult();
       } else {
         alerts("错误", data.message);
       }
@@ -75,16 +90,53 @@ onMounted(() => {
         <div v-else-if="results.length === 0" class="text-center p-4">
           暂无待确认成绩
         </div>
-        <DataTable
-          v-else
-          :value="results"
-          responsiveLayout="scroll"
-          class="p-datatable-sm"
-        >
-          <Column field="athleteName" header="姓名"></Column>
-          <Column field="score" header="成绩 (秒)"></Column>
-          <Column field="reviewer" header="复核员"></Column>
-        </DataTable>
+        <div v-else>
+          <DataTable
+            :value="results"
+            responsiveLayout="scroll"
+            class="p-datatable-sm mb-4"
+            stripedRows
+          >
+            <Column field="road" header="道次" style="width: 5rem">
+              <template #body="slotProps">
+                <Tag :value="slotProps.data.road" severity="primary" />
+              </template>
+            </Column>
+            <Column field="college" header="学院"></Column>
+            <Column header="成绩">
+              <template #body="slotProps">
+                <span
+                  v-if="slotProps.data.isValid === false"
+                  class="text-red-500 font-bold"
+                >
+                  {{ slotProps.data.invalidReason || "无效" }}
+                </span>
+                <span v-else-if="slotProps.data.rawScore">
+                  {{ slotProps.data.rawScore }}
+                </span>
+                <span v-else class="text-400">--</span>
+              </template>
+            </Column>
+            <Column field="tempRanking" header="临时排名" style="width: 6rem">
+              <template #body="slotProps">
+                <span class="font-bold">{{
+                  slotProps.data.tempRanking || "--"
+                }}</span>
+              </template>
+            </Column>
+            <Column field="tempPoints" header="临时积分" style="width: 6rem">
+              <template #body="slotProps">
+                <span class="font-bold">{{
+                  slotProps.data.tempPoints || "--"
+                }}</span>
+              </template>
+            </Column>
+          </DataTable>
+
+          <Message severity="warn" :closable="false" class="mb-3">
+            确认后成绩将被锁定，志愿者无法再次修改，仅管理员可解锁修改。
+          </Message>
+        </div>
       </template>
     </Card>
   </div>

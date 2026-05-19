@@ -10,10 +10,19 @@ const gameDetail = ref(null);
 const totalPoints = ref([]);
 const events = ref([]);
 const selectedEvent = ref(null);
+const selectedRound = ref(null);
 const eventResults = ref(null);
 
 const loading = ref(false);
 const error = ref(null);
+
+const roundOptions = ref([
+  { label: "决赛（默认）", value: null },
+  ...Array.from({ length: 10 }, (_, i) => ({
+    label: `第 ${i + 1} 组`,
+    value: i + 1,
+  })),
+]);
 
 // --- API 调用 ---
 
@@ -25,7 +34,7 @@ const fetchGameDetail = async (gameId) => {
     const data = await res.json();
     if (data.statusCode === 200) {
       gameDetail.value = data.data;
-      events.value = data.data.events.map((ev) => ({
+      events.value = (data.data.events || []).map((ev) => ({
         label: ev.eventName,
         value: ev,
       }));
@@ -59,18 +68,23 @@ const fetchTotalPoints = async (gameId) => {
 };
 
 // 3. 获取单项成绩
-const fetchEventResults = async (gameId, eventId) => {
+const fetchEventResults = async (gameId, eventId, round) => {
   if (!gameId || !eventId) return;
   try {
-    const res = await fetch(
-      `/api/funGame/getEventResults?competitionId=${gameId}&eventId=${eventId}`,
-    );
+    let url = `/api/funGame/getEventResults?competitionId=${gameId}&eventId=${eventId}`;
+    if (round) {
+      url += `&round=${round}`;
+    }
+    const res = await fetch(url);
     const data = await res.json();
     if (data.statusCode === 200) {
       eventResults.value = data.data;
+    } else {
+      eventResults.value = null;
     }
   } catch (e) {
     console.error("Fetch event results error:", e);
+    eventResults.value = null;
   }
 };
 
@@ -89,9 +103,9 @@ const init = () => {
 
 watch(() => route.query.game, init);
 
-watch(selectedEvent, (newVal) => {
-  if (newVal && route.query.game) {
-    fetchEventResults(route.query.game, newVal.eventId);
+watch([selectedEvent, selectedRound], ([newEvent, newRound]) => {
+  if (newEvent && route.query.game) {
+    fetchEventResults(route.query.game, newEvent.eventId, newRound);
   }
 });
 
@@ -162,22 +176,47 @@ const backToList = () => {
           <Card class="shadow-2">
             <template #title>单项成绩查询</template>
             <template #content>
-              <div class="field mb-4">
-                <label class="block mb-2 font-bold">选择项目</label>
-                <Select
-                  v-model="selectedEvent"
-                  :options="events"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="请选择项目"
-                  class="w-full md:w-20rem"
-                />
+              <div class="flex flex-column md:flex-row gap-3 mb-4">
+                <div class="field mb-0 flex-1">
+                  <label class="block mb-2 font-bold">选择项目</label>
+                  <Select
+                    v-model="selectedEvent"
+                    :options="events"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="请选择项目"
+                    class="w-full"
+                  />
+                </div>
+                <div class="field mb-0" style="min-width: 10rem">
+                  <label class="block mb-2 font-bold">选择组别</label>
+                  <Select
+                    v-model="selectedRound"
+                    :options="roundOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="决赛"
+                    class="w-full"
+                  />
+                </div>
               </div>
 
               <div v-if="eventResults">
                 <div class="mb-3 p-3 surface-100 border-round">
                   <div class="text-xl font-bold mb-2">
                     {{ eventResults.eventName }}
+                    <Tag
+                      v-if="selectedRound"
+                      :value="`第 ${selectedRound} 组`"
+                      severity="info"
+                      class="ml-2"
+                    />
+                    <Tag
+                      v-else
+                      value="决赛"
+                      severity="warn"
+                      class="ml-2"
+                    />
                   </div>
                   <div
                     class="text-600"
@@ -194,8 +233,8 @@ const backToList = () => {
                 >
                   <Column
                     field="road"
-                    header="道次/组次"
-                    style="width: 6rem"
+                    header="道次"
+                    style="width: 5rem"
                   ></Column>
                   <Column field="college" header="学院"></Column>
                   <Column header="成绩">
