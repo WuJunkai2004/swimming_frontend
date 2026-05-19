@@ -1,8 +1,3 @@
-<script>
-// 页面打开期间持续保存在全局变量
-const globalTeamsPool = new Map();
-</script>
-
 <script setup>
 import { ref, onMounted } from "vue";
 import { useToken } from "#/useToken";
@@ -90,31 +85,7 @@ const fetchTeamsList = () => {
         error.value = data.message || "无法加载队伍列表";
         return;
       }
-      const fetchedTeams = data.data || [];
-
-      // 1. 将本次获取到的队伍合并到全局队伍池
-      fetchedTeams.forEach((t) => {
-        if (t.college) {
-          globalTeamsPool.set(t.college, {
-            teamId: t.teamId,
-            college: t.college,
-            members: t.members || [],
-          });
-        }
-      });
-
-      // 2. 构造当前项目的队伍列表
-      const currentEventTeams = [];
-      for (const [college, teamInfo] of globalTeamsPool.entries()) {
-        const fetchedTeam = fetchedTeams.find((t) => t.college === college);
-        currentEventTeams.push({
-          ...teamInfo,
-          round: fetchedTeam ? fetchedTeam.round || 0 : 0,
-          road: fetchedTeam ? fetchedTeam.road || 0 : 0,
-        });
-      }
-
-      teamsList.value = currentEventTeams;
+      teamsList.value = data.data || [];
     })
     .catch((e) => {
       error.value = "网络错误，请稍后重试";
@@ -337,7 +308,6 @@ const deleteTeam = (team) => {
       .then((data) => {
         if (data.statusCode === 200) {
           alerts("成功", "删除成功");
-          globalTeamsPool.delete(team.college);
           fetchTeamsList();
         } else {
           alerts("错误", data.message || "删除失败");
