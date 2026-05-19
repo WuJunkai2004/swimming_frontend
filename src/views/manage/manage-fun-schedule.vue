@@ -14,6 +14,7 @@ const foulState = useFoulEnum();
 // --- 2. 状态定义 ---
 const gameId = ref("");
 const eventId = ref("");
+const currentRound = ref(1);
 const eventsOptions = ref([]);
 
 const teamsList = ref([]); // 用于分道
@@ -39,6 +40,13 @@ const foulOptions = computed(() => {
   return Object.entries(foulState.foulMap).map(([value, label]) => ({
     label,
     value,
+  }));
+});
+
+const roundOptions = computed(() => {
+  return Array.from({ length: 10 }, (_, i) => ({
+    label: `第 ${i + 1} 组`,
+    value: i + 1,
   }));
 });
 
@@ -124,6 +132,7 @@ const saveLanes = () => {
   const teamRoads = teamsList.value.map((t) => ({
     teamId: t.teamId,
     road: t.road || 0,
+    round: currentRound.value,
   }));
 
   // 校验是否有重复道次 (除了0)
@@ -147,7 +156,7 @@ const saveLanes = () => {
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
-        alerts("成功", "道次分配成功");
+        alerts("成功", `第 ${currentRound.value} 组道次分配成功`);
         fetchAllData();
       } else {
         alerts("错误", data.message || "分道失败");
@@ -255,10 +264,20 @@ onMounted(() => {
       <TabPanels>
         <TabPanel value="0">
           <div class="flex flex-column gap-3">
-            <div class="flex justify-content-between align-items-center">
-              <span class="text-500 text-sm"
-                >在这里为各参赛队伍分配泳道。设置为 0 表示未分配。</span
-              >
+            <div class="flex justify-content-between align-items-center flex-wrap gap-3">
+              <div class="flex align-items-center gap-3">
+                <span class="text-500 text-sm"
+                  >在这里为各参赛队伍分配泳道。设置为 0 表示未分配。</span
+                >
+                <Select
+                  v-model="currentRound"
+                  :options="roundOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="选择组别"
+                  class="w-10rem"
+                />
+              </div>
               <Button
                 label="保存道次"
                 icon="pi pi-save"

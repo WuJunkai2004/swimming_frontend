@@ -111,6 +111,8 @@ const handleLogin = async () => {
         alerts("提示", "登录成功，正在跳转");
         setToken(data.data.token);
         saveData("gameId", selectedCompetitionId.value);
+        saveData("funPosition", data.data.position || "");
+        saveData("funName", data.data.name || "");
         router.push("/fun-volunteer");
       } else {
         alerts("警告", "登录失败: " + data.message);
