@@ -2182,6 +2182,80 @@ token+项目id
 {}
 ```
 
+### 更新道次分配
+
+- **Method:** `POST`
+- **Path:** `/admin/fun/updateRoad`
+- **Tags:** 趣味运动会管理员相关接口
+
+管理员更新已分配的道次，同步更新成绩记录中的道次
+
+#### Parameters
+
+##### `dto`
+
+- **In:** `query`
+
+管理员token+比赛ID+新的道次分配
+
+#### Request Body
+
+##### Content-Type: application/json
+
+- **`eventId` (required)**
+
+  `string`
+
+- **`token` (required)**
+
+  `string`
+
+- **`teamRoads`**
+
+  `array`
+
+  **Items:**
+
+  - **`road` (required)**
+
+    `integer`, format: `int32`
+
+  - **`teamId` (required)**
+
+    `integer`, format: `int64`
+
+  - **`round`**
+
+    `integer`, format: `int32`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "eventId": "",
+  "teamRoads": [
+    {
+      "teamId": 1,
+      "road": 1,
+      "round": 1
+    }
+  ]
+}
+```
+
+#### Responses
+
+##### Status: 200 OK
+
+###### Content-Type: \*/\*
+
+**Example:**
+
+```json
+{}
+```
+
 ### 管理员修改成绩
 
 - **Method:** `POST`
@@ -6192,6 +6266,80 @@ token+项目id
 }
 ```
 
+### FunAssignRoadDto
+
+- **Type:**`object`
+
+管理员token+比赛ID
+
+- **`eventId` (required)**
+
+  `string`
+
+- **`token` (required)**
+
+  `string`
+
+- **`teamRoads`**
+
+  `array`
+
+  **Items:**
+
+  - **`road` (required)**
+
+    `integer`, format: `int32`
+
+  - **`teamId` (required)**
+
+    `integer`, format: `int64`
+
+  - **`round`**
+
+    `integer`, format: `int32`
+
+**Example:**
+
+```json
+{
+  "token": "",
+  "eventId": "",
+  "teamRoads": [
+    {
+      "teamId": 1,
+      "road": 1,
+      "round": 1
+    }
+  ]
+}
+```
+
+### TeamRoad
+
+- **Type:**`object`
+
+* **`road` (required)**
+
+  `integer`, format: `int32`
+
+* **`teamId` (required)**
+
+  `integer`, format: `int64`
+
+* **`round`**
+
+  `integer`, format: `int32`
+
+**Example:**
+
+```json
+{
+  "teamId": 1,
+  "road": 1,
+  "round": 1
+}
+```
+
 ### FunUpdateResultDto
 
 - **Type:**`object`
@@ -6645,80 +6793,6 @@ token+项目id
   "road": [
     1
   ]
-}
-```
-
-### FunAssignRoadDto
-
-- **Type:**`object`
-
-管理员token+比赛ID
-
-- **`eventId` (required)**
-
-  `string`
-
-- **`token` (required)**
-
-  `string`
-
-- **`teamRoads`**
-
-  `array`
-
-  **Items:**
-
-  - **`road` (required)**
-
-    `integer`, format: `int32`
-
-  - **`teamId` (required)**
-
-    `integer`, format: `int64`
-
-  - **`round`**
-
-    `integer`, format: `int32`
-
-**Example:**
-
-```json
-{
-  "token": "",
-  "eventId": "",
-  "teamRoads": [
-    {
-      "teamId": 1,
-      "road": 1,
-      "round": 1
-    }
-  ]
-}
-```
-
-### TeamRoad
-
-- **Type:**`object`
-
-* **`road` (required)**
-
-  `integer`, format: `int32`
-
-* **`teamId` (required)**
-
-  `integer`, format: `int64`
-
-* **`round`**
-
-  `integer`, format: `int32`
-
-**Example:**
-
-```json
-{
-  "teamId": 1,
-  "road": 1,
-  "round": 1
 }
 ```
 

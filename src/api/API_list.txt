@@ -35,6 +35,7 @@
 /admin/getAdminList
 /admin/fun/updateVolunteer
 /admin/fun/updateTeam
+/admin/fun/updateRoad
 /admin/fun/updateResult
 /admin/fun/updateGame
 /admin/fun/updateEvent
