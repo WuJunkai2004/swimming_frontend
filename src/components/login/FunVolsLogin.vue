@@ -34,7 +34,9 @@ const queryCompetitions = async () => {
   if (!studentNumber.value) return;
 
   isQueryingCompetitions.value = true;
-  fetch(`/api/funVolunteer/queryCompetition?studentNumber=${studentNumber.value}`)
+  fetch(
+    `/api/funVolunteer/queryCompetition?studentNumber=${studentNumber.value}`,
+  )
     .then((response) => response.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -88,9 +90,9 @@ const handleLogin = async () => {
   }
 
   emit("update:isLoginning", true);
-  
+
   const pw_sha = await SHA256(password.value);
-  
+
   const payload = {
     name: props.username,
     studentNumber: studentNumber.value,
@@ -111,6 +113,7 @@ const handleLogin = async () => {
         alerts("提示", "登录成功，正在跳转");
         setToken(data.data.token);
         saveData("gameId", selectedCompetitionId.value);
+        saveData("funPosition", data.data.position || "");
         router.push("/fun-volunteer");
       } else {
         alerts("警告", "登录失败: " + data.message);
