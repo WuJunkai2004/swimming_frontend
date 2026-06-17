@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { activityApi } from '@/api/serve.js';
 
 // Vue Router 实例
 const route = useRoute();
@@ -26,7 +27,7 @@ const fetchNews = async (page) => {
     loadingMore.value = true;
   }
   error.value = null;
-  fetch(`/activity/getNewsList?page=${page}&limit=${limit.value}`)
+  activityApi.getNewsList({ page, limit: limit.value })
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {

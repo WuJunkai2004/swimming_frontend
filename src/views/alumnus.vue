@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { alumnusApi } from '@/api/serve.js';
 // --- 1. 状态定义 ---
 // 优秀校友列表的状态
 const playersList = ref([]);
@@ -17,7 +18,7 @@ const playerDialogRef = ref(null);
 const fetchPlayerList = async () => {
   isListLoading.value = true;
   listError.value = null;
-  fetch('/alumnus/getAlumnusList')
+  alumnusApi.getAlumnusList()
   .then(response => response.json())
   .then(data => {
     if(data && data.statusCode === 200){

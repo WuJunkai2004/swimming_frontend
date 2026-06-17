@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { leaderApi } from '@/api/serve.js';
 // --- 1. 状态定义 ---
 // 领导列表的状态
 const leadersList = ref([]);
@@ -17,7 +18,7 @@ const leaderDialogRef = ref(null);
 const fetchLeaderList = async () => {
   isListLoading.value = true;
   listError.value = null;
-  fetch('/leader/getLeaderList')
+  leaderApi.getLeaderList()
   .then(response => response.json())
   .then(data => {
     if(data && data.statusCode === 200){

@@ -2,6 +2,7 @@
 import router from "@/router";
 import { ref, watch, onMounted,computed } from "vue";
 import { useRoute } from "vue-router";
+import { activityApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const route = useRoute();
@@ -15,7 +16,7 @@ const fetchNewsDetail = async (id) => {
   loading.value = true;
   error.value = null;
   newsDetail.value = null;
-  fetch(`/activity/getNewsDetail?id=${id}`)
+  activityApi.getNewsDetail({ id })
     .then((response) => response.json())
     .then((data) => {
       if (data && data.statusCode === 200) {

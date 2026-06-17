@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { competitionApi } from '@/api/serve.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -45,7 +46,7 @@ const fetchCompetitions = async (page) => {
   loading.value = true;
   error.value = null;
 
-  fetch(`/api/competition/list?page=${page}&limit=${limit.value}`)
+  competitionApi.list({ page, size: limit.value })
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {

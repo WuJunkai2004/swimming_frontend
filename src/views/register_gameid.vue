@@ -3,6 +3,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAlert } from '#/useAlert';
+import { sportApi } from '@/api/serve.js';
 
 // --- 2. 静态资源导入 ---;
 // 导入学院枚举数据
@@ -45,7 +46,7 @@ const collegeOptions = ref(
 const fetchGameInfo = async () => {
   isLoading.value = true;
   error.value = null;
-  fetch(`/sport/getGameInfo?game=${gameId}`)
+  sportApi.getGameInfo({ game: gameId })
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
@@ -89,16 +90,10 @@ const handleSubmit = async () => {
     academicNumber: academicNumber.value,
     sportType: selectedSport.value,
     college: selectedCollege.value,
-    gameId: gameId
+    competitionId: gameId
   };
 
-  fetch('/sport/register', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(registrationData)
-  })
+  sportApi.register(registrationData)
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
