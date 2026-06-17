@@ -16,7 +16,7 @@ class endpoint {
    *
    * @param {Map<String, any>} params
    */
-  request(params) {
+  request(params = {}) {
     // Validate required parameters
     for (let param of this.required) {
       if (!(param in params)) {
