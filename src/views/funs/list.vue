@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { funGameApi } from "@/api/serve.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -44,8 +45,7 @@ const fetchCompetitions = async (page) => {
   loading.value = true;
   error.value = null;
 
-  // 使用接口文档中的接口: GET /api/funGame/list?page=1&size=10
-  fetch(`/api/funGame/list?page=${page}&size=${limit.value}`)
+  funGameApi.getGameList({ page, size: limit.value })
     .then((response) => response.json())
     .then((result) => {
       if (result.statusCode === 200) {

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { funGameApi } from "@/api/serve.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -30,7 +31,7 @@ const roundOptions = ref([
 const fetchGameDetail = async (gameId) => {
   loading.value = true;
   try {
-    const res = await fetch(`/api/funGame/detail?competitionId=${gameId}`);
+    const res = await funGameApi.getGameDetail({ competitionId: gameId });
     const data = await res.json();
     if (data.statusCode === 200) {
       gameDetail.value = data.data;
@@ -55,9 +56,7 @@ const fetchGameDetail = async (gameId) => {
 // 2. 获取总积分
 const fetchTotalPoints = async (gameId) => {
   try {
-    const res = await fetch(
-      `/api/funGame/getTotalPoints?competitionId=${gameId}`,
-    );
+    const res = await funGameApi.getTotalPoints({ competitionId: gameId });
     const data = await res.json();
     if (data.statusCode === 200) {
       totalPoints.value = data.data;
@@ -71,11 +70,11 @@ const fetchTotalPoints = async (gameId) => {
 const fetchEventResults = async (gameId, eventId, round) => {
   if (!gameId || !eventId) return;
   try {
-    let url = `/api/funGame/getEventResults?competitionId=${gameId}&eventId=${eventId}`;
+    const params = { competitionId: gameId, eventId };
     if (round) {
-      url += `&round=${round}`;
+      params.round = round;
     }
-    const res = await fetch(url);
+    const res = await funGameApi.getEventResults(params);
     const data = await res.json();
     if (data.statusCode === 200) {
       eventResults.value = data.data;

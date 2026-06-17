@@ -3,6 +3,7 @@ import { ref, watch, onMounted } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
 import { useFoulEnum } from "#/foulMapping";
+import { funVolunteerApi } from "@/api/serve.js";
 
 const props = defineProps(["currentEvent"]);
 
@@ -20,14 +21,10 @@ const fetchResults = async () => {
 
   loading.value = true;
   try {
-    const res = await fetch("/api/funVolunteer/reviewResults", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: getToken(),
-        eventId: props.currentEvent.eventId,
-        round: props.currentEvent.round || 1,
-      }),
+    const res = await funVolunteerApi.reviewResults({
+      token: getToken(),
+      eventId: props.currentEvent.eventId,
+      round: props.currentEvent.round || 1,
     });
     const data = await res.json();
     if (data.statusCode === 200) {
@@ -100,11 +97,7 @@ const submitData = async () => {
     }
 
     try {
-      const res = await fetch("/api/funVolunteer/uploadResult", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await funVolunteerApi.uploadResult(payload);
       const data = await res.json();
       if (data.statusCode === 200) {
         successCount++;

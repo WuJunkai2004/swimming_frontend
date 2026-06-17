@@ -2,6 +2,7 @@
 import { ref, watch, onMounted } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
+import { funVolunteerApi } from "@/api/serve.js";
 
 const props = defineProps(["currentEvent"]);
 
@@ -49,14 +50,10 @@ const submitData = async () => {
     return;
   }
 
-  fetch("/api/funVolunteer/confirmResults", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      eventId: props.currentEvent.id,
-      round: props.currentEvent.round || 1,
-    }),
+  funVolunteerApi.confirmResults({
+    token: getToken(),
+    eventId: props.currentEvent.id,
+    round: props.currentEvent.round || 1,
   })
     .then((res) => res.json())
     .then(async (data) => {

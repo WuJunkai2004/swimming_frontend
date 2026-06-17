@@ -2,6 +2,7 @@
 import { onMounted, shallowRef, ref, watch, computed } from "vue";
 import { useToken } from "#/useToken";
 import { getData } from "#/useStorage";
+import { funVolunteerApi } from "@/api/serve.js";
 import loading from "@/views/loading.vue";
 
 const { getToken } = useToken();
@@ -21,15 +22,9 @@ const fetchEventList = async () => {
   if (!gameId) return;
 
   try {
-    const res = await fetch("/api/funVolunteer/getEventList", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: getToken(),
-        competitionId: gameId,
-      }),
+    const res = await funVolunteerApi.getEventList({
+      token: getToken(),
+      competitionId: gameId,
     });
     const data = await res.json();
     if (data.statusCode === 200) {
