@@ -1,9 +1,9 @@
-<script setup>
-</script>
+<script setup></script>
 
 <template>
-  <router-view/>
-  <ConfirmDialog/>
+  <router-view />
+  <ICPBar />
+  <ConfirmDialog />
 </template>
 
 <style scoped></style>
