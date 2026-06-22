@@ -26,6 +26,7 @@ const isNew = ref(true);
 const editForm = ref({
   teamId: null,
   college: "",
+  teamName: "",
   members: [], // [{ name, studentNumber, college }]
 });
 
@@ -235,14 +236,19 @@ const saveTeam = () => {
     }
   }
 
+  if (editForm.value.teamName.length > 79) {
+    alerts("警告", "队伍名称不能超过 80 字");
+    return;
+  }
+
   isSaving.value = true;
 
   const requestBody = {
     token: getToken(),
     competitionId: gameId.value,
     eventId: eventId.value,
-    college: collegeMap[editForm.value.college] ? editForm.value.college : "",
-    teamName: editForm.value.college,
+    college: editForm.value.college,
+    teamName: editForm.value.teamName,
     members: validMembers,
   };
 
@@ -273,7 +279,7 @@ const saveTeam = () => {
 const deleteTeam = (team) => {
   awaitAlert(
     "确认",
-    `确定要删除“${collegeMap[team.college] || team.college || team.teamName}”的参赛队伍吗？`,
+    `确定要删除“${team.teamName || collegeMap[team.college] || team.college}”的参赛队伍吗？`,
     {
       accept: "确认删除",
       reject: "取消",
@@ -378,9 +384,9 @@ onMounted(() => {
       <Column field="college" header="队伍" sortable>
         <template #body="slotProps">
           {{
+            slotProps.data.teamName ||
             collegeMap[slotProps.data.college] ||
-            slotProps.data.college ||
-            slotProps.data.teamName
+            slotProps.data.college
           }}
         </template>
       </Column>
@@ -463,7 +469,7 @@ onMounted(() => {
             class="font-bold text-lg flex align-items-center"
           >
             <i class="pi pi-map-marker mr-2 text-primary"></i>
-            队伍名称
+            所属学院
           </label>
           <Select
             id="college"
@@ -473,8 +479,23 @@ onMounted(() => {
             optionValue="value"
             placeholder="请选择或直接填写"
             filter
-            editable
             fluid
+            class="w-full shadow-1"
+          />
+        </div>
+        <!-- 队伍名称输入 可选 -->
+        <div class="flex flex-column gap-2">
+          <label
+            for="teamName"
+            class="font-bold text-lg flex align-items-center"
+            ><i class="pi pi-id-card mr-2 text-primary"></i> 队伍名称
+            (可选)</label
+          >
+          <InputText
+            id="teamName"
+            v-model="editForm.teamName"
+            placeholder="若不填写，则默认使用学院名称"
+            size="small"
             class="w-full shadow-1"
           />
         </div>
