@@ -3,14 +3,12 @@ import { ref, onMounted, computed } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
 import { useCollegeEnum } from "#/collegeMapping";
-import { useFoulEnum } from "#/foulMapping";
 import { adminFunApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
-const { alerts, awaitAlert } = useAlert();
+const { alerts } = useAlert();
 const { collegeMap } = useCollegeEnum();
-const foulState = useFoulEnum();
 
 // --- 2. 状态定义 ---
 const gameId = ref("");
@@ -30,15 +28,7 @@ const editResultForm = ref({
   teamName: "",
   rawScore: "",
   isValid: true,
-  invalidType: null,
   invalidReason: "",
-});
-
-const foulOptions = computed(() => {
-  return Object.entries(foulState.foulMap).map(([value, label]) => ({
-    label,
-    value,
-  }));
 });
 
 // --- 3. API 调用 ---
@@ -48,10 +38,11 @@ const fetchEventsOptions = () => {
   if (!gameId.value) return;
   isLoading.value = true;
 
-  adminFunApi.getEventList({
-    token: getToken(),
-    competitionId: gameId.value,
-  })
+  adminFunApi
+    .getEventList({
+      token: getToken(),
+      competitionId: gameId.value,
+    })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -80,7 +71,8 @@ const fetchAllData = () => {
   isLoading.value = true;
   error.value = null;
 
-  adminFunApi.getResults({ token: getToken(), eventId: eventId.value })
+  adminFunApi
+    .getResults({ token: getToken(), eventId: eventId.value })
     .then((res) => res.json())
     .then((resultsData) => {
       if (resultsData.statusCode === 200) {
@@ -104,7 +96,6 @@ const openEditResultDialog = (result) => {
     teamName: collegeMap[result.college] || result.college,
     rawScore: result.rawScore,
     isValid: result.isValid,
-    invalidType: result.invalidType,
     invalidReason: result.invalidReason,
   };
   isEditResultVisible.value = true;
@@ -113,7 +104,8 @@ const openEditResultDialog = (result) => {
 // 保存成绩
 const saveResult = () => {
   isSavingResult.value = true;
-  adminFunApi.updateResult({
+  adminFunApi
+    .updateResult({
       token: getToken(),
       ...editResultForm.value,
     })
@@ -252,18 +244,7 @@ onMounted(() => {
           class="flex flex-column gap-3 animate-fadein"
         >
           <div class="flex flex-column gap-1">
-            <label class="font-bold text-red-500">犯规类型</label>
-            <Select
-              v-model="editResultForm.invalidType"
-              :options="foulOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="选择犯规原因"
-              fluid
-            />
-          </div>
-          <div class="flex flex-column gap-1">
-            <label class="font-bold">详细备注</label>
+            <label class="font-bold">犯规原因</label>
             <Textarea
               v-model="editResultForm.invalidReason"
               rows="2"
