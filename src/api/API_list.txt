@@ -75,6 +75,7 @@
 /api/funGame/list
 /api/funGame/getTotalPoints
 /api/funGame/getEventResults
+/api/funGame/foulReason
 /api/funGame/detail
 /api/contract/template
 /api/contract/check

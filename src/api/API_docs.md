@@ -2150,6 +2150,10 @@ token+项目id
 
   `string`
 
+- **`teamName`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -2159,6 +2163,7 @@ token+项目id
   "eventId": "",
   "teamId": "",
   "college": "SCHOOL_OF_ELECTRICAL_ENGINEERING_AND_AUTOMATION",
+  "teamName": "",
   "members": [
     {
       "studentNumber": "",
@@ -3161,6 +3166,10 @@ token+项目id
 
   `string`
 
+- **`teamName`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -3170,6 +3179,7 @@ token+项目id
   "eventId": "",
   "teamId": "",
   "college": "SCHOOL_OF_ELECTRICAL_ENGINEERING_AND_AUTOMATION",
+  "teamName": "",
   "members": [
     {
       "studentNumber": "",
@@ -4271,6 +4281,24 @@ token+项目id
 - **In:** `query`
 
 `integer`, format: `int32`
+
+#### Responses
+
+##### Status: 200 OK
+
+###### Content-Type: \*/\*
+
+**Example:**
+
+```json
+{}
+```
+
+### 公众查询犯规枚举
+
+- **Method:** `GET`
+- **Path:** `/api/funGame/foulReason`
+- **Tags:** fun-public-controller
 
 #### Responses
 
@@ -6220,6 +6248,10 @@ token+项目id
 
   `string`
 
+- **`teamName`**
+
+  `string`
+
 **Example:**
 
 ```json
@@ -6229,6 +6261,7 @@ token+项目id
   "eventId": "",
   "teamId": "",
   "college": "SCHOOL_OF_ELECTRICAL_ENGINEERING_AND_AUTOMATION",
+  "teamName": "",
   "members": [
     {
       "studentNumber": "",
