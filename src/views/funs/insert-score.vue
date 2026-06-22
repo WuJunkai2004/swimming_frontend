@@ -31,6 +31,14 @@ const resetForm = () => {
 watch(() => props.currentEvent, resetForm);
 
 const submitData = async () => {
+  console.log("提交成绩", {
+    eventId: props.currentEvent?.eventId,
+    road: road.value,
+    rawScore: rawScore.value,
+    isValid: isValid.value,
+    invalidType: invalidType.value,
+    invalidReason: invalidReason.value,
+  });
   if (!props.currentEvent) {
     alerts("警告", "请先选择比赛项目");
     return;
@@ -62,30 +70,35 @@ const submitData = async () => {
     payload.invalidReason = invalidReason.value || undefined;
   }
 
-  try {
-    const res = await funVolunteerApi.uploadResult(payload);
-    const data = await res.json();
-    if (data.statusCode === 200) {
-      alerts("成功", `第 ${road.value} 道成绩提交成功`);
-      resetForm();
-    } else {
-      alerts("失败", data.message || "提交失败");
-    }
-  } catch (e) {
-    console.error(e);
-    alerts("错误", "网络异常，提交出错");
-  } finally {
-    submitting.value = false;
-  }
+  funVolunteerApi
+    .uploadResult(payload)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.statusCode === 200) {
+        alerts("成功", `第 ${road.value} 道成绩提交成功`);
+        resetForm();
+      } else {
+        alerts("失败", data.message || "提交失败");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      alerts("错误", "网络异常，提交出错");
+    })
+    .finally(() => {
+      submitting.value = false;
+    });
 };
 
 defineExpose({ submit: submitData });
 
 onMounted(() => {
-  foulOptions.value = Object.entries(foulState.foulMap).map(([value, label]) => ({
-    label,
-    value,
-  }));
+  foulOptions.value = Object.entries(foulState.foulMap).map(
+    ([value, label]) => ({
+      label,
+      value,
+    }),
+  );
 });
 </script>
 
@@ -113,7 +126,9 @@ onMounted(() => {
                 placeholder="输入成绩"
                 class="w-full"
               />
-              <span class="text-color-secondary whitespace-nowrap">{{ props.currentEvent?.unit || '' }}</span>
+              <span class="text-color-secondary whitespace-nowrap">{{
+                props.currentEvent?.unit || ""
+              }}</span>
             </div>
           </div>
 
@@ -143,13 +158,6 @@ onMounted(() => {
               />
             </div>
           </div>
-
-          <Button
-            label="提交该道次成绩"
-            icon="pi pi-check"
-            :loading="submitting"
-            @click="submitData"
-          />
         </div>
       </template>
     </Card>

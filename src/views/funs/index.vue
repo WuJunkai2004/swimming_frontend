@@ -54,6 +54,7 @@ const routes = {
 };
 
 const loadedComponents = shallowRef([]);
+const childRefs = ref([]);
 
 const syncHash = () => {
   const hash = window.location.hash.slice(1);
@@ -66,7 +67,7 @@ const syncHash = () => {
 };
 
 const submitAll = () => {
-  for (let component of loadedComponents.value) {
+  for (let component of childRefs.value) {
     if (component && component.submit) {
       component.submit();
     }
@@ -132,7 +133,15 @@ onMounted(async () => {
       :key="index"
       class="content-window"
     >
-      <component :is="currentView" :current-event="selectedEvent" />
+      <component
+        :is="currentView"
+        :current-event="selectedEvent"
+        :ref="
+          (el) => {
+            if (el) childRefs.push(el);
+          }
+        "
+      />
     </div>
 
     <Button
