@@ -58,7 +58,7 @@ class apiClient {
     return new Proxy(this, {
       get(target, prop) {
         if (prop in target.endpoints) {
-          return target.endpoints[prop].request;
+          return target.endpoints[prop].request.bind(target.endpoints[prop]);
         }
         return target[prop];
       },
