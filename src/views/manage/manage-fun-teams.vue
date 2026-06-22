@@ -41,10 +41,11 @@ const collegeOptions = collegeEnum.map((key) => ({
 const fetchEventsOptions = () => {
   if (!gameId.value) return;
 
-  adminFunApi.getEventList({
-    token: getToken(),
-    competitionId: gameId.value,
-  })
+  adminFunApi
+    .getEventList({
+      token: getToken(),
+      competitionId: gameId.value,
+    })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -68,10 +69,11 @@ const fetchTeamsList = () => {
   isLoading.value = true;
   error.value = null;
 
-  adminFunApi.getTeamList({
-    token: getToken(),
-    eventId: eventId.value,
-  })
+  adminFunApi
+    .getTeamList({
+      token: getToken(),
+      eventId: eventId.value,
+    })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode !== 200) {
@@ -149,11 +151,12 @@ const saveLanes = () => {
   }
 
   isSavingLanes.value = true;
-  adminFunApi.assignRoad({
-    token: getToken(),
-    eventId: eventId.value,
-    teamRoads,
-  })
+  adminFunApi
+    .assignRoad({
+      token: getToken(),
+      eventId: eventId.value,
+      teamRoads,
+    })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -238,7 +241,8 @@ const saveTeam = () => {
     token: getToken(),
     competitionId: gameId.value,
     eventId: eventId.value,
-    college: editForm.value.college,
+    college: collegeMap[editForm.value.college] ? editForm.value.college : "",
+    teamName: editForm.value.college,
     members: validMembers,
   };
 
@@ -269,7 +273,7 @@ const saveTeam = () => {
 const deleteTeam = (team) => {
   awaitAlert(
     "确认",
-    `确定要删除“${collegeMap[team.college] || team.college}”的参赛队伍吗？`,
+    `确定要删除“${collegeMap[team.college] || team.college || team.teamName}”的参赛队伍吗？`,
     {
       accept: "确认删除",
       reject: "取消",
@@ -278,7 +282,8 @@ const deleteTeam = (team) => {
   ).then((confirm) => {
     if (!confirm) return;
 
-    adminFunApi.deleteTeam({
+    adminFunApi
+      .deleteTeam({
         token: getToken(),
         teamId: team.teamId,
       })
@@ -370,9 +375,13 @@ onMounted(() => {
     </div>
 
     <DataTable v-else :value="teamsList" responsiveLayout="scroll" stripedRows>
-      <Column field="college" header="所属学院" sortable>
+      <Column field="college" header="队伍" sortable>
         <template #body="slotProps">
-          {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+          {{
+            collegeMap[slotProps.data.college] ||
+            slotProps.data.college ||
+            slotProps.data.teamName
+          }}
         </template>
       </Column>
       <Column header="轮次" style="width: 120px">
