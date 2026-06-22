@@ -18,26 +18,22 @@ const fetchResults = async () => {
   }
 
   loading.value = true;
-  fetch(`/api/funVolunteer/getReviewedResults`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      eventId: props.currentEvent.eventId,
-      round: props.currentEvent.round || 1,
-    }),
+  funVolunteerApi.reviewResults({
+    token: getToken(),
+    eventId: props.currentEvent.id,
+    round: props.currentEvent.round || 1,
   })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
         results.value = data.data || [];
       } else {
-        result.value = [];
+        results.value = [];
       }
     })
     .catch((e) => {
       console.error("Fetch reviewed results error:", e);
-      result.value = [];
+      results.value = [];
     })
     .finally(() => (loading.value = false));
 };

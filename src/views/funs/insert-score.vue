@@ -3,6 +3,7 @@ import { ref, watch, onMounted } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
 import { useFoulEnum } from "#/foulMapping";
+import { getData } from "#/useStorage";
 import { funVolunteerApi } from "@/api/serve.js";
 
 const props = defineProps(["currentEvent"]);
@@ -11,57 +12,23 @@ const { getToken } = useToken();
 const { alerts } = useAlert();
 const foulState = useFoulEnum();
 
-const results = ref([]);
-const loading = ref(false);
-const hasChanges = ref(false);
-
-// 从 reviewResults 获取当前项目+轮次的道次列表和成绩
-const fetchResults = async () => {
-  if (!props.currentEvent) return;
-
-  loading.value = true;
-  try {
-    const res = await funVolunteerApi.reviewResults({
-      token: getToken(),
-      eventId: props.currentEvent.eventId,
-      round: props.currentEvent.round || 1,
-    });
-    const data = await res.json();
-    if (data.statusCode === 200) {
-      // 为每条记录增加编辑字段
-      results.value = (data.data || []).map((item) => ({
-        ...item,
-        _rawScore: item.rawScore,
-        _isValid: item.isValid !== false,
-        _invalidType: item.invalidType || null,
-        _invalidReason: item.invalidReason || "",
-      }));
-      hasChanges.value = false;
-    } else {
-      alerts("错误", data.message || "获取成绩列表失败");
-      results.value = [];
-    }
-  } catch (e) {
-    console.error("Fetch results error:", e);
-    alerts("错误", "网络异常，无法获取成绩列表");
-  } finally {
-    loading.value = false;
-  }
-};
-
-watch(() => props.currentEvent, fetchResults);
+const road = ref(getData("road") || "");
+const rawScore = ref("");
+const isValid = ref(true);
+const invalidType = ref("");
+const invalidReason = ref("");
+const submitting = ref(false);
 
 const foulOptions = ref([]);
-const loadFoulOptions = () => {
-  foulOptions.value = Object.entries(foulState.foulMap).map(([value, label]) => ({
-    label,
-    value,
-  }));
+
+const resetForm = () => {
+  rawScore.value = "";
+  isValid.value = true;
+  invalidType.value = "";
+  invalidReason.value = "";
 };
 
-const markChanged = () => {
-  hasChanges.value = true;
-};
+watch(() => props.currentEvent, resetForm);
 
 const submitData = async () => {
   if (!props.currentEvent) {
@@ -69,63 +36,56 @@ const submitData = async () => {
     return;
   }
 
-  if (!hasChanges.value) {
-    alerts("提示", "没有需要提交的修改");
+  if (!road.value || isNaN(Number(road.value))) {
+    alerts("警告", "请输入有效的道次");
     return;
   }
 
-  const token = getToken();
-  const eventId = props.currentEvent.eventId;
-  const round = props.currentEvent.round || 1;
-
-  let successCount = 0;
-  let failCount = 0;
-
-  for (const item of results.value) {
-    const payload = {
-      token,
-      eventId,
-      road: item.road,
-      round,
-      rawScore: item._rawScore,
-      isValid: item._isValid,
-    };
-
-    if (!item._isValid) {
-      payload.invalidType = item._invalidType;
-      payload.invalidReason = item._invalidReason;
-    }
-
-    try {
-      const res = await funVolunteerApi.uploadResult(payload);
-      const data = await res.json();
-      if (data.statusCode === 200) {
-        successCount++;
-      } else {
-        failCount++;
-        console.error(`Upload failed for road ${item.road}:`, data.message);
-      }
-    } catch (e) {
-      failCount++;
-      console.error(`Upload error for road ${item.road}:`, e);
-    }
+  if (!rawScore.value) {
+    alerts("警告", "请输入成绩");
+    return;
   }
 
-  if (failCount === 0) {
-    alerts("提示", `成功录入 ${successCount} 条成绩`);
-    hasChanges.value = false;
-    await fetchResults();
-  } else {
-    alerts("错误", `成功 ${successCount} 条，失败 ${failCount} 条，请检查网络或刷新重试`);
-    await fetchResults();
+  submitting.value = true;
+
+  const payload = {
+    token: getToken(),
+    eventId: props.currentEvent.eventId,
+    road: Number(road.value),
+    round: props.currentEvent.round || 1,
+    rawScore: Number(rawScore.value),
+    isValid: isValid.value,
+  };
+
+  if (!isValid.value) {
+    payload.invalidType = invalidType.value || undefined;
+    payload.invalidReason = invalidReason.value || undefined;
+  }
+
+  try {
+    const res = await funVolunteerApi.uploadResult(payload);
+    const data = await res.json();
+    if (data.statusCode === 200) {
+      alerts("成功", `第 ${road.value} 道成绩提交成功`);
+      resetForm();
+    } else {
+      alerts("失败", data.message || "提交失败");
+    }
+  } catch (e) {
+    console.error(e);
+    alerts("错误", "网络异常，提交出错");
+  } finally {
+    submitting.value = false;
   }
 };
 
 defineExpose({ submit: submitData });
 
 onMounted(() => {
-  loadFoulOptions();
-  if (props.currentEvent) fetchResults();
+  foulOptions.value = Object.entries(foulState.foulMap).map(([value, label]) => ({
+    label,
+    value,
+  }));
 });
 </script>
 
@@ -134,63 +94,62 @@ onMounted(() => {
     <Card>
       <template #title>成绩录入</template>
       <template #content>
-        <div v-if="loading" class="text-center p-4">
-          <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
-        </div>
-        <div v-else-if="results.length === 0" class="text-center p-4">
-          请选择项目或该项目暂无选手
-        </div>
-        <div v-else class="flex flex-column gap-3">
-          <div
-            v-for="item in results"
-            :key="item.road"
-            class="p-3 border-round surface-card shadow-1 border-1 surface-border"
-          >
-            <div class="flex align-items-center justify-content-between mb-2">
-              <div class="flex align-items-center gap-2">
-                <Tag :value="`第 ${item.road} 道`" severity="primary" />
-                <span class="font-bold">{{ item.college }}</span>
-              </div>
-              <div class="flex align-items-center gap-2">
-                <label class="text-sm">成绩有效</label>
-                <Checkbox
-                  v-model="item._isValid"
-                  :binary="true"
-                  @change="markChanged"
-                />
-              </div>
-            </div>
+        <div class="flex flex-column gap-3">
+          <div class="field">
+            <label class="block mb-2 font-bold">道次</label>
+            <InputText
+              v-model="road"
+              placeholder="道次号"
+              class="w-full"
+              disabled
+            />
+          </div>
 
-            <div class="flex flex-column gap-2">
-              <div class="flex align-items-center gap-2">
-                <InputText
-                  v-model="item._rawScore"
-                  placeholder="输入成绩"
-                  class="w-10rem"
-                  @update:model-value="markChanged"
-                />
-                <span class="text-color-secondary">{{ props.currentEvent?.unit || '' }}</span>
-              </div>
-
-              <div v-if="!item._isValid" class="flex flex-column gap-2 mt-2">
-                <Select
-                  v-model="item._invalidType"
-                  :options="foulOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="选择犯规类型"
-                  class="w-full"
-                  @update:model-value="markChanged"
-                />
-                <InputText
-                  v-model="item._invalidReason"
-                  placeholder="犯规原因备注（可选）"
-                  class="w-full"
-                  @update:model-value="markChanged"
-                />
-              </div>
+          <div class="field">
+            <label class="block mb-2 font-bold">成绩</label>
+            <div class="flex align-items-center gap-2">
+              <InputText
+                v-model="rawScore"
+                placeholder="输入成绩"
+                class="w-full"
+              />
+              <span class="text-color-secondary whitespace-nowrap">{{ props.currentEvent?.unit || '' }}</span>
             </div>
           </div>
+
+          <div class="field-checkbox flex align-items-center gap-2">
+            <Checkbox v-model="isValid" :binary="true" inputId="validCheck" />
+            <label for="validCheck" class="font-bold">成绩有效</label>
+          </div>
+
+          <div v-if="!isValid" class="flex flex-column gap-2">
+            <div class="field">
+              <label class="block mb-2">犯规类型</label>
+              <Select
+                v-model="invalidType"
+                :options="foulOptions"
+                option-label="label"
+                option-value="value"
+                placeholder="选择犯规类型"
+                class="w-full"
+              />
+            </div>
+            <div class="field">
+              <label class="block mb-2">犯规原因备注（可选）</label>
+              <InputText
+                v-model="invalidReason"
+                placeholder="输入备注"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <Button
+            label="提交该道次成绩"
+            icon="pi pi-check"
+            :loading="submitting"
+            @click="submitData"
+          />
         </div>
       </template>
     </Card>

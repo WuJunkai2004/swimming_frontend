@@ -114,6 +114,9 @@ const handleLogin = async () => {
         setToken(data.data.token);
         saveData("gameId", selectedCompetitionId.value);
         saveData("funPosition", data.data.position || "");
+        if (data.data.road) {
+          saveData("road", data.data.road);
+        }
         router.push("/fun-volunteer");
       } else {
         alerts("警告", "登录失败: " + data.message);

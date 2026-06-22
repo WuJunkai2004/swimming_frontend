@@ -96,7 +96,7 @@ const init = () => {
     fetchTotalPoints(gameId);
   } else {
     // 如果没有 game ID，跳转回列表页
-    router.replace("/fun/list");
+    router.replace("/fun/games");
   }
 };
 
@@ -135,12 +135,6 @@ const backToList = () => {
 
         <div v-else-if="gameDetail">
           <div class="flex align-items-center mb-3">
-            <Button
-              icon="pi pi-arrow-left"
-              class="p-button-text mr-2"
-              @click="backToList"
-              label="返回列表"
-            />
             <h2 class="m-0">{{ gameDetail.gameName }}</h2>
           </div>
 
