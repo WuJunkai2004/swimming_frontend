@@ -4,6 +4,7 @@ import { getData } from "#/useStorage";
 import { useAlert } from "#/useAlert";
 import { useToken } from "#/useToken";
 import { useRouter } from "vue-router";
+import { volunteerApi } from "@/api/serve.js";
 
 const props = defineProps(["currentProgram"]);
 
@@ -66,29 +67,20 @@ const submitData = async () => {
   try {
     const token = getToken();
     const payload = {
+      type: "TECHNICAL_INSPECTION_OF_SWIMMING_IN",
       token: token,
       gameId: gameId.value,
-      // 使用选定项目的 program 字段作为标识符
       id: props.currentProgram.program,
 
       data: {
-        foulOrNot: true, // 既然选了泳道并提交，肯定是有犯规
+        foulOrNot: true,
         foulReason: selectedFoulReason.value,
         foulDescription: foulDescription.value,
-        road: foulOccurred.value, // 必须带上泳道号
+        road: foulOccurred.value,
       },
     };
 
-    const res = await fetch(
-      "/api/volunteer/uploadData?type=TECHNICAL_INSPECTION_OF_SWIMMING_IN",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      },
-    );
+    const res = await volunteerApi.uploadData(payload);
 
     const data = await res.json();
     if (data.statusCode === 200) {

@@ -4,6 +4,7 @@ import { useToken } from '#/useToken';
 import { getData, saveData } from '#/useStorage';
 import { useAlert } from "#/useAlert";
 import { useEventEnum } from '#/eventMapping';
+import { volunteerApi, competitionApi } from '@/api/serve.js';
 import loading from '@/views/loading.vue';
 
 const { getToken } = useToken();
@@ -50,17 +51,11 @@ const fetchCompetitionList = async () => {
     const gameId = getData('gameId');
     const time = getCurrentTimePeriod();
 
-    const res = await fetch("/api/volunteer/getCompetitionList", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: token,
-        gameId: gameId,
-        time: time,
-        marked: selectedProgram.value.marked
-      }),
+    const res = await volunteerApi.getCompetitionList({
+      token: token,
+      gameId: gameId,
+      time: time,
+      marked: selectedProgram.value.marked
     });
 
     const data = await res.json();
@@ -138,7 +133,7 @@ const loadSchedule = async () => {
   }
 
   try {
-    const response = await fetch(`/api/competition/getGameSchedule?id=${gameId}`);
+    const response = await competitionApi.getGameSchedule({ id: gameId });
     const data = await response.json();
     if (data.statusCode === 200) {
       const newSchedule = data.data;

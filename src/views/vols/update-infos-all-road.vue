@@ -5,6 +5,7 @@ import { getData } from "#/useStorage";
 import { useAlert } from "#/useAlert";
 import { useRouter } from "vue-router";
 import { updatePrimaryPalette } from "@primeuix/themes";
+import { volunteerApi } from "@/api/serve.js";
 
 const props = defineProps([
   "currentProgram",
@@ -50,11 +51,7 @@ const fetchResults = async () => {
       group: props.currentGroup
     };
 
-    const res = await fetch("/api/volunteer/reviewResult", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const res = await volunteerApi.reviewResult(payload);
 
     const data = await res.json();
     if (data.statusCode === 200) {
@@ -104,11 +101,7 @@ const updateResult = async () => {
       data: updateData
     };
 
-    const res = await fetch("/api/volunteer/updateResult", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const res = await volunteerApi.updateResult(payload);
 
     const data = await res.json();
     if (data.statusCode === 200) {
@@ -149,11 +142,7 @@ const confirmResult = async () => {
       group: props.currentGroup
     };
 
-    const res = await fetch("/api/volunteer/confirmResult", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const res = await volunteerApi.confirmResult(payload);
 
     const data = await res.json();
     if (data.statusCode === 200) {

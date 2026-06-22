@@ -4,6 +4,7 @@ import { getData } from "#/useStorage";
 import { useAlert } from "#/useAlert";
 import { useToken } from "#/useToken";
 import { useRouter } from "vue-router";
+import { volunteerApi } from "@/api/serve.js";
 
 const props = defineProps(["currentProgram", "currentGroup", "athleteList"]);
 
@@ -141,6 +142,7 @@ const submitData = async () => {
   try {
     const token = getToken();
     const payload = {
+      type: "TIMER",
       token: token,
       gameId: gameId.value,
       id: uploadId.value,
@@ -153,13 +155,7 @@ const submitData = async () => {
       },
     };
 
-    const res = await fetch("/api/volunteer/uploadData?type=TIMER", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const res = await volunteerApi.uploadData(payload);
 
     const data = await res.json();
     if (data.statusCode === 200) {
