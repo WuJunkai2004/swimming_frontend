@@ -454,7 +454,7 @@ onMounted(() => {
             class="font-bold text-lg flex align-items-center"
           >
             <i class="pi pi-map-marker mr-2 text-primary"></i>
-            所属学院
+            队伍名称
           </label>
           <Select
             id="college"
@@ -462,8 +462,9 @@ onMounted(() => {
             :options="collegeOptions"
             optionLabel="label"
             optionValue="value"
-            placeholder="请选择参赛学院"
+            placeholder="请选择或直接填写"
             filter
+            editable
             fluid
             class="w-full shadow-1"
           />
