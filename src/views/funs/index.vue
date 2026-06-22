@@ -44,7 +44,7 @@ const fetchEventList = async () => {
 const position = getData("funPosition") || "";
 const positionRoutes = {
   TIMER: ["insert_score"],
-  EXECUTIVE_PRESIDENT: ["review_results", "confirm_results"],
+  EXECUTIVE_PRESIDENT: ["confirm_results"],
 };
 
 const routes = {

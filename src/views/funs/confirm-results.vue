@@ -2,10 +2,12 @@
 import { ref, watch, onMounted } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
+import { useCollegeEnum } from "#/collegeMapping";
 import { funVolunteerApi } from "@/api/serve.js";
 
 const props = defineProps(["currentEvent"]);
 
+const { collegeMap } = useCollegeEnum();
 const { getToken } = useToken();
 const { alerts } = useAlert();
 
@@ -20,7 +22,7 @@ const fetchResults = async () => {
   loading.value = true;
   funVolunteerApi.reviewResults({
     token: getToken(),
-    eventId: props.currentEvent.id,
+    eventId: props.currentEvent.eventId,
     round: props.currentEvent.round || 1,
   })
     .then((res) => res.json())
@@ -48,7 +50,7 @@ const submitData = async () => {
 
   funVolunteerApi.confirmResults({
     token: getToken(),
-    eventId: props.currentEvent.id,
+    eventId: props.currentEvent.eventId,
     round: props.currentEvent.round || 1,
   })
     .then((res) => res.json())
@@ -95,7 +97,11 @@ onMounted(() => {
                 <Tag :value="slotProps.data.road" severity="primary" />
               </template>
             </Column>
-            <Column field="college" header="学院"></Column>
+            <Column field="college" header="学院">
+              <template #body="slotProps">
+                <span>{{ collegeMap[slotProps.data.college] || slotProps.data.college }}</span>
+              </template>
+            </Column>
             <Column header="成绩">
               <template #body="slotProps">
                 <span

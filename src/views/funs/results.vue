@@ -2,7 +2,9 @@
 import { ref, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { funGameApi } from "@/api/serve.js";
+import { useCollegeEnum } from "#/collegeMapping";
 
+const { collegeMap } = useCollegeEnum();
 const route = useRoute();
 const router = useRouter();
 
@@ -168,7 +170,11 @@ const backToList = () => {
                     {{ slotProps.index + 1 }}
                   </template>
                 </Column>
-                <Column field="college" header="学院"></Column>
+                <Column field="college" header="学院">
+                  <template #body="slotProps">
+                    {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+                  </template>
+                </Column>
                 <Column field="totalPoints" header="总积分" sortable>
                   <template #body="slotProps">
                     <span class="font-bold text-primary">{{
@@ -244,7 +250,11 @@ const backToList = () => {
                     header="道次"
                     style="width: 5rem"
                   ></Column>
-                  <Column field="college" header="学院"></Column>
+                  <Column field="college" header="学院">
+                    <template #body="slotProps">
+                      {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+                    </template>
+                  </Column>
                   <Column header="成绩">
                     <template #body="slotProps">
                       <span
