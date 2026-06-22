@@ -7,6 +7,7 @@ const route = useRoute();
 const router = useRouter();
 
 // --- 状态 ---
+const selectedGameId = ref(null);
 const gameDetail = ref(null);
 const totalPoints = ref([]);
 const events = ref([]);
@@ -92,12 +93,26 @@ const fetchEventResults = async (gameId, eventId, round) => {
 const init = () => {
   const gameId = route.query.game;
   if (gameId) {
+    selectedGameId.value = gameId;
     fetchGameDetail(gameId);
     fetchTotalPoints(gameId);
   } else {
     // 如果没有 game ID，跳转回列表页
     router.replace("/fun/games");
   }
+};
+
+const onSelectGame = (gameId) => {
+  selectedGameId.value = gameId;
+  gameDetail.value = null;
+  totalPoints.value = [];
+  events.value = [];
+  selectedEvent.value = null;
+  eventResults.value = null;
+  error.value = null;
+  router.replace({ path: "/fun/results", query: { game: gameId } });
+  fetchGameDetail(gameId);
+  fetchTotalPoints(gameId);
 };
 
 watch(() => route.query.game, init);
