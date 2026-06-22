@@ -4,6 +4,7 @@ import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
 import { useCollegeEnum } from "#/collegeMapping";
 import { useFoulEnum } from "#/foulMapping";
+import { adminFunApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
@@ -47,13 +48,9 @@ const fetchEventsOptions = () => {
   if (!gameId.value) return;
   isLoading.value = true;
 
-  fetch("/admin/fun/getEventList", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      competitionId: gameId.value,
-    }),
+  adminFunApi.getEventList({
+    token: getToken(),
+    competitionId: gameId.value,
   })
     .then((res) => res.json())
     .then((data) => {
@@ -83,11 +80,7 @@ const fetchAllData = () => {
   isLoading.value = true;
   error.value = null;
 
-  fetch("/admin/fun/getResults", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token: getToken(), eventId: eventId.value }),
-  })
+  adminFunApi.getResults({ token: getToken(), eventId: eventId.value })
     .then((res) => res.json())
     .then((resultsData) => {
       if (resultsData.statusCode === 200) {
@@ -120,14 +113,10 @@ const openEditResultDialog = (result) => {
 // 保存成绩
 const saveResult = () => {
   isSavingResult.value = true;
-  fetch("/admin/fun/updateResult", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+  adminFunApi.updateResult({
       token: getToken(),
       ...editResultForm.value,
-    }),
-  })
+    })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {

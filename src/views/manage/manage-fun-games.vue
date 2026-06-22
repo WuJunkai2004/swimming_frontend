@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
+import { adminFunApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
@@ -47,14 +48,10 @@ const fetchGamesList = async () => {
   error.value = null;
 
   try {
-    const response = await fetch("/admin/fun/getGameList", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: getToken(),
-        page: 1,
-        size: 100, // 假设趣味赛数量不多，一次性加载
-      }),
+    const response = await adminFunApi.getGameList({
+      token: getToken(),
+      page: 1,
+      size: 100,
     });
     const result = await response.json();
     if (result.statusCode === 200) {
@@ -120,17 +117,10 @@ const saveGame = async () => {
   }
 
   isSaving.value = true;
-  const apiPath = isNew.value
-    ? "/admin/fun/createGame"
-    : "/admin/fun/updateGame";
 
-  fetch(apiPath, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      ...editForm.value,
-    }),
+  (isNew.value ? adminFunApi.createGame : adminFunApi.updateGame)({
+    token: getToken(),
+    ...editForm.value,
   })
     .then((res) => res.json())
     .then((data) => {
@@ -166,13 +156,9 @@ const deleteGame = async (game) => {
     return;
   }
 
-  fetch("/admin/fun/deleteGame", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      competitionId: game.competitionId,
-    }),
+  adminFunApi.deleteGame({
+    token: getToken(),
+    competitionId: game.competitionId,
   })
     .then((res) => res.json())
     .then((data) => {

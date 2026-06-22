@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
 import { useCollegeEnum } from "@/utils/collegeMapping";
+import { adminFunApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
@@ -40,13 +41,9 @@ const collegeOptions = collegeEnum.map((key) => ({
 const fetchEventsOptions = () => {
   if (!gameId.value) return;
 
-  fetch("/admin/fun/getEventList", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      competitionId: gameId.value,
-    }),
+  adminFunApi.getEventList({
+    token: getToken(),
+    competitionId: gameId.value,
   })
     .then((res) => res.json())
     .then((data) => {
@@ -71,13 +68,9 @@ const fetchTeamsList = () => {
   isLoading.value = true;
   error.value = null;
 
-  fetch("/admin/fun/getTeamList", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      eventId: eventId.value,
-    }),
+  adminFunApi.getTeamList({
+    token: getToken(),
+    eventId: eventId.value,
   })
     .then((res) => res.json())
     .then((data) => {
@@ -156,14 +149,10 @@ const saveLanes = () => {
   }
 
   isSavingLanes.value = true;
-  fetch("/admin/fun/assignRoad", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      eventId: eventId.value,
-      teamRoads,
-    }),
+  adminFunApi.assignRoad({
+    token: getToken(),
+    eventId: eventId.value,
+    teamRoads,
   })
     .then((res) => res.json())
     .then((data) => {
@@ -244,9 +233,6 @@ const saveTeam = () => {
   }
 
   isSaving.value = true;
-  const apiPath = isNew.value
-    ? "/admin/fun/createTeam"
-    : "/admin/fun/updateTeam";
 
   const requestBody = {
     token: getToken(),
@@ -260,11 +246,7 @@ const saveTeam = () => {
     requestBody.teamId = editForm.value.teamId;
   }
 
-  fetch(apiPath, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(requestBody),
-  })
+  (isNew.value ? adminFunApi.createTeam : adminFunApi.updateTeam)(requestBody)
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -296,14 +278,10 @@ const deleteTeam = (team) => {
   ).then((confirm) => {
     if (!confirm) return;
 
-    fetch("/admin/fun/deleteTeam", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    adminFunApi.deleteTeam({
         token: getToken(),
         teamId: team.teamId,
-      }),
-    })
+      })
       .then((res) => res.json())
       .then((data) => {
         if (data.statusCode === 200) {

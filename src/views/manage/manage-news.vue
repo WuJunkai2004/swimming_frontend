@@ -3,6 +3,7 @@ import { ref, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToken } from '#/useToken';
 import { useAlert } from '#/useAlert';
+import { adminApi, activityApi } from "@/api/serve.js";
 
 const router = useRouter();
 const { alerts, asyncAlert } = useAlert();
@@ -40,16 +41,10 @@ const saveTime = async () => {
     const formattedDate = `${year}-${month}-${day}`;
     console.log('准备保存日期:', formattedDate, '新闻ID:', editingNewsId.value);
 
-    const res = await fetch('/admin/updatePublishTime', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        newsId: editingNewsId.value,
-        publishTime: formattedDate,
-        token: getToken()
-      })
+    const res = await adminApi.updatePublishTime({
+      newsId: editingNewsId.value,
+      publishTime: formattedDate,
+      token: getToken()
     });
     const data = await res.json();
     if (data.statusCode !== 200) {
@@ -76,24 +71,17 @@ const fetchNews = async () => {
 
   let fetch_response = null;
   if(showDeleted.value) {
-    fetch_response = fetch(`/activity/getNewsList`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        page: currentPage.value,
-        limit: limit.value,
-        deletion: true,
-        token: getToken(),
-      })
+    fetch_response = activityApi.getNewsList_2({
+      page: currentPage.value,
+      limit: limit.value,
+      deletion: true,
+      token: getToken(),
     });
   } else {
-    const params = new URLSearchParams({
+    fetch_response = activityApi.getNewsList({
       page: currentPage.value,
       limit: limit.value,
     });
-    fetch_response = fetch(`/activity/getNewsList?${params.toString()}`);
   }
 
   const handleFetchResult = (data) => {
@@ -140,15 +128,9 @@ const deleteNews = (newsItem) => {
       icon: 'pi pi-exclamation-triangle'
     })
   .then(() => {
-    fetch('/admin/deleteNews', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id: newsItem.id,
-        token: getToken()
-      })
+    adminApi.deleteNews({
+      id: newsItem.id,
+      token: getToken()
     })
     .then(res => res.json())
     .then(endOfFetch);
@@ -167,15 +149,9 @@ const restoreNews = (newsItem) => {
       icon: 'pi pi-info-circle'
     })
   .then(() => {
-    fetch('/admin/withdrawNews', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id: newsItem.id,
-        token: getToken()
-      })
+    adminApi.withdrawNews({
+      id: newsItem.id,
+      token: getToken()
     })
     .then(res => res.json())
     .then(endOfFetch);

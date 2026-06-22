@@ -6,6 +6,7 @@ import { useToken } from '#/useToken';
 import { uploadImage, uploadVideo } from '#/uploads';
 import { useRouter } from 'vue-router';
 import { saveData, getData, removeData } from '#/useStorage';
+import { adminApi } from "@/api/serve.js";
 
 // --- 2. 初始化 ---
 const { alerts, asyncAlert } = useAlert();
@@ -271,16 +272,10 @@ const publishNews = async () => {
     return false;
   });
   console.log('准备发布新闻:', { title: title.value, content: publishContent });
-  fetch('/admin/uploadNews', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      title: title.value,
-      content: publishContent,
-    })
+  adminApi.uploadNews({
+    token: getToken(),
+    title: title.value,
+    content: publishContent,
   })
   .then(response => response.json())
   .then(result => {

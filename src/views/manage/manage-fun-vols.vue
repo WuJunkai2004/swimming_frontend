@@ -4,6 +4,7 @@ import { useAlert } from "#/useAlert";
 import { Excetract } from "#/excelUtils";
 import { useToken } from "#/useToken";
 import { SHA256 } from "#/useHash";
+import { adminFunApi } from "@/api/serve.js";
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();
@@ -32,15 +33,9 @@ const isAdding = ref(false);
 
 const loadFunVolunteers = () => {
   isLoading.value = true;
-  fetch("/admin/fun/getVolunteerList", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      competitionId: gameId.value,
-    }),
+  adminFunApi.getVolunteerList({
+    token: getToken(),
+    competitionId: gameId.value,
   })
     .then((res) => res.json())
     .then((result) => {
@@ -132,15 +127,9 @@ const deleteVolunteer = async (volId) => {
   if (!confirm) return;
 
   isLoading.value = true;
-  fetch("/admin/fun/deleteVolunteer", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      volunteerId: volId,
-    }),
+  adminFunApi.deleteVolunteer({
+    token: getToken(),
+    volunteerId: volId,
   })
     .then((res) => res.json())
     .then((data) => {
@@ -171,10 +160,6 @@ const saveVolunteer = async () => {
     editForm.value.road = [1, 2, 3, 4, 5, 6, 7, 8];
   }
 
-  const apiPath = isAdding.value
-    ? "/admin/fun/createVolunteer"
-    : "/admin/fun/updateVolunteer";
-
   const body = {
     token: getToken(),
     ...editForm.value,
@@ -182,12 +167,11 @@ const saveVolunteer = async () => {
 
   if (isAdding.value) {
     body.competitionId = gameId.value;
-    delete body.volunteerId; // 新增不需要传 volunteerId
+    delete body.volunteerId;
     if (!body.password) {
       body.password = generateRandomPassword();
       const rawPassword = body.password;
       body.password = await SHA256(body.password);
-      // 如果是新增，记录下随机生成的密码以便显示
       processedPasswords.value = [
         {
           name: body.name,
@@ -201,18 +185,12 @@ const saveVolunteer = async () => {
   } else {    if (body.password) {
       body.password = await SHA256(body.password);
     } else {
-      delete body.password; // 不更新密码
+      delete body.password;
     }
   }
 
   isLoading.value = true;
-  fetch(apiPath, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
+  (isAdding.value ? adminFunApi.createVolunteer : adminFunApi.updateVolunteer)(body)
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -360,13 +338,7 @@ const confirmUpload = async () => {
     volunteers: data,
   };
 
-  fetch("/admin/fun/importVolunteers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
+  adminFunApi.importVolunteers(body)
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {

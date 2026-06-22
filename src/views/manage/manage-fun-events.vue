@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
+import { adminFunApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
@@ -39,13 +40,9 @@ const fetchEventsList = () => {
   isLoading.value = true;
   error.value = null;
 
-  fetch("/admin/fun/getEventList", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      competitionId: gameId.value,
-    }),
+  adminFunApi.getEventList({
+    token: getToken(),
+    competitionId: gameId.value,
   })
     .then((res) => res.json())
     .then((data) => {
@@ -92,23 +89,17 @@ const saveEvent = () => {
   }
 
   isSaving.value = true;
-  const apiPath = isNew.value
-    ? "/admin/fun/createEvent"
-    : "/admin/fun/updateEvent";
   if (isNew.value) {
-    // 创建时不需要 eventId
     delete editForm.value.eventId;
   }
 
-  fetch(apiPath, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      competitionId: gameId.value,
-      ...editForm.value,
-    }),
-  })
+  const params = {
+    token: getToken(),
+    competitionId: gameId.value,
+    ...editForm.value,
+  };
+
+  (isNew.value ? adminFunApi.createEvent : adminFunApi.updateEvent)(params)
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -136,14 +127,10 @@ const deleteEvent = (event) => {
   }).then((confirm) => {
     if (!confirm) return;
 
-    fetch("/admin/fun/deleteEvent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    adminFunApi.deleteEvent({
         token: getToken(),
         eventId: event.eventId,
-      }),
-    })
+      })
       .then((res) => res.json())
       .then((data) => {
         if (data.statusCode === 200) {

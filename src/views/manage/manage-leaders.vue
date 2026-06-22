@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useToken } from '#/useToken';
 import { useAlert } from '#/useAlert';
 import { uploadImage } from '#/uploads';
+import { leaderApi, adminApi } from "@/api/serve.js";
 
 const { getToken } = useToken(); // 获取 Token 的函数
 const { alerts, awaitAlert } = useAlert(); // 弹窗提示服务
@@ -34,7 +35,7 @@ const allRequiredField = computed(() => {
 const fetchLeadersList = async () => {
   isLoading.value = true;
   error.value = null;
-  fetch('/leader/getLeaderList')
+  leaderApi.getLeaderList()
   .then(response => response.json())
   .then(data => {
     if(data.statusCode === 200){
@@ -76,7 +77,7 @@ const handleAvatarUpload = async (event) => {
 // 获取领导详情 (用于修改时预填表单)
 const fetchLeaderDetail = async (id) => {
   isDialogLoading.value = true;
-  fetch(`/leader/getLeaderDetail?id=${id}`)
+  leaderApi.getLeaderDetail({ id })
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
@@ -97,19 +98,13 @@ const fetchLeaderDetail = async (id) => {
 
 // 新增领导
 const addLeader = async () => {
-  const response = await fetch('/admin/addLeader', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      name: formName.value,
-      age: formAge.value,
-      position: formPosition.value,
-      introduction: formIntroduction.value,
-      imgUrl: formImgUrl.value,
-    }),
+  const response = await adminApi.addLeader({
+    token: getToken(),
+    name: formName.value,
+    age: formAge.value,
+    position: formPosition.value,
+    introduction: formIntroduction.value,
+    imgUrl: formImgUrl.value,
   });
   const result = await response.json();
   isDialogLoading.value = false;
@@ -123,15 +118,9 @@ const addLeader = async () => {
 
 // 删除领导
 const deleteLeader = async (id) => {
-  const response = await fetch('/admin/deleteLeader', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      id: id,
-    }),
+  const response = await adminApi.deleteLeader({
+    token: getToken(),
+    id: id,
   });
   const result = await response.json();
   if(result.statusCode === 200){

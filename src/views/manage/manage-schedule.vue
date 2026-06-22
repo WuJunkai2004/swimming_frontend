@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch } from "vue";
 import { useAlert } from "#/useAlert";
 import { useToken } from "#/useToken";
 import { useEventEnum } from "#/eventMapping";
+import { sportApi, competitionApi, adminApi } from "@/api/serve.js";
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();
@@ -43,7 +44,7 @@ const loadGameInfo = () => {
   }
 
   isLoading.value = true;
-  fetch(`/sport/getGameInfo?game=${gameId.value}`)
+  sportApi.getGameInfo({ game: gameId.value })
     .then((response) => response.json())
     .then((result) => {
       if (result.statusCode === 200) {
@@ -63,7 +64,7 @@ const loadGameInfo = () => {
 // 获取日程
 const loadSchedule = () => {
   if (!gameId.value) return;
-  fetch(`/api/competition/getGameSchedule?id=${gameId.value}`)
+  competitionApi.getGameSchedule({ id: gameId.value })
     .then((res) => res.json())
     .then((res) => {
       if (res.statusCode === 200) {
@@ -84,16 +85,12 @@ const loadAthletes = async (eventProgram) => {
 
   try {
     const token = getToken();
-    const res = await fetch("/admin/getParticipatAthleteList", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const res = await adminApi.getParticipatAthleteList({
         token,
         gameId: gameId.value,
         event: eventProgram,
         group: selectedGroup.value.code,
-      }),
-    });
+      });
     const result = await res.json();
     if (result.statusCode === 200) {
       availableAthletes.value = result.data;
@@ -205,11 +202,7 @@ const saveHeat = async (heatIdx) => {
       data: assignedItems,
     };
 
-    const res = await fetch("/admin/arrangeProgram", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const res = await adminApi.arrangeProgram(payload);
 
     const result = await res.json();
     if (result.statusCode === 200) {

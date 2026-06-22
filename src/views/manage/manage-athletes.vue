@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useToken } from '#/useToken';
 import { useAlert } from '#/useAlert';
 import { uploadImage } from '#/uploads';
+import { alumnusApi, adminApi } from "@/api/serve.js";
 
 const { getToken } = useToken(); // 获取 Token 的函数
 const { alerts, awaitAlert } = useAlert(); // 弹窗提示服务
@@ -34,7 +35,7 @@ const allRequiredField = computed(() => {
 const fetchAthletesList = async () => {
   isLoading.value = true;
   error.value = null;
-  fetch('/alumnus/getAlumnusList')
+  alumnusApi.getAlumnusList()
   .then(response => response.json())
   .then(data => {
     if(data.statusCode === 200){
@@ -76,7 +77,7 @@ const handleAvatarUpload = async (event) => {
 // 获取校友详情 (用于修改时预填表单)
 const fetchAthleteDetail = async (id) => {
   isDialogLoading.value = true;
-  fetch(`/alumnus/getAlumnusDetail?id=${id}`)
+  alumnusApi.getAlumnusDetail({ id })
   .then(response => response.json())
   .then(result => {
     if (result.statusCode === 200) {
@@ -97,19 +98,13 @@ const fetchAthleteDetail = async (id) => {
 
 // 新增校友
 const addExcellence = async () => {
-  const response = await fetch('/admin/addAlumnus', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      name: formName.value,
-      age: formAge.value,
-      grade: formGrade.value,
-      introduction: formIntroduction.value,
-      imgUrl: formImgUrl.value,
-    }),
+  const response = await adminApi.addAlumnus({
+    token: getToken(),
+    name: formName.value,
+    age: formAge.value,
+    grade: formGrade.value,
+    introduction: formIntroduction.value,
+    imgUrl: formImgUrl.value,
   });
   const result = await response.json();
   isDialogLoading.value = false;
@@ -123,15 +118,9 @@ const addExcellence = async () => {
 
 // 删除校友
 const deleteExcellence = async (id) => {
-  const response = await fetch('/admin/deleteAlumnus', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      id: id,
-    }),
+  const response = await adminApi.deleteAlumnus({
+    token: getToken(),
+    id: id,
   });
   const result = await response.json();
   if(result.statusCode === 200){

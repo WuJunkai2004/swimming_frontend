@@ -3,6 +3,7 @@ import { ref, onMounted, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useAlert } from "#/useAlert";
 import { useToken } from "#/useToken";
+import { contractApi } from "@/api/serve.js";
 
 const route = useRoute();
 const { alerts } = useAlert();
@@ -215,14 +216,10 @@ const getFieldsValue = () => {
 
 const postSignature = async () => {
   const signature = signatureRef.value.getSignatures().join("");
-  const res = await fetch("/api/contract/uploadSignature", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      signature: signature,
-      type: type.value.toUpperCase(),
-    }),
+  const res = await contractApi.uploadSignature({
+    token: getToken(),
+    signature: signature,
+    type: type.value.toUpperCase(),
   });
   const data = await res.json();
   if (data.statusCode === 200) {

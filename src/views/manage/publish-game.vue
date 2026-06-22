@@ -8,6 +8,7 @@ import {
 } from "#/excelUtils";
 import { useCollegeEnum } from "#/collegeMapping";
 import { useEventEnum } from "#/eventMapping";
+import { adminApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
@@ -143,13 +144,7 @@ const publishGame = async () => {
     endTime: formatDate(gameData.endTime),
   };
 
-  fetch("/admin/postSignUpList", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  })
+  adminApi.postSignUpList(payload)
   .then((res) => res.json())
   .then((data) => {
     if (data.statusCode !== 200) {

@@ -5,6 +5,7 @@ import { useAlert } from "#/useAlert";
 import { useCollegeEnum } from "#/collegeMapping";
 import { useEventEnum } from "#/eventMapping";
 import { Copying } from "#/useCopy";
+import { sportApi, adminApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const { getToken } = useToken();
@@ -62,7 +63,7 @@ const copyShareLink = () => {
 const fetchGamesList = async () => {
   isLoading.value = true;
   error.value = null;
-  fetch("/sport/getGameList")
+  sportApi.getGameList()
     .then((response) => response.json())
     .then((result) => {
       if (result.statusCode === 200) {
@@ -90,7 +91,7 @@ const onRowExpand = async (event) => {
   // 如果是展开行，并且尚未加载过详情
   if (!game.details) {
     game.isLoadingDetails = true;
-    fetch(`/sport/getGameInfo?game=${game.uuid}`)
+    sportApi.getGameInfo({ game: game.uuid })
       .then((response) => response.json())
       .then((result) => {
         if (result.statusCode === 200) {
@@ -123,13 +124,9 @@ const showPreview = async (game) => {
   currentGame.value = game;
 
   try {
-    const response = await fetch("/sport/preview", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: getToken(),
-        gameId: game.uuid,
-      }),
+    const response = await sportApi.preview({
+      token: getToken(),
+      gameId: game.uuid,
     });
     const result = await response.json();
 
@@ -151,13 +148,9 @@ const exportData = async (game) => {
   exportButton.disabled = true; // 临时禁用按钮防止重复点击
 
   try {
-    const response = await fetch("/sport/export", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token: getToken(),
-        gameId: game.uuid,
-      }),
+    const response = await sportApi.export({
+      token: getToken(),
+      gameId: game.uuid,
     });
 
     if (!response.ok) {
@@ -213,13 +206,9 @@ const stopSignup = async (game) => {
   ) {
     return;
   }
-  fetch("/admin/confirmSignUp",{
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      token: getToken(),
-      gameId: game.uuid,
-    }),
+  adminApi.confirmSignUp({
+    token: getToken(),
+    gameId: game.uuid,
   })
   .then((response) => response.json())
   .then((result) => {

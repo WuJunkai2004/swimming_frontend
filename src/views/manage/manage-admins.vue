@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useToken } from '#/useToken';
 import { useAlert } from '#/useAlert';
 import { SHA256 } from '#/useHash';
+import { adminApi } from "@/api/serve.js";
 
 const { getToken } = useToken(); // 获取 Token 的函数
 const { alerts, awaitAlert } = useAlert(); // 弹窗提示服务
@@ -73,14 +74,8 @@ const allRequiredField = computed(() => {
 const fetchAdminsList = async () => {
   isLoading.value = true;
   error.value = null;
-  fetch('/admin/getAdminList', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-    })
+  adminApi.getAdminList({
+    token: getToken(),
   })
   .then(response => response.json())
   .then(data => {
@@ -98,16 +93,10 @@ const fetchAdminsList = async () => {
 // 新增管理员
 const addAdmin = async () => {
   const pw_sha = await SHA256(formPassword.value);
-  const response = await fetch('/admin/addAdmin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      adminName: formUsername.value,
-      password: pw_sha,
-    }),
+  const response = await adminApi.addAdmin({
+    token: getToken(),
+    adminName: formUsername.value,
+    password: pw_sha,
   });
   const result = await response.json();
   if(result.statusCode === 200){
@@ -121,17 +110,11 @@ const addAdmin = async () => {
 // 更新管理员信息
 const updateAdmin = async () => {
   const pw_sha = await SHA256(formPassword.value);
-  const response = await fetch('/admin/updateAdmin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      id: editingAdminId.value,
-      adminName: formUsername.value,
-      password: pw_sha,
-    }),
+  const response = await adminApi.updateAdmin({
+    token: getToken(),
+    id: editingAdminId.value,
+    adminName: formUsername.value,
+    password: pw_sha,
   });
   const result = await response.json();
   if(result.statusCode === 200){
@@ -144,15 +127,9 @@ const updateAdmin = async () => {
 
 // 删除管理员
 const deleteAdmin = async (id) => {
-  const response = await fetch('/admin/deleteAdmin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token: getToken(),
-      adminId: id,
-    }),
+  const response = await adminApi.deleteAdmin({
+    token: getToken(),
+    adminId: id,
   });
   const result = await response.json();
   if(result.statusCode === 200){

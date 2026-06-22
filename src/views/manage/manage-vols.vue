@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { useAlert } from "#/useAlert";
 import { Excetract } from "#/excelUtils";
 import { useToken } from "#/useToken";
+import { sportApi, adminApi } from "@/api/serve.js";
 
 const { alerts, awaitAlert } = useAlert();
 const { getToken } = useToken();
@@ -66,7 +67,7 @@ const loadGameInfo = () => {
   }
 
   isLoading.value = true;
-  fetch(`/sport/getGameInfo?game=${gameId.value}`)
+  sportApi.getGameInfo({ game: gameId.value })
     .then((response) => response.json())
     .then((result) => {
       if (result.statusCode === 200) {
@@ -167,13 +168,7 @@ const confirmUpload = async () => {
     data: data,
   };
 
-  fetch("/admin/uploadVolunteer", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
+  adminApi.uploadVolunteer(body)
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
