@@ -75,7 +75,7 @@ adminApi._add_endpoint("addAdmin", "/admin/addAdmin", ["token","adminName","pass
 // === adminFunApi === 趣味运动会管理员相关接口
 const adminFunApi = new apiClient();
 adminFunApi._add_endpoint("updateVolunteer", "/admin/fun/updateVolunteer", ["token","volunteerId"], ["dto","name","studentNumber","position","password","road"], "POST"); // 更新志愿者
-adminFunApi._add_endpoint("updateTeam", "/admin/fun/updateTeam", ["token","college"], ["dto","competitionId","eventId","teamId","members","id"], "POST"); // 更新参赛队伍
+adminFunApi._add_endpoint("updateTeam", "/admin/fun/updateTeam", ["token","college"], ["dto","competitionId","eventId","teamId","teamName","members","id"], "POST"); // 更新参赛队伍
 adminFunApi._add_endpoint("updateRoad", "/admin/fun/updateRoad", ["token","eventId"], ["dto","teamRoads"], "POST"); // 更新道次分配
 adminFunApi._add_endpoint("updateResult", "/admin/fun/updateResult", ["token","resultId","rawScore","isValid"], ["dto","invalidType","invalidReason"], "POST"); // 管理员修改成绩
 adminFunApi._add_endpoint("updateGame", "/admin/fun/updateGame", [], ["dto","token","gameName","startTime","endTime","status","competitionId"], "POST"); // 更新活动
@@ -91,7 +91,7 @@ adminFunApi._add_endpoint("deleteTeam", "/admin/fun/deleteTeam", ["token","teamI
 adminFunApi._add_endpoint("deleteGame", "/admin/fun/deleteGame", [], ["dto","token","competitionId"], "POST"); // 删除活动
 adminFunApi._add_endpoint("deleteEvent", "/admin/fun/deleteEvent", ["token","eventId"], ["dto"], "POST"); // 删除比赛单项
 adminFunApi._add_endpoint("createVolunteer", "/admin/fun/createVolunteer", ["token","competitionId","name","studentNumber","position","password","road"], ["dto"], "POST"); // 新增志愿者
-adminFunApi._add_endpoint("createTeam", "/admin/fun/createTeam", ["token","college"], ["dto","competitionId","eventId","teamId","members","id"], "POST"); // 录入参赛队伍
+adminFunApi._add_endpoint("createTeam", "/admin/fun/createTeam", ["token","college"], ["dto","competitionId","eventId","teamId","teamName","members","id"], "POST"); // 录入参赛队伍
 adminFunApi._add_endpoint("createGame", "/admin/fun/createGame", [], ["dto","token","gameName","startTime","endTime","status","competitionId"], "POST"); // 创建活动
 adminFunApi._add_endpoint("createEvent", "/admin/fun/createEvent", ["token","competitionId","eventName","rules","unit","sortDirection","sortOrder"], ["dto","id","eventId"], "POST"); // 创建比赛单项
 adminFunApi._add_endpoint("assignRoad", "/admin/fun/assignRoad", ["token","eventId"], ["dto","teamRoads"], "POST"); // 道次分配
@@ -123,6 +123,7 @@ const funGameApi = new apiClient();
 funGameApi._add_endpoint("getGameList", "/api/funGame/list", [], ["page","size"], "GET"); // 公众查询活动列表
 funGameApi._add_endpoint("getTotalPoints", "/api/funGame/getTotalPoints", ["competitionId"], [], "GET"); // 公众查询总积分排名
 funGameApi._add_endpoint("getEventResults", "/api/funGame/getEventResults", ["competitionId","eventId"], ["round"], "GET"); // 公众查询单项成绩
+funGameApi._add_endpoint("getFoulReason", "/api/funGame/foulReason", [], [], "GET"); // 公众查询犯规枚举
 funGameApi._add_endpoint("getGameDetail", "/api/funGame/detail", ["competitionId"], [], "GET"); // 公众查询活动详情
 
 // === competitionApi === 比赛信息查询接口

@@ -19,7 +19,7 @@ class endpoint {
   request(params = {}) {
     // Validate required parameters
     for (let param of this.required) {
-      if (!(param in params)) {
+      if (!(param in params) || params[param] === undefined || params[param] === null) {
         throw new Error(`Missing required parameter: ${param}`);
       }
     }
