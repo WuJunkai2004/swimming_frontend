@@ -260,4 +260,71 @@ const currentView = computed(() => {
   background-color: var(--p-primary-300) !important;
   color: var(--p-text-color) !important;
 }
+
+/* 深色模式适配 */
+.p-dark .top-toolbar {
+  background-color: var(--p-surface-800);
+  border-color: var(--p-surface-600);
+}
+.p-dark .desktop-sidebar {
+  background-color: var(--p-surface-900);
+  border-right-color: var(--p-surface-700);
+}
+.p-dark .desktop-sidebar :deep(.p-menu) {
+  background: transparent;
+}
+.p-dark .desktop-sidebar :deep(.p-menu-item-content),
+.p-dark :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content) {
+  color: var(--p-surface-0);
+}
+.p-dark .desktop-sidebar :deep(.p-menu-item-content:hover),
+.p-dark :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content:hover) {
+  background-color: var(--p-surface-800) !important;
+}
+.p-dark :deep(.active-menu-item > .p-menu-item-content) {
+  background-color: var(--p-primary-700) !important;
+  color: var(--p-surface-0) !important;
+}
+.p-dark :deep(.p-drawer) {
+  background-color: var(--p-surface-900);
+}
+.p-dark :deep(.p-drawer-header) {
+  background-color: var(--p-surface-900);
+  color: var(--p-surface-0);
+  border-bottom-color: var(--p-surface-700);
+}
+
+@media (prefers-color-scheme: dark) {
+  .top-toolbar {
+    background-color: var(--p-surface-800);
+    border-color: var(--p-surface-600);
+  }
+  .desktop-sidebar {
+    background-color: var(--p-surface-900);
+    border-right-color: var(--p-surface-700);
+  }
+  .desktop-sidebar :deep(.p-menu) {
+    background: transparent;
+  }
+  .desktop-sidebar :deep(.p-menu-item-content),
+  :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content) {
+    color: var(--p-surface-0);
+  }
+  .desktop-sidebar :deep(.p-menu-item-content:hover),
+  :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content:hover) {
+    background-color: var(--p-surface-800) !important;
+  }
+  :deep(.active-menu-item > .p-menu-item-content) {
+    background-color: var(--p-primary-700) !important;
+    color: var(--p-surface-0) !important;
+  }
+  :deep(.p-drawer) {
+    background-color: var(--p-surface-900);
+  }
+  :deep(.p-drawer-header) {
+    background-color: var(--p-surface-900);
+    color: var(--p-surface-0);
+    border-bottom-color: var(--p-surface-700);
+  }
+}
 </style>
