@@ -281,6 +281,10 @@ const activities = ref([
 /* 第三部分：Awards Section */
 .awards-section {
   background-color: var(--p-surface-100);
+  color: var(--p-text-color);
+}
+.awards-section h2 {
+  color: var(--p-text-color);
 }
 .custom-marker {
   display: flex;
@@ -295,6 +299,41 @@ const activities = ref([
 :deep(.p-timeline-event-opposite) {
   flex-grow: 0;
   padding: 0 !important;
+}
+:deep(.p-timeline-event-content) {
+  color: var(--p-text-color);
+}
+:deep(.p-timeline-event-connector) {
+  background-color: var(--p-surface-300);
+}
+:deep(.p-text-secondary) {
+  color: var(--p-text-secondary-color) !important;
+}
+
+/* 深色模式适配 */
+.p-dark .awards-section {
+  background-color: var(--p-surface-900);
+}
+.p-dark .awards-section h2,
+.p-dark .awards-section :deep(.p-timeline-event-content) {
+  color: var(--p-surface-0);
+}
+.p-dark .awards-section :deep(.p-timeline-event-connector) {
+  background-color: var(--p-surface-600);
+}
+
+@media (prefers-color-scheme: dark) {
+  .awards-section {
+    background-color: var(--p-surface-900);
+    color: var(--p-surface-0);
+  }
+  .awards-section h2,
+  .awards-section :deep(.p-timeline-event-content) {
+    color: var(--p-surface-0);
+  }
+  .awards-section :deep(.p-timeline-event-connector) {
+    background-color: var(--p-surface-600);
+  }
 }
 
 /* 第四部分：Contact Section */
