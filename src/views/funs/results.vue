@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { funGameApi } from "@/api/serve.js";
 import { useCollegeEnum } from "#/collegeMapping";
@@ -21,7 +21,7 @@ const loading = ref(false);
 const error = ref(null);
 
 const roundOptions = ref([
-  { label: "决赛（默认）", value: null },
+  { label: "决赛", value: null },
   ...Array.from({ length: 10 }, (_, i) => ({
     label: `第 ${i + 1} 组`,
     value: i + 1,
@@ -127,6 +127,19 @@ watch([selectedEvent, selectedRound], ([newEvent, newRound]) => {
 
 onMounted(init);
 
+const rankedTotalPoints = computed(() => {
+  const sorted = [...totalPoints.value].sort(
+    (a, b) => b.totalPoints - a.totalPoints,
+  );
+  let rank = 1;
+  return sorted.map((item, i) => {
+    if (i > 0 && item.totalPoints < sorted[i - 1].totalPoints) {
+      rank = i + 1;
+    }
+    return { ...item, rank };
+  });
+});
+
 const backToList = () => {
   router.push("/fun/list");
 };
@@ -160,19 +173,22 @@ const backToList = () => {
             <template #title>总积分排名</template>
             <template #content>
               <DataTable
-                :value="totalPoints"
+                :value="rankedTotalPoints"
                 responsiveLayout="scroll"
                 stripedRows
                 class="p-datatable-sm"
               >
                 <Column header="排名" style="width: 4rem">
                   <template #body="slotProps">
-                    {{ slotProps.index + 1 }}
+                    {{ slotProps.data.rank }}
                   </template>
                 </Column>
                 <Column field="college" header="学院">
                   <template #body="slotProps">
-                    {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+                    {{
+                      collegeMap[slotProps.data.college] ||
+                      slotProps.data.college
+                    }}
                   </template>
                 </Column>
                 <Column field="totalPoints" header="总积分" sortable>
@@ -225,12 +241,7 @@ const backToList = () => {
                       severity="info"
                       class="ml-2"
                     />
-                    <Tag
-                      v-else
-                      value="决赛"
-                      severity="warn"
-                      class="ml-2"
-                    />
+                    <Tag v-else value="决赛" severity="warn" class="ml-2" />
                   </div>
                   <div
                     class="text-600"
@@ -245,29 +256,6 @@ const backToList = () => {
                   responsiveLayout="scroll"
                   stripedRows
                 >
-                  <Column
-                    field="road"
-                    header="道次"
-                    style="width: 5rem"
-                  ></Column>
-                  <Column field="college" header="学院">
-                    <template #body="slotProps">
-                      {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
-                    </template>
-                  </Column>
-                  <Column header="成绩">
-                    <template #body="slotProps">
-                      <span
-                        v-if="slotProps.data.display"
-                        class="text-red-500 font-bold"
-                      >
-                        {{ slotProps.data.display }}
-                      </span>
-                      <span v-else>
-                        {{ slotProps.data.rawScore }} {{ eventResults.unit }}
-                      </span>
-                    </template>
-                  </Column>
                   <Column field="ranking" header="排名">
                     <template #body="slotProps">
                       <Tag
@@ -291,6 +279,32 @@ const backToList = () => {
                   <Column field="points" header="积分">
                     <template #body="slotProps">
                       <span class="font-bold">{{ slotProps.data.points }}</span>
+                    </template>
+                  </Column>
+                  <Column header="成绩">
+                    <template #body="slotProps">
+                      <span
+                        v-if="slotProps.data.display"
+                        class="text-red-500 font-bold"
+                      >
+                        {{ slotProps.data.display }}
+                      </span>
+                      <span v-else>
+                        {{ slotProps.data.rawScore }} {{ eventResults.unit }}
+                      </span>
+                    </template>
+                  </Column>
+                  <Column
+                    field="road"
+                    header="道次"
+                    style="width: 5rem"
+                  ></Column>
+                  <Column field="college" header="学院">
+                    <template #body="slotProps">
+                      {{
+                        collegeMap[slotProps.data.college] ||
+                        slotProps.data.college
+                      }}
                     </template>
                   </Column>
                 </DataTable>
