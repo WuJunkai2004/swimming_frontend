@@ -89,6 +89,14 @@ const fetchAllData = () => {
     });
 };
 
+// 显示队伍/学院名称：优先使用 teamName，否则使用 college
+const displayName = (item) => {
+  if (item.teamName) {
+    return item.teamName;
+  }
+  return collegeMap[item.college] || item.college;
+};
+
 // 打开编辑成绩弹窗
 const openEditResultDialog = (result) => {
   editResultForm.value = {
@@ -180,7 +188,7 @@ onMounted(() => {
       >
         <Column field="college" header="学院/队伍">
           <template #body="slotProps">
-            {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+            {{ displayName(slotProps.data) }}
           </template>
         </Column>
         <Column field="round" header="轮次" style="width: 80px"></Column>
