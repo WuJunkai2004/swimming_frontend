@@ -143,6 +143,14 @@ const rankedTotalPoints = computed(() => {
 const backToList = () => {
   router.push("/fun/list");
 };
+
+// 显示队伍/学院名称：优先使用 teamName，否则使用 college
+const displayName = (item) => {
+  if (item.teamName) {
+    return item.teamName;
+  }
+  return collegeMap[item.college] || item.college;
+};
 </script>
 
 <template>
@@ -183,12 +191,9 @@ const backToList = () => {
                     {{ slotProps.data.rank }}
                   </template>
                 </Column>
-                <Column field="college" header="学院">
+                <Column field="college" header="学院/队伍">
                   <template #body="slotProps">
-                    {{
-                      collegeMap[slotProps.data.college] ||
-                      slotProps.data.college
-                    }}
+                    {{ displayName(slotProps.data) }}
                   </template>
                 </Column>
                 <Column field="totalPoints" header="总积分" sortable>
@@ -299,12 +304,9 @@ const backToList = () => {
                     header="道次"
                     style="width: 5rem"
                   ></Column>
-                  <Column field="college" header="学院">
+                  <Column field="college" header="学院/队伍">
                     <template #body="slotProps">
-                      {{
-                        collegeMap[slotProps.data.college] ||
-                        slotProps.data.college
-                      }}
+                      {{ displayName(slotProps.data) }}
                     </template>
                   </Column>
                 </DataTable>
