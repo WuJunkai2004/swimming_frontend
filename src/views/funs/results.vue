@@ -164,7 +164,7 @@ const backToList = () => {
         </Message>
 
         <div v-else-if="gameDetail">
-          <div class="flex align-items-center mb-3">
+          <div class="flex align-items-center justify-content-center mb-3">
             <h2 class="m-0">{{ gameDetail.gameName }}</h2>
           </div>
 
