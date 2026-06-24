@@ -20,11 +20,12 @@ const fetchResults = async () => {
   }
 
   loading.value = true;
-  funVolunteerApi.reviewResults({
-    token: getToken(),
-    eventId: props.currentEvent.eventId,
-    round: props.currentEvent.round || 1,
-  })
+  funVolunteerApi
+    .reviewResults({
+      token: getToken(),
+      eventId: props.currentEvent.eventId,
+      round: props.currentEvent.round || 1,
+    })
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
@@ -48,16 +49,17 @@ const submitData = async () => {
     return;
   }
 
-  funVolunteerApi.confirmResults({
-    token: getToken(),
-    eventId: props.currentEvent.eventId,
-    round: props.currentEvent.round || 1,
-  })
+  funVolunteerApi
+    .confirmResults({
+      token: getToken(),
+      eventId: props.currentEvent.eventId,
+      round: props.currentEvent.round || 1,
+    })
     .then((res) => res.json())
     .then(async (data) => {
       if (data.statusCode === 200) {
         alerts("提示", "成绩已最终确认");
-        await fetchResult();
+        await fetchResults();
       } else {
         alerts("错误", data.message);
       }
@@ -99,7 +101,9 @@ onMounted(() => {
             </Column>
             <Column field="college" header="学院">
               <template #body="slotProps">
-                <span>{{ collegeMap[slotProps.data.college] || slotProps.data.college }}</span>
+                <span>{{
+                  collegeMap[slotProps.data.college] || slotProps.data.college
+                }}</span>
               </template>
             </Column>
             <Column header="成绩">
