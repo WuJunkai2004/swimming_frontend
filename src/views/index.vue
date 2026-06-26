@@ -311,14 +311,14 @@ const activities = ref([
 }
 
 /* 深色模式适配 */
-.p-dark .awards-section {
+:where(.p-dark) .awards-section {
   background-color: var(--p-surface-900);
 }
-.p-dark .awards-section h2,
-.p-dark .awards-section :deep(.p-timeline-event-content) {
+:where(.p-dark) .awards-section h2,
+:where(.p-dark) .awards-section :deep(.p-timeline-event-content) {
   color: var(--p-surface-0);
 }
-.p-dark .awards-section :deep(.p-timeline-event-connector) {
+:where(.p-dark) .awards-section :deep(.p-timeline-event-connector) {
   background-color: var(--p-surface-600);
 }
 
@@ -339,6 +339,10 @@ const activities = ref([
 /* 第四部分：Contact Section */
 .contact-section {
   background-color: var(--p-surface-0);
+  color: var(--p-text-color);
+}
+.contact-section h2 {
+  color: var(--p-text-color);
 }
 .qr-code-img {
   width: 200px;
@@ -346,6 +350,31 @@ const activities = ref([
   border-radius: 12px;
   /* 如果二维码是白底，加个边框会让它在浅色背景上更清晰 */
   border: 1px solid var(--p-card-color);
+}
+
+/* 深色模式适配 */
+:where(.p-dark) .contact-section {
+  background-color: var(--p-surface-900);
+  color: var(--p-surface-0);
+}
+:where(.p-dark) .contact-section h2 {
+  color: var(--p-surface-0);
+}
+:where(.p-dark) .contact-section .text-color-secondary {
+  color: var(--p-surface-400);
+}
+
+@media (prefers-color-scheme: dark) {
+  .contact-section {
+    background-color: var(--p-surface-900);
+    color: var(--p-surface-0);
+  }
+  .contact-section h2 {
+    color: var(--p-surface-0);
+  }
+  .contact-section .text-color-secondary {
+    color: var(--p-surface-400);
+  }
 }
 
 /* 响应式调整 */

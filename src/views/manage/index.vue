@@ -274,21 +274,21 @@ const currentView = computed(() => {
   background: transparent;
 }
 .p-dark .desktop-sidebar :deep(.p-menu-item-content),
-.p-dark :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content) {
+:global(.p-dark) :deep(.p-drawer-content .p-menu .p-menu-item-content) {
   color: var(--p-surface-0);
 }
 .p-dark .desktop-sidebar :deep(.p-menu-item-content:hover),
-.p-dark :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content:hover) {
+:global(.p-dark) :deep(.p-drawer-content .p-menu .p-menu-item-content:hover) {
   background-color: var(--p-surface-800) !important;
 }
-.p-dark :deep(.active-menu-item > .p-menu-item-content) {
+:global(.p-dark) :deep(.active-menu-item > .p-menu-item-content) {
   background-color: var(--p-primary-700) !important;
   color: var(--p-surface-0) !important;
 }
-.p-dark :deep(.p-drawer) {
+:global(.p-dark) :deep(.p-drawer) {
   background-color: var(--p-surface-900);
 }
-.p-dark :deep(.p-drawer-header) {
+:global(.p-dark) :deep(.p-drawer-header) {
   background-color: var(--p-surface-900);
   color: var(--p-surface-0);
   border-bottom-color: var(--p-surface-700);
@@ -307,11 +307,11 @@ const currentView = computed(() => {
     background: transparent;
   }
   .desktop-sidebar :deep(.p-menu-item-content),
-  :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content) {
+  :deep(.p-drawer-content .p-menu .p-menu-item-content) {
     color: var(--p-surface-0);
   }
   .desktop-sidebar :deep(.p-menu-item-content:hover),
-  :deep(.p-drawer-content) .p-menu :deep(.p-menu-item-content:hover) {
+  :deep(.p-drawer-content .p-menu .p-menu-item-content:hover) {
     background-color: var(--p-surface-800) !important;
   }
   :deep(.active-menu-item > .p-menu-item-content) {
