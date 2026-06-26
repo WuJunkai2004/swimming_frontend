@@ -13,6 +13,7 @@ const { alerts } = useAlert();
 
 const results = ref([]);
 const loading = ref(false);
+const submitting = ref(false);
 
 const fetchResults = async () => {
   if (!props.currentEvent) {
@@ -49,24 +50,31 @@ const submitData = async () => {
     return;
   }
 
-  funVolunteerApi
-    .confirmResults({
+  if (submitting.value) {
+    return;
+  }
+
+  submitting.value = true;
+  try {
+    const res = await funVolunteerApi.confirmResults({
       token: getToken(),
       eventId: props.currentEvent.eventId,
       round: props.currentEvent.round || 1,
-    })
-    .then((res) => res.json())
-    .then(async (data) => {
-      if (data.statusCode === 200) {
-        alerts("提示", "成绩已最终确认");
-        await fetchResults();
-      } else {
-        alerts("错误", data.message);
-      }
-    })
-    .catch((e) => {
-      alerts("错误", "提交失败");
     });
+    const data = await res.json();
+
+    if (data.statusCode === 200) {
+      await fetchResults();
+      alerts("提示", "成绩已最终确认");
+    } else {
+      alerts("错误", data.message || "确认失败");
+    }
+  } catch (e) {
+    console.error("Confirm results error:", e);
+    alerts("错误", "提交失败");
+  } finally {
+    submitting.value = false;
+  }
 };
 
 defineExpose({ submit: submitData });

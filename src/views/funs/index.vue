@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, shallowRef, ref, watch, computed } from "vue";
+import { onMounted, shallowRef, ref, watch, computed, onBeforeUpdate } from "vue";
 import { useToken } from "#/useToken";
 import { getData } from "#/useStorage";
 import { funVolunteerApi } from "@/api/serve.js";
@@ -55,6 +55,16 @@ const routes = {
 
 const loadedComponents = shallowRef([]);
 const childRefs = ref([]);
+
+const setChildRef = (el, index) => {
+  if (el) {
+    childRefs.value[index] = el;
+  }
+};
+
+onBeforeUpdate(() => {
+  childRefs.value = [];
+});
 
 const syncHash = () => {
   const hash = window.location.hash.slice(1);
@@ -136,11 +146,7 @@ onMounted(async () => {
       <component
         :is="currentView"
         :current-event="selectedEvent"
-        :ref="
-          (el) => {
-            if (el) childRefs.push(el);
-          }
-        "
+        :ref="(el) => setChildRef(el, index)"
       />
     </div>
 
