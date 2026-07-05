@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { activityApi } from '@/api/serve.js';
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { activityApi } from "@/api/serve.js";
 
 // Vue Router 实例
 const route = useRoute();
@@ -18,39 +18,44 @@ const isLastPage = ref(false); // 是否是最后一页
 
 // 核心数据获取函数
 const fetchNews = async (page) => {
-  if(loadingMore.value || isLastPage.value){
-    return
+  if (loadingMore.value || isLastPage.value) {
+    return;
   }
-  if(page === 1){
+  if (page === 1) {
     loadingFirst.value = true;
   } else {
     loadingMore.value = true;
   }
   error.value = null;
-  activityApi.getNewsList({ page, limit: limit.value })
-  .then(response => response.json())
-  .then(result => {
-    if (result.statusCode === 200) {
-      news.value.push(...result.data);
-      // 判断是否是最后一页：如果返回的数据量小于请求的 limit，则认为是最后一页
-      isLastPage.value = result.data.length < limit.value;
-    } else {
-      error.value = result.message || '获取新闻失败。';
-    }
-  })
-  .catch(() => {
-    error.value = '网络错误，请稍后再试';
-  })
-  .finally(() => {
-    loadingFirst.value = false;
-    loadingMore.value = false;
-  });
+  activityApi
+    .getNewsList({ page, limit: limit.value })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.statusCode === 200) {
+        news.value.push(...result.data);
+        // 判断是否是最后一页：如果返回的数据量小于请求的 limit，则认为是最后一页
+        isLastPage.value = result.data.length < limit.value;
+      } else {
+        error.value = result.message || "获取新闻失败。";
+      }
+    })
+    .catch(() => {
+      error.value = "网络错误，请稍后再试";
+    })
+    .finally(() => {
+      loadingFirst.value = false;
+      loadingMore.value = false;
+    });
 };
 
 // 滚动事件
 const handleScroll = () => {
+  if (loadingFirst.value) {
+    return;
+  }
   // 获取页面的滚动高度、可视高度和总高度
-  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  const scrollTop =
+    document.documentElement.scrollTop || document.body.scrollTop;
   const clientHeight = document.documentElement.clientHeight;
   const scrollHeight = document.documentElement.scrollHeight;
 
@@ -78,40 +83,46 @@ onMounted(() => {
 
   fetchNews(1);
 
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener("scroll", handleScroll);
 });
 
 // 组件卸载时，移除滚动事件监听，防止内存泄漏
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
 <template>
-  <div style="overflow-x: hidden;">
+  <div style="overflow-x: hidden">
     <MobileMenuBar />
     <ComputerMenuBar />
 
     <div class="grid justify-content-center">
       <div class="col-12 lg:col-8 xl:col-6">
-
         <div v-if="loadingFirst" class="text-center p-5">
           <ProgressSpinner />
           <p>正在加载新闻...</p>
         </div>
 
         <div v-else-if="error" class="p-3">
-            <Message severity="error">{{ error }}</Message>
+          <Message severity="error">{{ error }}</Message>
         </div>
 
         <div v-else>
           <div class="news-list p-3">
-            <Card v-for="item in news" :key="item.id" class="mb-3 news-item" @click="goToDetail(item.id)">
+            <Card
+              v-for="item in news"
+              :key="item.id"
+              class="mb-3 news-item"
+              @click="goToDetail(item.id)"
+            >
               <template #title>
                 <a class="news-title-link">{{ item.title }}</a>
               </template>
               <template #content>
-                <div class="flex justify-content-between align-items-center text-sm text-gray-500">
+                <div
+                  class="flex justify-content-between align-items-center text-sm text-gray-500"
+                >
                   <span>发布于: {{ item.publishTime }}</span>
                   <span class="flex align-items-center">
                     <i class="pi pi-eye mr-1"></i>
@@ -128,7 +139,10 @@ onBeforeUnmount(() => {
           </div>
 
           <div v-if="loadingMore" class="text-center p-4">
-            <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="3" />
+            <ProgressSpinner
+              style="width: 40px; height: 40px"
+              strokeWidth="3"
+            />
             <p class="text-color-secondary mt-2">正在加载更多...</p>
           </div>
 
@@ -146,7 +160,9 @@ onBeforeUnmount(() => {
 <style scoped>
 /* 响应式布局的核心由 PrimeFlex 的 grid 和 col-* 类处理，无需太多自定义 CSS */
 .news-item {
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   cursor: pointer;
 }
 
