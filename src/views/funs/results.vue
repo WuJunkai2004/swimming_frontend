@@ -128,21 +128,30 @@ watch([selectedEvent, selectedRound], ([newEvent, newRound]) => {
 onMounted(init);
 
 const rankedTotalPoints = computed(() => {
-  const sorted = [...totalPoints.value].sort(
-    (a, b) => b.totalPoints - a.totalPoints,
-  );
-  let rank = 1;
-  return sorted.map((item, i) => {
-    if (i > 0 && item.totalPoints < sorted[i - 1].totalPoints) {
-      rank = i + 1;
+  const sorted = [...totalPoints.value].sort((a, b) => {
+    if (b.totalPoints !== a.totalPoints) {
+      return b.totalPoints - a.totalPoints;
     }
-    return { ...item, rank };
+    // 积分相同时按名称决胜：中文按拼音、英文/数字按 ASCII 码
+    return displayName(a).localeCompare(displayName(b), "zh-Hans-CN");
   });
+  // 严格排名：即使积分相同也按决胜规则分出 1、2、3 名
+  return sorted.map((item, i) => ({ ...item, rank: i + 1 }));
 });
 
 const backToList = () => {
   router.push("/fun/list");
 };
+
+// 领奖台前三名数据
+const top3PodiumItems = computed(() =>
+  rankedTotalPoints.value.slice(0, 3).map((item) => ({
+    rank: item.rank,
+    key: item.teamName || item.college || "",
+    name: displayName(item),
+    points: item.totalPoints,
+  })),
+);
 
 // 显示队伍/学院名称：优先使用 teamName，否则使用 college
 const displayName = (item) => {
@@ -182,11 +191,14 @@ const displayName = (item) => {
             <div class="gold-divider"></div>
           </header>
 
+          <!-- 前三名领奖台 -->
+          <Top3Podium :items="top3PodiumItems" class="mb-5" />
+
           <!-- 总积分排名 -->
           <Card class="mb-5 luxury-card">
             <template #title>
               <div class="luxury-card-title">
-                <i class="pi pi-star-fill mr-2"></i>总积分排名
+                <i class="pi pi-crown mr-2"></i>总积分排名
               </div>
             </template>
             <template #content>
