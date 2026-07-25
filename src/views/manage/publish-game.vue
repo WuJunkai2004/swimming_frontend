@@ -120,18 +120,6 @@ const getExcelFile = async (event) => {
   stage.value = "edit";
 };
 
-/**
- * 下载志愿者填写表模板
- */
-const downloadTemplate = () => {
-  const link = document.createElement("a");
-  link.href = encodeURI("/志愿者填写表.xlsx");
-  link.download = "表格模板下载.xlsx";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
 // 志愿者职务映射（与后端 VolunteerPositionEnum 一致）
 const positionMap = {
   执行总裁: "EXECUTIVE_PRESIDENT",
@@ -273,19 +261,6 @@ const publishGame = async () => {
     alerts("错误", "请选择报名开始和结束时间");
     return;
   }
-  // 学院无法识别的运动员会导致后端反序列化失败（433）
-  const unmatched = gameData.athleteList.filter((a) => !a.college);
-  if (unmatched.length > 0) {
-    const names = unmatched
-      .slice(0, 5)
-      .map((a) => a.name)
-      .join("、");
-    alerts(
-      "错误",
-      `有 ${unmatched.length} 名运动员的学院无法识别（${names}${unmatched.length > 5 ? " 等" : ""}），请修正表格后重新上传`,
-    );
-    return;
-  }
 
   isPublishing.value = true;
   console.log("准备发布比赛，提交的数据:", gameData);
@@ -367,23 +342,10 @@ const publishGame = async () => {
             accept=".xlsx, .xls, .csv"
             :maxFileSize="10000000"
             :multiple="false"
+            chooseLabel="选择表格文件"
             :showUploadButton="false"
             :showCancelButton="false"
           >
-            <template #header="{ chooseCallback }">
-              <div class="flex flex-column gap-2">
-                <Button
-                  label="选择表格文件"
-                  icon="pi pi-file-excel"
-                  @click="chooseCallback()"
-                />
-                <Button
-                  label="表格模板下载"
-                  icon="pi pi-download"
-                  @click="downloadTemplate"
-                />
-              </div>
-            </template>
             <template #empty>
               <div
                 class="flex align-items-center justify-content-center flex-column p-5"
