@@ -209,7 +209,7 @@ const exportData = async (game) => {
   }
 };
 
-// 更新运动员报名项目
+// 更新运动员报名项目（用于替换/编辑）
 const updateAthleteEvents = async (athlete, events) => {
   try {
     const res = await sportApi.updateAthleteEvents({
@@ -232,12 +232,63 @@ const updateAthleteEvents = async (athlete, events) => {
   }
 };
 
+// 删除运动员报名项目
+const deleteAthleteEvents = async (athlete, eventsToDelete) => {
+  try {
+    const res = await sportApi.deleteAthleteEvents({
+      token: getToken(),
+      gameId: currentGame.value.uuid,
+      athleteId: athlete.athleteId,
+      athleteName: athlete.athleteName,
+      events: eventsToDelete,
+    });
+    const result = await res.json();
+    if (result.statusCode === 200) {
+      const current = editingAthleteEvents.value[athlete.athleteId] || [];
+      const newEvents = current.filter((e) => !eventsToDelete.includes(e));
+      editingAthleteEvents.value[athlete.athleteId] = newEvents;
+      athlete.registerEvents = newEvents;
+    } else {
+      alerts("错误", result.message || "删除失败");
+    }
+  } catch (e) {
+    console.error(e);
+    alerts("错误", "网络异常，删除失败");
+  }
+};
+
+// 添加运动员报名项目
+const addAthleteEvents = async (athlete, eventsToAdd) => {
+  try {
+    const res = await sportApi.addAthleteEvents({
+      token: getToken(),
+      gameId: currentGame.value.uuid,
+      athleteId: athlete.athleteId,
+      athleteName: athlete.athleteName,
+      events: eventsToAdd,
+    });
+    const result = await res.json();
+    if (result.statusCode === 200) {
+      const current = editingAthleteEvents.value[athlete.athleteId] || [];
+      const newEvents = [...current, ...eventsToAdd];
+      editingAthleteEvents.value[athlete.athleteId] = newEvents;
+      athlete.registerEvents = newEvents;
+    } else {
+      alerts("错误", result.message || "添加失败");
+    }
+  } catch (e) {
+    console.error(e);
+    alerts("错误", "网络异常，添加失败");
+  }
+};
+
 const removeAthleteEvent = async (athlete, eventValue) => {
   const current = editingAthleteEvents.value[athlete.athleteId] || [];
-  await updateAthleteEvents(
-    athlete,
-    current.filter((e) => e !== eventValue),
-  );
+  if (current.length <= 1) {
+    alerts("提示", "运动员至少保留一个报名项目");
+    return;
+  }
+  await deleteAthleteEvents(athlete, [eventValue]);
 };
 
 const addAthleteEvent = async (athlete, eventValue) => {
@@ -246,7 +297,7 @@ const addAthleteEvent = async (athlete, eventValue) => {
   if (!eventValue) return;
   const current = editingAthleteEvents.value[athlete.athleteId] || [];
   if (current.includes(eventValue)) return;
-  await updateAthleteEvents(athlete, [...current, eventValue]);
+  await addAthleteEvents(athlete, [eventValue]);
 };
 
 const availableOptionsForAthlete = (athleteId) => {
