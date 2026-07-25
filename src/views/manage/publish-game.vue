@@ -103,6 +103,18 @@ const getExcelFile = async (event) => {
 };
 
 /**
+ * 下载志愿者填写表模板
+ */
+const downloadTemplate = () => {
+  const link = document.createElement("a");
+  link.href = encodeURI("/志愿者填写表.xlsx");
+  link.download = "表格模板下载.xlsx";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+/**
  * 需求 4.1: 修改校友信息的函数存根
  */
 const editAthlete = (athlete) => {
@@ -201,10 +213,23 @@ const publishGame = async () => {
             accept=".xlsx, .xls"
             :maxFileSize="10000000"
             :multiple="false"
-            chooseLabel="选择表格文件"
             :showUploadButton="false"
             :showCancelButton="false"
           >
+            <template #header="{ chooseCallback }">
+              <div class="flex flex-column gap-2">
+                <Button
+                  label="选择表格文件"
+                  icon="pi pi-file-excel"
+                  @click="chooseCallback()"
+                />
+                <Button
+                  label="表格模板下载"
+                  icon="pi pi-download"
+                  @click="downloadTemplate"
+                />
+              </div>
+            </template>
             <template #empty>
               <div
                 class="flex align-items-center justify-content-center flex-column p-5"
