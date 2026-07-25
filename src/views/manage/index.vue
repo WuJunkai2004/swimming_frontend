@@ -41,7 +41,7 @@ const menuModel = ref([
     icon: "pi pi-calendar",
     items: [
       { label: "发布比赛", icon: "pi pi-plus", url: "#/publish-game" },
-      { label: "管理比赛", icon: "pi pi-list", url: "#/manage-games" },
+      { label: "振奋杯管理", icon: "pi pi-list", url: "#/manage-games" },
       { label: "趣味赛管理", icon: "pi pi-star", url: "#/manage-fun-games" },
     ],
   },
