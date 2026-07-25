@@ -318,7 +318,7 @@ onMounted(() => {
             @uploader="getExcelFile"
             auto
             customUpload
-            accept=".xlsx, .xls"
+            accept=".xlsx, .xls, .csv"
             :maxFileSize="10000000"
             :multiple="false"
             chooseLabel="选择表格文件"
@@ -333,7 +333,7 @@ onMounted(() => {
                   class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400"
                 />
                 <p class="mt-4 mb-0 text-xl">
-                  将志愿者信息表 (Excel) 拖拽到此处
+                  将志愿者信息表 (Excel 或 CSV) 拖拽到此处
                 </p>
                 <p class="mt-2 text-color-secondary">或点击选择文件</p>
               </div>
