@@ -490,11 +490,18 @@ onMounted(fetchGamesList);
                   <Tag
                     v-for="evt in editingAthleteEvents[slotProps.data.athleteId] || []"
                     :key="evt"
-                    :value="eventMap[evt] || evt"
                     severity="info"
-                    removable
-                    @remove="removeAthleteEvent(slotProps.data, evt)"
-                  />
+                    class="athlete-event-tag"
+                  >
+                    <span>{{ eventMap[evt] || evt }}</span>
+                    <Button
+                      icon="pi pi-times"
+                      rounded
+                      text
+                      class="p-button-sm event-tag-remove"
+                      @click.stop="removeAthleteEvent(slotProps.data, evt)"
+                    />
+                  </Tag>
                   <Button
                     v-if="addingEventFor !== slotProps.data.athleteId"
                     icon="pi pi-plus"
@@ -545,5 +552,25 @@ onMounted(fetchGamesList);
   word-break: break-all;
   white-space: normal;
   overflow-wrap: break-word;
+}
+
+/* 报名项目标签：悬浮时显示删除按钮 */
+.athlete-event-tag {
+  position: relative;
+  padding-right: 1.75rem;
+}
+
+.athlete-event-tag .event-tag-remove {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.athlete-event-tag:hover .event-tag-remove {
+  opacity: 1;
+  pointer-events: auto;
 }
 </style>
