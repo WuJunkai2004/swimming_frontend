@@ -25,6 +25,7 @@ const isPreviewVisible = ref(false);
 const isPreviewLoading = ref(false);
 const previewData = ref(null);
 const editingAthleteEvents = ref({});
+const editingEventFor = ref({ athleteId: null, eventValue: null });
 const addingEventFor = ref(null);
 const eventOptions = ref([]);
 
@@ -153,6 +154,7 @@ const showPreview = async (game) => {
         value: ev,
       }));
       addingEventFor.value = null;
+      editingEventFor.value = { athleteId: null, eventValue: null };
     } else {
       throw new Error(result.message || "预览失败");
     }
@@ -240,6 +242,7 @@ const removeAthleteEvent = async (athlete, eventValue) => {
 
 const addAthleteEvent = async (athlete, eventValue) => {
   addingEventFor.value = null;
+  editingEventFor.value = { athleteId: null, eventValue: null };
   if (!eventValue) return;
   const current = editingAthleteEvents.value[athlete.athleteId] || [];
   if (current.includes(eventValue)) return;
@@ -249,6 +252,37 @@ const addAthleteEvent = async (athlete, eventValue) => {
 const availableOptionsForAthlete = (athleteId) => {
   const selected = editingAthleteEvents.value[athleteId] || [];
   return eventOptions.value.filter((opt) => !selected.includes(opt.value));
+};
+
+const startEditingEvent = (athlete, eventValue) => {
+  editingEventFor.value = { athleteId: athlete.athleteId, eventValue };
+  addingEventFor.value = null;
+};
+
+const availableOptionsForEdit = (athleteId, currentEventValue) => {
+  const selected = editingAthleteEvents.value[athleteId] || [];
+  return eventOptions.value.filter(
+    (opt) => !selected.includes(opt.value) || opt.value === currentEventValue,
+  );
+};
+
+const replaceAthleteEvent = async (athlete, oldEventValue, newEventValue) => {
+  editingEventFor.value = { athleteId: null, eventValue: null };
+  if (!newEventValue || oldEventValue === newEventValue) return;
+  const current = editingAthleteEvents.value[athlete.athleteId] || [];
+  if (current.includes(newEventValue)) {
+    alerts("提示", "该项目已存在");
+    return;
+  }
+  const newEvents = current.map((e) =>
+    e === oldEventValue ? newEventValue : e,
+  );
+  await updateAthleteEvents(athlete, newEvents);
+};
+
+const startAddingEvent = (athlete) => {
+  addingEventFor.value = athlete.athleteId;
+  editingEventFor.value = { athleteId: null, eventValue: null };
 };
 
 // 需求 2.5: 打开志愿者导入页面
@@ -486,40 +520,108 @@ onMounted(fetchGamesList);
             </Column>
             <Column header="报名项目" style="min-width: 16rem">
               <template #body="slotProps">
-                <div class="flex flex-wrap align-items-center gap-2">
-                  <Tag
-                    v-for="evt in editingAthleteEvents[slotProps.data.athleteId] || []"
+                <div class="flex flex-column align-items-start gap-2 athlete-events-cell">
+                  <div
+                    v-for="(evt, index) in editingAthleteEvents[slotProps.data.athleteId] || []"
                     :key="evt"
-                    severity="info"
-                    class="athlete-event-tag"
+                    class="flex align-items-center gap-2 athlete-event-row"
                   >
-                    <span>{{ eventMap[evt] || evt }}</span>
+                    <template
+                      v-if="
+                        editingEventFor.athleteId === slotProps.data.athleteId &&
+                        editingEventFor.eventValue === evt
+                      "
+                    >
+                      <Select
+                        :options="availableOptionsForEdit(slotProps.data.athleteId, evt)"
+                        optionLabel="label"
+                        optionValue="value"
+                        :modelValue="evt"
+                        placeholder="选择项目"
+                        filter
+                        class="w-12rem"
+                        @change="replaceAthleteEvent(slotProps.data, evt, $event.value)"
+                      />
+                      <Button
+                        icon="pi pi-times"
+                        rounded
+                        text
+                        class="p-button-sm"
+                        @click="editingEventFor = { athleteId: null, eventValue: null }"
+                      />
+                    </template>
+                    <template v-else>
+                      <Tag severity="info" class="athlete-event-tag">
+                        <div class="flex align-items-center gap-2">
+                          <span>{{ eventMap[evt] || evt }}</span>
+                          <div class="flex align-items-center gap-1">
+                            <Button
+                              icon="pi pi-pencil"
+                              rounded
+                              text
+                              class="p-button-sm"
+                              @click.stop="startEditingEvent(slotProps.data, evt)"
+                            />
+                            <Button
+                              icon="pi pi-times"
+                              rounded
+                              text
+                              class="p-button-sm"
+                              @click.stop="removeAthleteEvent(slotProps.data, evt)"
+                            />
+                          </div>
+                        </div>
+                      </Tag>
+                      <template
+                        v-if="
+                          index ===
+                          (editingAthleteEvents[slotProps.data.athleteId] || []).length - 1
+                        "
+                      >
+                        <Button
+                          v-if="addingEventFor !== slotProps.data.athleteId"
+                          icon="pi pi-plus"
+                          rounded
+                          text
+                          class="p-button-sm"
+                          @click="startAddingEvent(slotProps.data)"
+                        />
+                        <Select
+                          v-else
+                          :options="availableOptionsForAthlete(slotProps.data.athleteId)"
+                          optionLabel="label"
+                          optionValue="value"
+                          placeholder="选择项目"
+                          filter
+                          class="w-12rem"
+                          @change="addAthleteEvent(slotProps.data, $event.value)"
+                        />
+                      </template>
+                    </template>
+                  </div>
+                  <div
+                    v-if="(editingAthleteEvents[slotProps.data.athleteId] || []).length === 0"
+                    class="flex align-items-center gap-2 athlete-event-row"
+                  >
                     <Button
-                      icon="pi pi-times"
+                      v-if="addingEventFor !== slotProps.data.athleteId"
+                      icon="pi pi-plus"
                       rounded
                       text
-                      class="p-button-sm event-tag-remove"
-                      @click.stop="removeAthleteEvent(slotProps.data, evt)"
+                      class="p-button-sm"
+                      @click="startAddingEvent(slotProps.data)"
                     />
-                  </Tag>
-                  <Button
-                    v-if="addingEventFor !== slotProps.data.athleteId"
-                    icon="pi pi-plus"
-                    rounded
-                    text
-                    class="p-button-sm"
-                    @click="addingEventFor = slotProps.data.athleteId"
-                  />
-                  <Select
-                    v-else
-                    :options="availableOptionsForAthlete(slotProps.data.athleteId)"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="选择项目"
-                    filter
-                    class="w-12rem"
-                    @change="addAthleteEvent(slotProps.data, $event.value)"
-                  />
+                    <Select
+                      v-else
+                      :options="availableOptionsForAthlete(slotProps.data.athleteId)"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="选择项目"
+                      filter
+                      class="w-12rem"
+                      @change="addAthleteEvent(slotProps.data, $event.value)"
+                    />
+                  </div>
                 </div>
               </template>
             </Column>
@@ -554,23 +656,21 @@ onMounted(fetchGamesList);
   overflow-wrap: break-word;
 }
 
-/* 报名项目标签：悬浮时显示删除按钮 */
+/* 报名项目标签：始终显示编辑和删除按钮 */
+.athlete-events-cell {
+  width: 100%;
+}
+
+.athlete-event-row {
+  min-height: 2.25rem;
+}
+
 .athlete-event-tag {
-  position: relative;
-  padding-right: 1.75rem;
+  padding-right: 0;
 }
 
-.athlete-event-tag .event-tag-remove {
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  opacity: 0;
-  transition: opacity 0.15s;
-  pointer-events: none;
-}
-
-.athlete-event-tag:hover .event-tag-remove {
+.athlete-event-tag .p-button {
+  visibility: visible;
   opacity: 1;
-  pointer-events: auto;
 }
 </style>

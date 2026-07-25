@@ -36,6 +36,17 @@ const isOverEnd = computed(() => {
   return now > endTime;
 });
 
+// 已分配到泳道的运动员（绿色锁定，不可再次选择）
+const lockedAthletes = computed(() => {
+  const set = new Set();
+  heatData.value.flat().forEach((a) => {
+    if (a && a.studentNumber) {
+      set.add(a.studentNumber);
+    }
+  });
+  return set;
+});
+
 // 获取比赛信息
 const loadGameInfo = () => {
   if (!gameId.value) {
@@ -145,6 +156,10 @@ const assignAthlete = (heatIdx, laneIdx, athlete = null) => {
 
 // HTML5 Drag and Drop handlers
 const onAthleteDragStart = (e, athlete) => {
+  if (lockedAthletes.value.has(athlete.studentNumber)) {
+    e.preventDefault();
+    return;
+  }
   e.dataTransfer.setData("application/json", JSON.stringify(athlete));
   e.dataTransfer.effectAllowed = "move";
 };
@@ -373,14 +388,21 @@ onMounted(() => {
               <div
                 v-for="athlete in availableAthletes"
                 :key="athlete.studentNumber"
-                class="p-2 border-bottom-1 surface-border cursor-pointer hover:surface-hover transition-colors"
+                class="p-2 border-bottom-1 surface-border athlete-list-item"
                 :class="{
-                  'surface-highlight':
-                    selectedAthlete?.studentNumber === athlete.studentNumber,
+                  'selected-athlete':
+                    selectedAthlete?.studentNumber === athlete.studentNumber &&
+                    !lockedAthletes.has(athlete.studentNumber),
+                  'locked-athlete': lockedAthletes.has(athlete.studentNumber),
+                  'cursor-pointer hover:surface-hover transition-colors':
+                    !lockedAthletes.has(athlete.studentNumber),
                 }"
-                draggable="true"
+                :draggable="!lockedAthletes.has(athlete.studentNumber)"
                 @dragstart="onAthleteDragStart($event, athlete)"
-                @click="selectedAthlete = athlete"
+                @click="
+                  !lockedAthletes.has(athlete.studentNumber) &&
+                    (selectedAthlete = athlete)
+                "
               >
                 <div class="font-bold">{{ athlete.name }}</div>
                 <div class="text-sm text-500">{{ athlete.studentNumber }}</div>
@@ -467,6 +489,26 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.athlete-list-item {
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.athlete-list-item.selected-athlete {
+  border-left-color: var(--p-primary-500);
+  border-right-color: var(--p-primary-500);
+  background-color: var(--p-primary-50);
+}
+
+.athlete-list-item.locked-athlete {
+  border-left-color: var(--p-green-500);
+  border-right-color: var(--p-green-500);
+  background-color: var(--p-green-50);
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
