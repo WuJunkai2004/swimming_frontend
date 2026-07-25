@@ -24,6 +24,9 @@ const expandedRows = ref({}); // 控制 DataTable 的行展开状态
 const isPreviewVisible = ref(false);
 const isPreviewLoading = ref(false);
 const previewData = ref(null);
+const editingAthleteEvents = ref({});
+const addingEventFor = ref(null);
+const eventOptions = ref([]);
 
 // 分享弹窗状态
 const isShareVisible = ref(false);
@@ -132,6 +135,24 @@ const showPreview = async (game) => {
 
     if (result.statusCode === 200) {
       previewData.value = result.data;
+      // 初始化运动员报名项目编辑状态
+      editingAthleteEvents.value = {};
+      if (Array.isArray(result.data.athleteDetail)) {
+        for (const athlete of result.data.athleteDetail) {
+          editingAthleteEvents.value[athlete.athleteId] = [
+            ...(athlete.registerEvents || []),
+          ];
+        }
+      }
+      // 构造可选项目下拉（优先使用比赛允许的项目）
+      const allowed = Array.isArray(result.data.allowedEvents)
+        ? result.data.allowedEvents
+        : Object.keys(eventMap);
+      eventOptions.value = allowed.map((ev) => ({
+        label: eventMap[ev] || ev,
+        value: ev,
+      }));
+      addingEventFor.value = null;
     } else {
       throw new Error(result.message || "预览失败");
     }
@@ -184,6 +205,50 @@ const exportData = async (game) => {
   } finally {
     exportButton.disabled = false; // 重新启用按钮
   }
+};
+
+// 更新运动员报名项目
+const updateAthleteEvents = async (athlete, events) => {
+  try {
+    const res = await sportApi.updateAthleteEvents({
+      token: getToken(),
+      gameId: currentGame.value.uuid,
+      athleteId: athlete.athleteId,
+      athleteName: athlete.athleteName,
+      events,
+    });
+    const result = await res.json();
+    if (result.statusCode === 200) {
+      editingAthleteEvents.value[athlete.athleteId] = events;
+      athlete.registerEvents = events;
+    } else {
+      alerts("错误", result.message || "保存失败");
+    }
+  } catch (e) {
+    console.error(e);
+    alerts("错误", "网络异常，保存失败");
+  }
+};
+
+const removeAthleteEvent = async (athlete, eventValue) => {
+  const current = editingAthleteEvents.value[athlete.athleteId] || [];
+  await updateAthleteEvents(
+    athlete,
+    current.filter((e) => e !== eventValue),
+  );
+};
+
+const addAthleteEvent = async (athlete, eventValue) => {
+  addingEventFor.value = null;
+  if (!eventValue) return;
+  const current = editingAthleteEvents.value[athlete.athleteId] || [];
+  if (current.includes(eventValue)) return;
+  await updateAthleteEvents(athlete, [...current, eventValue]);
+};
+
+const availableOptionsForAthlete = (athleteId) => {
+  const selected = editingAthleteEvents.value[athleteId] || [];
+  return eventOptions.value.filter((opt) => !selected.includes(opt.value));
 };
 
 // 需求 2.5: 打开志愿者导入页面
@@ -310,9 +375,10 @@ onMounted(fetchGamesList);
               <div v-else class="flex flex-wrap gap-4 align-items-center">
                 <div>
                   <span class="font-semibold">报名截止日期: </span>
-                  <span>{{
-                    new Date(slotProps.data.details.endTime).toLocaleString()
-                  }}</span>
+                  <span v-if="slotProps.data.details.endTime">
+                    {{ new Date(slotProps.data.details.endTime).toLocaleString() }}
+                  </span>
+                  <span v-else class="text-color-secondary">未设置</span>
                 </div>
                 <div>
                   <span class="font-semibold">项目总数: </span>
@@ -418,9 +484,36 @@ onMounted(fetchGamesList);
                 }}
               </template>
             </Column>
-            <Column field="registerEvents" header="报名项目">
+            <Column header="报名项目" style="min-width: 16rem">
               <template #body="slotProps">
-                {{ slotProps.data.registerEvents.map(event => eventMap[event]).join(", ") }}
+                <div class="flex flex-wrap align-items-center gap-2">
+                  <Tag
+                    v-for="evt in editingAthleteEvents[slotProps.data.athleteId] || []"
+                    :key="evt"
+                    :value="eventMap[evt] || evt"
+                    severity="info"
+                    removable
+                    @remove="removeAthleteEvent(slotProps.data, evt)"
+                  />
+                  <Button
+                    v-if="addingEventFor !== slotProps.data.athleteId"
+                    icon="pi pi-plus"
+                    rounded
+                    text
+                    class="p-button-sm"
+                    @click="addingEventFor = slotProps.data.athleteId"
+                  />
+                  <Select
+                    v-else
+                    :options="availableOptionsForAthlete(slotProps.data.athleteId)"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="选择项目"
+                    filter
+                    class="w-12rem"
+                    @change="addAthleteEvent(slotProps.data, $event.value)"
+                  />
+                </div>
               </template>
             </Column>
           </DataTable>
@@ -433,7 +526,17 @@ onMounted(fetchGamesList);
 <style scoped>
 /* 展开行的内容样式 */
 .expansion-content {
-  background-color: var(--p-surface-100);
+  background-color: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  color: var(--p-text-color);
+}
+
+/* 与 index.vue 一致的 prefers-color-scheme 兜底 */
+@media (prefers-color-scheme: dark) {
+  .expansion-content {
+    background-color: var(--p-surface-800);
+    border-color: var(--p-surface-700);
+  }
 }
 
 /* 分享链接的预览区域文字自动换行 */

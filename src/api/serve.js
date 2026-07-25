@@ -6,6 +6,7 @@ import { apiClient } from "./client.js";
 const sportApi = new apiClient();
 sportApi._add_endpoint("register", "/sport/register", ["name","academicNumber","sportType","college","competitionId"], ["group"], "POST"); // 运动员报名
 sportApi._add_endpoint("preview", "/sport/preview", ["token","gameId"], [], "POST"); // 预览报名信息
+sportApi._add_endpoint("updateAthleteEvents", "/sport/updateAthleteEvents", ["token","gameId","athleteId","events"], ["athleteName"], "POST"); // 更新运动员报名项目（待后端实现）
 sportApi._add_endpoint("export", "/sport/export", ["token","gameId"], [], "POST"); // 导出报名信息
 sportApi._add_endpoint("getGameList", "/sport/getGameList", [], [], "GET"); // 获取可报名比赛列表
 sportApi._add_endpoint("getGameInfo", "/sport/getGameInfo", ["game"], [], "GET"); // 获取比赛信息

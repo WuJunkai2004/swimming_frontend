@@ -121,12 +121,13 @@ const openArrangeDialog = async (event) => {
 };
 
 // Assign athlete to lane
-const assignAthlete = (heatIdx, laneIdx) => {
-  if (!selectedAthlete.value) return;
+const assignAthlete = (heatIdx, laneIdx, athlete = null) => {
+  const target = athlete || selectedAthlete.value;
+  if (!target) return;
 
   // Check if athlete is already assigned in all heat
   const isAlreadyAssigned = heatData.value.flat().some(
-    athlete => athlete && athlete.studentNumber === selectedAthlete.value.studentNumber
+    (a) => a && a.studentNumber === target.studentNumber
   );
 
   if (isAlreadyAssigned) {
@@ -135,11 +136,35 @@ const assignAthlete = (heatIdx, laneIdx) => {
   }
 
   // Assign
-  heatData.value[heatIdx][laneIdx] = { ...selectedAthlete.value };
+  heatData.value[heatIdx][laneIdx] = { ...target };
 
   // Optionally remove from available list or just deselect
-  // availableAthletes.value = availableAthletes.value.filter(a => a.studentNumber !== selectedAthlete.value.studentNumber);
+  // availableAthletes.value = availableAthletes.value.filter(a => a.studentNumber !== target.studentNumber);
   selectedAthlete.value = null;
+};
+
+// HTML5 Drag and Drop handlers
+const onAthleteDragStart = (e, athlete) => {
+  e.dataTransfer.setData("application/json", JSON.stringify(athlete));
+  e.dataTransfer.effectAllowed = "move";
+};
+
+const onLaneDragOver = (e) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+};
+
+const onLaneDrop = (e, heatIdx, laneIdx) => {
+  e.preventDefault();
+  if (heatData.value[heatIdx][laneIdx]) return;
+  const json = e.dataTransfer.getData("application/json");
+  if (!json) return;
+  try {
+    const athlete = JSON.parse(json);
+    assignAthlete(heatIdx, laneIdx, athlete);
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 const removeAthlete = (heatIdx, laneIdx) => {
@@ -353,6 +378,8 @@ onMounted(() => {
                   'surface-highlight':
                     selectedAthlete?.studentNumber === athlete.studentNumber,
                 }"
+                draggable="true"
+                @dragstart="onAthleteDragStart($event, athlete)"
                 @click="selectedAthlete = athlete"
               >
                 <div class="font-bold">{{ athlete.name }}</div>
@@ -395,24 +422,26 @@ onMounted(() => {
                       class="col-12 md:col-6 lg:col-3 mb-3"
                     >
                       <div
-                        class="surface-card border-1 border-round p-3 flex flex-column align-items-center justify-content-center h-full relative"
+                        class="border-1 border-round p-3 flex flex-column align-items-center justify-content-center h-full relative"
                         :class="
                           laneAthlete
-                            ? 'border-primary'
-                            : 'border-300 surface-ground cursor-pointer hover:surface-200'
+                            ? 'bg-green-100 border-green-300 text-green-800'
+                            : 'bg-gray-200 border-gray-300 text-gray-600 cursor-pointer hover:bg-gray-300'
                         "
                         style="min-height: 120px"
+                        @dragover.prevent="onLaneDragOver"
+                        @drop="onLaneDrop($event, idx, laneIdx)"
                         @click="!laneAthlete && assignAthlete(idx, laneIdx)"
                       >
-                        <div class="font-bold text-xl mb-2 text-700">
+                        <div class="font-bold text-xl mb-2">
                           泳道 {{ laneIdx + 1 }}
                         </div>
 
                         <div v-if="laneAthlete" class="text-center w-full">
-                          <div class="text-primary font-bold text-lg mb-1">
+                          <div class="font-bold text-lg mb-1">
                             {{ laneAthlete.name }}
                           </div>
-                          <div class="text-500 text-sm mb-3">
+                          <div class="text-sm mb-3 opacity-80">
                             {{ laneAthlete.studentNumber }}
                           </div>
                           <Button
@@ -421,11 +450,8 @@ onMounted(() => {
                             @click.stop="removeAthlete(idx, laneIdx)"
                           />
                         </div>
-                        <div v-else class="text-500 text-sm">
-                          <span v-if="selectedAthlete"
-                            >点击分配: {{ selectedAthlete.name }}</span
-                          >
-                          <span v-else>空闲 (点击分配)</span>
+                        <div v-else class="text-sm font-semibold">
+                          空闲泳道
                         </div>
                       </div>
                     </div>
