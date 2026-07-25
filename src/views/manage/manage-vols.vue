@@ -169,17 +169,20 @@ const confirmUpload = async () => {
       alerts("错误", `未知职务: ${vol.position} (姓名: ${vol.name})`);
       return;
     }
-    let road = "";
+    let road = [];
     if (code === "TIMER" || code === "REINTAKE_INSPECTION") {
       if (!vol.lane) {
         alerts("错误", `${vol.name} (${vol.position}) 需要填写泳道`);
         return;
       }
-      road = String(vol.lane);
-      if (!["1", "2", "3", "4", "5", "6", "7", "8"].includes(road)) {
+      const lane = String(vol.lane);
+      if (!["1", "2", "3", "4", "5", "6", "7", "8"].includes(lane)) {
         alerts("错误", `泳道必须是 1-8: ${vol.lane} (姓名: ${vol.name})`);
         return;
       }
+      road = [parseInt(lane)];
+    } else if (code === "EXECUTIVE_PRESIDENT") {
+      road = [1, 2, 3, 4, 5, 6, 7, 8];
     }
 
     const rawPassword = generateRandomPassword();

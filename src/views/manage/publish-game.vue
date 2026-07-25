@@ -191,19 +191,22 @@ const uploadVolunteerCsv = async (file) => {
       alerts("错误", `未知职务: ${vol_position[i]} (姓名: ${name})`);
       return;
     }
-    // 只有计时员、转身检查需要填写道次，其他职务必须为空
-    let road = "";
+    // 只有计时员、转身检查需要填写道次，执行总裁为全部道次，其他职务为空数组
+    let road = [];
     if (code === "TIMER" || code === "REINTAKE_INSPECTION") {
       const lane = take_road[i];
       if (!lane) {
         alerts("错误", `${name} (${vol_position[i]}) 需要填写泳道`);
         return;
       }
-      road = String(lane);
-      if (!["1", "2", "3", "4", "5", "6", "7", "8"].includes(road)) {
+      const laneStr = String(lane);
+      if (!["1", "2", "3", "4", "5", "6", "7", "8"].includes(laneStr)) {
         alerts("错误", `泳道必须是 1-8: ${lane} (姓名: ${name})`);
         return;
       }
+      road = [parseInt(lane)];
+    } else if (code === "EXECUTIVE_PRESIDENT") {
+      road = [1, 2, 3, 4, 5, 6, 7, 8];
     }
     const rawPassword = generateRandomPassword();
     const hashedPassword = await SHA256(rawPassword);
