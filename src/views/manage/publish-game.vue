@@ -8,6 +8,7 @@ import {
 } from "#/excelUtils";
 import { useCollegeEnum } from "#/collegeMapping";
 import { useEventEnum } from "#/eventMapping";
+import { SHA256 } from "#/useHash";
 import { adminApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
@@ -46,6 +47,14 @@ watch(sameActivityNoLimit, (isUnlimited) => {
   }
 });
 
+// 发布成功后返回的比赛信息（用于上传志愿者）
+const publishedGameId = ref(null);
+const publishedGameName = ref("");
+// 志愿者上传状态与密码对照表弹窗
+const isUploadingVols = ref(false);
+const isPasswordDialogVisible = ref(false);
+const processedPasswords = ref([]);
+
 // --- 3. 核心功能函数 ---
 const analyseAthlete = (size, names, stuID, colleges) => {
   const athleteList = [];
@@ -71,6 +80,15 @@ const getExcelFile = async (event) => {
   console.log(collegeEnumMap);
   const file = event.files[0];
   console.log("文件已选择:", file);
+  if (!file) {
+    alerts("错误", "未选择文件，请重新选择");
+    return;
+  }
+  // CSV 文件按志愿者表处理
+  if (/\.csv$/i.test(file.name)) {
+    await uploadVolunteerCsv(file);
+    return;
+  }
   // 开始解析
   const extract = await Excetract.create(file);
   // 解析校友信息
@@ -114,6 +132,126 @@ const downloadTemplate = () => {
   document.body.removeChild(link);
 };
 
+// 志愿者职务映射（与后端 VolunteerPositionEnum 一致）
+const positionMap = {
+  执行总裁: "EXECUTIVE_PRESIDENT",
+  发令员: "STARTER",
+  计时员: "TIMER",
+  游进技术检查: "TECHNICAL_INSPECTION_OF_SWIMMING_IN",
+  转身检查: "REINTAKE_INSPECTION",
+  转身检查长: "REBORN_INSPECTOR",
+  其他: "OTHER",
+};
+
+// 生成 12 位随机密码（与 manage-fun-vols 一致）
+const generateRandomPassword = () => {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let password = "";
+  for (let i = 0; i < 12; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
+
+// 导出志愿者密码对照表 CSV（与 manage-fun-vols 一致）
+const exportPasswordsToCsv = (passwords, gameName) => {
+  const csvContent =
+    "﻿姓名,学号,初始密码\n" +
+    passwords
+      .map((p) => `${p.name},${p.studentNumber},${p.rawPassword}`)
+      .join("\n");
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = `${gameName || "比赛"}-志愿者密码.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+/**
+ * 上传志愿者表 (CSV)：为每位志愿者生成随机密码，SHA-256 哈希后上传
+ * @param {File} file - 用户选择的 CSV 文件
+ */
+const uploadVolunteerCsv = async (file) => {
+  if (!publishedGameId.value) {
+    alerts("错误", "请先发布比赛，再上传志愿者表");
+    return;
+  }
+  const content = await Excetract.create(file);
+  const vol_name = content.getColOf("姓名");
+  const vol_id = content.getColOf("学号");
+  const vol_position = content.getColOf("职务");
+  const take_road = content.getColOf("泳道");
+  if (!vol_name.length || !vol_id.length || !vol_position.length) {
+    alerts("错误", "上传的表格格式不正确，请使用指定的志愿者填写表");
+    return;
+  }
+
+  processedPasswords.value = [];
+  const data = [];
+  for (let i = 0; i < vol_name.length; i++) {
+    const name = vol_name[i];
+    const studentNumber = String(vol_id[i] || "");
+    const code = positionMap[vol_position[i]];
+    if (!code) {
+      alerts("错误", `未知职务: ${vol_position[i]} (姓名: ${name})`);
+      return;
+    }
+    // 只有计时员、转身检查需要填写道次，其他职务必须为空
+    let road = "";
+    if (code === "TIMER" || code === "REINTAKE_INSPECTION") {
+      const lane = take_road[i];
+      if (!lane) {
+        alerts("错误", `${name} (${vol_position[i]}) 需要填写泳道`);
+        return;
+      }
+      road = String(lane);
+      if (!["1", "2", "3", "4", "5", "6", "7", "8"].includes(road)) {
+        alerts("错误", `泳道必须是 1-8: ${lane} (姓名: ${name})`);
+        return;
+      }
+    }
+    const rawPassword = generateRandomPassword();
+    const hashedPassword = await SHA256(rawPassword);
+    processedPasswords.value.push({ name, studentNumber, rawPassword });
+    data.push({
+      name,
+      studentNumber,
+      position: code,
+      road,
+      password: hashedPassword,
+    });
+  }
+
+  isUploadingVols.value = true;
+  adminApi.uploadVolunteer({
+    token: getToken(),
+    gameId: publishedGameId.value,
+    data,
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.statusCode === 200) {
+        isPasswordDialogVisible.value = true;
+      } else {
+        alerts("错误", result.message || "志愿者上传失败");
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+      alerts("错误", "网络异常，请稍后重试");
+    })
+    .finally(() => {
+      isUploadingVols.value = false;
+    });
+};
+
 /**
  * 需求 4.1: 修改校友信息的函数存根
  */
@@ -133,6 +271,19 @@ const publishGame = async () => {
   }
   if (!gameData.startTime || !gameData.endTime) {
     alerts("错误", "请选择报名开始和结束时间");
+    return;
+  }
+  // 学院无法识别的运动员会导致后端反序列化失败（433）
+  const unmatched = gameData.athleteList.filter((a) => !a.college);
+  if (unmatched.length > 0) {
+    const names = unmatched
+      .slice(0, 5)
+      .map((a) => a.name)
+      .join("、");
+    alerts(
+      "错误",
+      `有 ${unmatched.length} 名运动员的学院无法识别（${names}${unmatched.length > 5 ? " 等" : ""}），请修正表格后重新上传`,
+    );
     return;
   }
 
@@ -162,7 +313,10 @@ const publishGame = async () => {
     if (data.statusCode !== 200) {
       throw new Error(data.message || "发布请求失败");
     }
-    alerts("成功", "比赛已成功发布！");
+    alerts("成功", "比赛已成功发布！可继续上传志愿者表 (CSV)。");
+    // 保存发布成功的比赛信息，供上传志愿者使用
+    publishedGameId.value = data.data || null;
+    publishedGameName.value = gameData.competitionName;
     // 成功后可以重置页面状态
     stage.value = "upload";
     // 重置数据
@@ -210,7 +364,7 @@ const publishGame = async () => {
             @uploader="getExcelFile"
             auto
             customUpload
-            accept=".xlsx, .xls"
+            accept=".xlsx, .xls, .csv"
             :maxFileSize="10000000"
             :multiple="false"
             :showUploadButton="false"
@@ -238,7 +392,7 @@ const publishGame = async () => {
                   class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400"
                 />
                 <p class="mt-4 mb-0 text-xl">
-                  将比赛报名总表 (Excel) 拖拽到此处
+                  将比赛报名总表 (Excel) 或志愿者表 (CSV) 拖拽到此处
                 </p>
                 <p class="mt-2 text-color-secondary">或点击选择文件</p>
               </div>
@@ -386,6 +540,55 @@ const publishGame = async () => {
         </div>
       </div>
     </div>
+
+    <!-- 密码预览与下载弹窗（与 manage-fun-vols 一致） -->
+    <Dialog
+      v-model:visible="isPasswordDialogVisible"
+      modal
+      header="上传成功 - 志愿者初始密码对照表"
+      :style="{ width: '600px' }"
+      :closable="false"
+    >
+      <div class="flex flex-column gap-3 mt-2">
+        <Message
+          severity="warn"
+          icon="pi pi-exclamation-triangle"
+          :closable="false"
+        >
+          请立即下载或记录下方密码。关闭此窗口后，明文密码数据将无法找回。
+        </Message>
+        <DataTable
+          :value="processedPasswords"
+          scrollable
+          scrollHeight="300px"
+          stripedRows
+          size="small"
+        >
+          <Column field="name" header="姓名"></Column>
+          <Column field="studentNumber" header="学号"></Column>
+          <Column field="rawPassword" header="初始密码">
+            <template #body="slotProps">
+              <code class="font-bold text-primary">{{
+                slotProps.data.rawPassword
+              }}</code>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+      <template #footer>
+        <Button
+          label="关闭"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="isPasswordDialogVisible = false"
+        />
+        <Button
+          label="下载 CSV 对照表"
+          icon="pi pi-download"
+          @click="exportPasswordsToCsv(processedPasswords, publishedGameName)"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 

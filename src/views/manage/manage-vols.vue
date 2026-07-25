@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { useAlert } from "#/useAlert";
 import { Excetract } from "#/excelUtils";
 import { useToken } from "#/useToken";
+import { SHA256 } from "#/useHash";
 import { sportApi, adminApi } from "@/api/serve.js";
 
 const { alerts, awaitAlert } = useAlert();
@@ -14,6 +15,9 @@ const stage = ref("upload"); // 'upload' or 'manage'
 const volunteerList = ref([]);
 
 const isLoading = ref(false);
+
+const isPasswordDialogVisible = ref(false);
+const processedPasswords = ref([]);
 
 const isOverEnd = computed(() => {
   if (!gameInfo.value.endTime || gameInfo.value.endTime === "1970-01-01") {
@@ -121,10 +125,43 @@ const positionMap = {
   其他: "OTHER",
 };
 
+// 生成 12 位随机密码（与 manage-fun-vols 一致）
+const generateRandomPassword = () => {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let password = "";
+  for (let i = 0; i < 12; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
+
+// 导出志愿者密码对照表 CSV（与 manage-fun-vols 一致）
+const exportPasswordsToCsv = (passwords, gameName) => {
+  const csvContent =
+    "﻿姓名,学号,初始密码\n" +
+    passwords
+      .map((p) => `${p.name},${p.studentNumber},${p.rawPassword}`)
+      .join("\n");
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = `${gameName || "比赛"}-志愿者密码.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
 const confirmUpload = async () => {
   if (volunteerList.value.length === 0) {
     return;
   }
+
+  processedPasswords.value = [];
 
   const getCommonFields = async (vol) => {
     const code = positionMap[vol.position];
@@ -145,11 +182,20 @@ const confirmUpload = async () => {
       }
     }
 
+    const rawPassword = generateRandomPassword();
+    const hashedPassword = await SHA256(rawPassword);
+    processedPasswords.value.push({
+      name: vol.name,
+      studentNumber: String(vol.studentId),
+      rawPassword,
+    });
+
     return {
       name: vol.name,
       studentNumber: String(vol.studentId),
       position: code,
       road: road,
+      password: hashedPassword,
     };
   };
 
@@ -172,7 +218,11 @@ const confirmUpload = async () => {
     .then((res) => res.json())
     .then((data) => {
       if (data.statusCode === 200) {
-        alerts("成功", "上传成功");
+        if (processedPasswords.value.length > 0) {
+          isPasswordDialogVisible.value = true;
+        } else {
+          alerts("成功", "上传成功");
+        }
         volunteerList.value = [];
         stage.value = "upload";
       } else {
@@ -311,6 +361,55 @@ onMounted(() => {
         <Column field="lane" header="泳道"></Column>
       </DataTable>
     </div>
+
+    <!-- 密码预览与下载弹窗（与 manage-fun-vols 一致） -->
+    <Dialog
+      v-model:visible="isPasswordDialogVisible"
+      modal
+      header="上传成功 - 志愿者初始密码对照表"
+      :style="{ width: '600px' }"
+      :closable="false"
+    >
+      <div class="flex flex-column gap-3 mt-2">
+        <Message
+          severity="warn"
+          icon="pi pi-exclamation-triangle"
+          :closable="false"
+        >
+          请立即下载或记录下方密码。关闭此窗口后，明文密码数据将无法找回。
+        </Message>
+        <DataTable
+          :value="processedPasswords"
+          scrollable
+          scrollHeight="300px"
+          stripedRows
+          size="small"
+        >
+          <Column field="name" header="姓名"></Column>
+          <Column field="studentNumber" header="学号"></Column>
+          <Column field="rawPassword" header="初始密码">
+            <template #body="slotProps">
+              <code class="font-bold text-primary">{{
+                slotProps.data.rawPassword
+              }}</code>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+      <template #footer>
+        <Button
+          label="关闭"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="isPasswordDialogVisible = false"
+        />
+        <Button
+          label="下载 CSV 对照表"
+          icon="pi pi-download"
+          @click="exportPasswordsToCsv(processedPasswords, gameInfo.name)"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
