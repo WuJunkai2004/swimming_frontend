@@ -97,6 +97,14 @@ watch(selectedSessionIdx, () => {
   fixGroupSelection();
 });
 
+// 把当前场次/组别选择同步到路由 query，从详情页返回时可恢复
+watch([selectedSessionIdx, selectedGroup], ([idx, group]) => {
+  if (idx === null) return;
+  router.replace({
+    query: { ...route.query, session: idx, group },
+  });
+});
+
 // 获取比赛名称
 const fetchGameInfo = async () => {
   try {
@@ -111,7 +119,7 @@ const fetchGameInfo = async () => {
   }
 };
 
-// 获取比赛日程并初始化场次选择
+// 获取比赛日程并初始化场次选择（优先恢复路由 query 中保存的选择）
 const fetchSchedule = async () => {
   isLoading.value = true;
   error.value = null;
@@ -121,7 +129,17 @@ const fetchSchedule = async () => {
     if (result.statusCode === 200) {
       schedule.value = Array.isArray(result.data) ? result.data : [];
       if (schedule.value.length > 0) {
-        selectedSessionIdx.value = 0;
+        const fromQuery = Number.parseInt(route.query.session, 10);
+        selectedSessionIdx.value =
+          Number.isInteger(fromQuery) &&
+          fromQuery >= 0 &&
+          fromQuery < schedule.value.length
+            ? fromQuery
+            : 0;
+        const groupFromQuery = String(route.query.group || "");
+        if (groupOptions.some((g) => g.value === groupFromQuery)) {
+          selectedGroup.value = groupFromQuery;
+        }
         fixGroupSelection();
       }
     } else {
@@ -135,13 +153,14 @@ const fetchSchedule = async () => {
   }
 };
 
-// 场次 / 项目 / 组别选定后，跳转到一大组成绩详情页
+// 场次 / 项目 / 组别选定后，跳转到一大组成绩详情页（携带场次便于返回时恢复）
 const goToDetail = (item) => {
   if (!selectedSession.value) return;
   router.push({
     name: "ResultDetail",
     params: { gameid: gameId.value },
     query: {
+      session: selectedSessionIdx.value,
       date: selectedSession.value.date,
       time: selectedSession.value.time,
       program: item.program,

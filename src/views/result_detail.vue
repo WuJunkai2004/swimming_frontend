@@ -157,7 +157,16 @@ onMounted(() => {
               label="返回赛程"
               icon="pi pi-chevron-left"
               class="p-button-text p-button-sm"
-              @click="router.push(`/result/${gameId}`)"
+              @click="
+                router.push({
+                  name: 'Result',
+                  params: { gameid: gameId },
+                  query: {
+                    session: route.query.session,
+                    group: route.query.group,
+                  },
+                })
+              "
             />
           </div>
 
