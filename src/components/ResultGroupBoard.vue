@@ -505,7 +505,7 @@ const firstChar = (name) => (name ? String(name).charAt(0) : "?");
   font-weight: 700;
   border-radius: 50%;
   color: var(--p-text-color);
-  background: var(--p-surface-100);
+  background: var(--p-content-hover-background);
 }
 
 .rgb-medal-gold {
