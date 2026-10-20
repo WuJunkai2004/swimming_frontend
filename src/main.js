@@ -35,7 +35,11 @@ const app = createApp(App)
 app.use(router);
 app.use(PrimeVue, {
     theme: {
-        preset: Blue
+        preset: Blue,
+        options: {
+            // 跟随系统明暗主题（黑色/白色风格）
+            darkModeSelector: 'system'
+        }
     }
 });
 app.use(ConfirmationService);

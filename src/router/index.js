@@ -69,6 +69,11 @@ const routes = [
     component: () => import("@/views/result_gameid.vue"),
   },
   {
+    path: "/result/:gameid/detail", // 一大组（场次+项目+组别）成绩详情
+    name: "ResultDetail",
+    component: () => import("@/views/result_detail.vue"),
+  },
+  {
     path: "/volunteer", // 访问 /volunteer 路径时，使用哈希路由模式
     name: "Volunteer",
     component: () => import("@/views/vols/index.vue"),
