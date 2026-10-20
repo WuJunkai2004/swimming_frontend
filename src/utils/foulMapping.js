@@ -35,15 +35,27 @@ function loadFoulMap() {
   if (loading) return;
   loading = true;
 
+  const applyResult = (res) => {
+    if (res.statusCode === 200 && res.data) {
+      // Cache for 10 days (240 hours)
+      saveData('foulMap', res.data, 240);
+      updateState(res.data);
+      return true;
+    }
+    return false;
+  };
+
+  // 部分后端未提供 /api/volunteer/foulReason，失败时回退到公众犯规枚举接口
   fetch('/api/volunteer/foulReason')
-    .then(res => res.json())
+    .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
     .then(res => {
-      if (res.statusCode === 200 && res.data) {
-        // Cache for 10 days (240 hours)
-        saveData('foulMap', res.data, 240);
-        updateState(res.data);
-      }
+      if (!applyResult(res)) throw new Error('bad result');
     })
+    .catch(() =>
+      fetch('/api/funGame/foulReason')
+        .then(res => res.json())
+        .then(applyResult)
+    )
     .catch(err => {
       console.error('Failed to load foul map:', err);
     })
