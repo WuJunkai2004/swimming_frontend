@@ -345,6 +345,11 @@ const jumpScheduleManage = (game) => {
   window.location.href = `${window.location.href.split("#")[0]}#/manage-schedule?game=${game.uuid}`;
 };
 
+// 需求 2.6: 成绩管理（直录/修改成绩）
+const jumpResultsManage = (game) => {
+  window.location.href = `${window.location.href.split("#")[0]}#/manage-results?game=${game.uuid}&name=${encodeURIComponent(game.name)}`;
+};
+
 // 需求 2.7: 终止比赛报名
 const stopSignup = async (game) => {
   if (
@@ -419,7 +424,7 @@ onMounted(fetchGamesList);
 
         <Column field="name" header="比赛名称"></Column>
 
-        <Column header="操作" style="width: 12rem">
+        <Column header="操作" style="width: 16rem">
           <template #body="slotProps">
             <div class="flex gap-2">
               <Button
@@ -436,6 +441,11 @@ onMounted(fetchGamesList);
                 label="志愿者"
                 class="p-button-text p-button-sm p-button-info"
                 @click="jumpVolsManage(slotProps.data)"
+              />
+              <Button
+                label="成绩"
+                class="p-button-text p-button-sm p-button-warning"
+                @click="jumpResultsManage(slotProps.data)"
               />
             </div>
           </template>

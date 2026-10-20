@@ -113,6 +113,7 @@ const routes = {
   "/manage-vols": () => import("./manage-vols.vue"),
   "/manage-fun-vols": () => import("./manage-fun-vols.vue"),
   "/manage-schedule": () => import("./manage-schedule.vue"),
+  "/manage-results": () => import("./manage-results.vue"),
   "/manage-fun-games": () => import("./manage-fun-games.vue"),
   "/manage-fun-events": () => import("./manage-fun-events.vue"),
   "/manage-fun-teams": () => import("./manage-fun-teams.vue"),
