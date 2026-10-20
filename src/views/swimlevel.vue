@@ -248,6 +248,19 @@ const resetFollowingSteps = (step) => {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* 深色模式适配（darkModeSelector 为 system，.p-dark 兜底，媒体查询实际生效） */
+:where(.p-dark) .query-panel {
+  background-color: #1a1a1e;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  .query-panel {
+    background-color: #1a1a1e;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+}
+
 /* 步骤样式 */
 .step {
   display: flex;
