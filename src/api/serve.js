@@ -61,6 +61,8 @@ adminApi._add_endpoint("uploadImage", "/admin/uploadImage", ["vo"], [], "POST");
 adminApi._add_endpoint("updatePublishTime", "/admin/updatePublishTime", ["token","newsId"], ["publishTime"], "POST"); // 更新新闻发布时间
 adminApi._add_endpoint("updateAdmin", "/admin/updateAdmin", ["token","id","adminName","password"], [], "POST"); // 更新管理员信息
 adminApi._add_endpoint("postSignUpList", "/admin/postSignUpList", ["token","athleteList","activityTypes","athleteActivityLimits","competitionName","endTime"], ["colleges","collegeActivityLimits","sameActivityMaxLimit","leaderPhone","startTime"], "POST"); // 发布比赛报名
+adminApi._add_endpoint("uploadResultDirect", "/admin/uploadResultDirect", ["token","gameId","event","data"], ["date","time","marked","group","syncAthlete"], "POST"); // 管理员直录比赛成绩（免编排）
+adminApi._add_endpoint("updateAchievement", "/admin/updateAchievement", ["token","id","competitionId","time","program","group","name"], ["status","date","newTime","marked","competitionGroup","newName","studentNumber","college","road","athleteGroup","foulOrNot","achievement"], "POST"); // 管理员修改成绩记录
 adminApi._add_endpoint("login", "/admin/login", [], ["loginType","userName","password","ip"], "POST"); // 管理员登录
 adminApi._add_endpoint("getParticipatAthleteList", "/admin/getParticipatAthleteList", [], ["token","gameId","event","group"], "POST"); // 获取参赛运动员列表
 adminApi._add_endpoint("getAlumnusSignatureStatus", "/admin/getAlumnusSignatureStatus", [], ["token","page","limit"], "POST"); // 获取校友签名情况

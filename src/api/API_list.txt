@@ -21,6 +21,8 @@
 /alumnus/updateInfo
 /alumnus/login
 /alumnus/discuss
+/admin/uploadResultDirect
+/admin/updateAchievement
 /admin/withdrawNews
 /admin/uploadVolunteer
 /admin/uploadVideo
