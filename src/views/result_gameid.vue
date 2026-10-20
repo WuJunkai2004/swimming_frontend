@@ -218,8 +218,8 @@ onMounted(() => {
 
           <template v-else>
             <!-- 筛选条件：场次 + 组别 -->
-            <div class="p-fluid formgrid grid mb-3">
-              <div class="field col-7 md:col-8">
+            <div class="grid mb-3">
+              <div class="col-7 md:col-8 flex flex-column gap-1">
                 <label for="session">场次</label>
                 <Select
                   id="session"
@@ -228,9 +228,10 @@ onMounted(() => {
                   optionLabel="label"
                   optionValue="value"
                   placeholder="请选择场次"
+                  fluid
                 />
               </div>
-              <div class="field col-5 md:col-4">
+              <div class="col-5 md:col-4 flex flex-column gap-1">
                 <label for="group">组别</label>
                 <Select
                   id="group"
@@ -239,6 +240,7 @@ onMounted(() => {
                   optionLabel="label"
                   optionValue="value"
                   placeholder="请选择组别"
+                  fluid
                 />
               </div>
             </div>
