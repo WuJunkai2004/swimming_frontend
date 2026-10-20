@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch } from "vue";
+import { ref, reactive, watch, computed } from "vue";
 import { useToken } from "#/useToken";
 import { useAlert } from "#/useAlert";
 import {
@@ -16,6 +16,11 @@ const { getToken } = useToken();
 const { alerts } = useAlert();
 const { collegeEnumMap, collegeName, collegeMap } = useCollegeEnum();
 const { eventEnum, eventMap } = useEventEnum();
+
+// 学院下拉选项：显示中文名，绑定枚举码（最终统一上传枚举码）
+const collegeOptions = computed(() =>
+  Object.entries(collegeMap).map(([value, label]) => ({ label, value })),
+);
 
 // --- 2. 状态定义 ---
 // 页面阶段控制: 'upload' 或 'edit'
@@ -264,6 +269,18 @@ const publishGame = async () => {
     alerts("错误", "请选择报名开始和结束时间");
     return;
   }
+  const missingCollege = gameData.athleteList.find(
+    (a) => !collegeMap[a.college],
+  );
+  if (missingCollege) {
+    alerts(
+      "错误",
+      `请为 ${missingCollege.name || "未填写姓名的运动员"} 选择学院`,
+    );
+    return;
+  }
+  // 允许报名的学院列表以运动员实际学院为准，统一为枚举码
+  gameData.colleges = [...new Set(gameData.athleteList.map((a) => a.college))];
 
   isPublishing.value = true;
   console.log("准备发布比赛，提交的数据:", gameData);
@@ -280,6 +297,11 @@ const publishGame = async () => {
   const payload = {
     token: getToken(),
     ...gameData,
+    athleteList: gameData.athleteList.map((a) => ({
+      name: a.name,
+      academicNumber: a.academicNumber,
+      college: a.college,
+    })),
     leaderPhone: String(gameData.leaderPhone || ""),
     startTime: formatDate(gameData.startTime),
     endTime: formatDate(gameData.endTime),
@@ -391,7 +413,16 @@ const publishGame = async () => {
           <Column field="academicNumber" header="学号"></Column>
           <Column header="学院">
             <template #body="slotProps">
-              {{ collegeMap[slotProps.data.college] || slotProps.data.college }}
+              <Select
+                v-model="slotProps.data.college"
+                :options="collegeOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="请选择学院"
+                filter
+                :invalid="!collegeMap[slotProps.data.college]"
+                class="w-full"
+              />
             </template>
           </Column>
           <Column header="操作" style="width: 8rem; text-align: right;">
