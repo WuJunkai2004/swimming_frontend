@@ -8,24 +8,37 @@ import {
   shallowRef,
 } from "vue";
 import { useToken } from "#/useToken";
+import { ensureAdminSession, getAccessToken } from "#/adminAuth";
 
 import loading from "@/views/loading.vue";
 
 // --- 2. 鉴权与导航 ---
-const { getToken, removeToken } = useToken();
+const { removeToken } = useToken();
 
 /**
- * 页面加载时检查 Token
+ * 页面加载时恢复/刷新会话（双token：accessToken 2小时，refreshToken Cookie 7天）
  */
-onMounted(() => {
-  getToken();
+onMounted(async () => {
+  const token = await ensureAdminSession();
+  if (!token) {
+    console.warn("会话恢复失败，请重新登录");
+  }
 });
 
 /**
- * 退出登录
+ * 退出登录：通知后端使双 token 立即失效，再清理本地会话
  */
 const handleLogout = () => {
-  removeToken(true);
+  fetch("/admin/logout", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token: getAccessToken() || "" }),
+  }).finally(() => {
+    removeToken(true);
+  });
 };
 
 // --- 3. 响应式布局状态 ---
@@ -149,6 +162,8 @@ onBeforeUnmount(() => {
 watch(
   currentPath,
   async (newPath) => {
+    // 切换页面时顺手检查 accessToken 是否临近过期，必要时静默换新
+    ensureAdminSession();
     const path = newPath.slice(1) || "/";
     loadedComponent.value = await loadComponent(path);
   },

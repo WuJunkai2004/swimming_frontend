@@ -1,15 +1,15 @@
 import { useRouter } from 'vue-router';
-import { saveData, getData, removeData } from './useStorage';
+import { getAccessToken, saveAccessToken, clearAccessToken } from './adminAuth';
 
 export function useToken() {
     const router = useRouter();
 
-    const setToken = (token) => {
-        saveData('token', token, 24);
+    const setToken = (token, expiryHours = 24) => {
+        saveAccessToken(token, expiryHours);
     };
 
     const getToken = () => {
-        const token = getData('token');
+        const token = getAccessToken();
         if(!token){
             router.push('/login');
         }
@@ -17,7 +17,7 @@ export function useToken() {
     };
 
     const removeToken = (relogin = false) => {
-        removeData('token');
+        clearAccessToken();
         if(relogin){
             router.push('/login');
         }

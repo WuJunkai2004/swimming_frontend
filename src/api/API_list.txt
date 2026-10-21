@@ -32,6 +32,8 @@
 /admin/updateAdmin
 /admin/postSignUpList
 /admin/login
+/admin/refresh
+/admin/logout
 /admin/getParticipatAthleteList
 /admin/getAlumnusSignatureStatus
 /admin/getAdminList

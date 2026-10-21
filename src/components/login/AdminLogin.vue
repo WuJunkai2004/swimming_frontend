@@ -29,6 +29,7 @@ const adminLogin = async () => {
   const pw_sha = await SHA256(password.value);
   fetch("/admin/login", {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -42,7 +43,9 @@ const adminLogin = async () => {
     .then((data) => {
       if (data.statusCode === 200) {
         alerts("提示", "登录成功，正在跳转");
-        setToken(data.data.token);
+        // accessToken 有效期 2 小时，refreshToken（HttpOnly Cookie）7 天，
+        // 本地保存 7 天以支持会话静默恢复
+        setToken(data.data.accessToken || data.data.token, 168);
         router.push("/manage");
       } else {
         alerts("警告", "登录失败: " + data.message);

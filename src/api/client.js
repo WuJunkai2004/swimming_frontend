@@ -1,3 +1,5 @@
+import { refreshAccessToken } from "../utils/adminAuth.js";
+
 class endpoint {
   /**
    *
@@ -12,6 +14,17 @@ class endpoint {
     this.optional = optional;
     this.method = method;
   }
+  /**
+   * 该端点是否参与双 token 自动换新（管理员业务接口）
+   */
+  get _dualTokenEligible() {
+    return (
+      this.path.startsWith("/admin") &&
+      this.path !== "/admin/login" &&
+      this.path !== "/admin/refresh"
+    );
+  }
+
   /**
    *
    * @param {Map<String, any>} params
@@ -29,25 +42,49 @@ class endpoint {
         console.warn(`Optional parameter not provided: ${param}`);
       }
     }
-    if (this.method === "GET") {
-      // Construct query string for GET request
-      const queryString = Object.entries(params)
-        .map(
-          ([key, value]) =>
-            `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
-        )
-        .join("&");
-      return fetch(`${this.path}?${queryString}`, {
-        method: "GET",
+
+    const send = (p) => {
+      if (this.method === "GET") {
+        // Construct query string for GET request
+        const queryString = Object.entries(p)
+          .map(
+            ([key, value]) =>
+              `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+          )
+          .join("&");
+        return fetch(`${this.path}?${queryString}`, {
+          method: "GET",
+          credentials: "include",
+        });
+      }
+      // For POST, PUT, DELETE, etc., send parameters in the body
+      return fetch(this.path, {
+        method: this.method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(p),
       });
-    }
-    // For POST, PUT, DELETE, etc., send parameters in the body
-    return fetch(this.path, {
-      method: this.method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(params),
+    };
+
+    return send(params).then(async (response) => {
+      // accessToken 过期（425）时先用 refreshToken 换新再重试一次
+      if (this._dualTokenEligible) {
+        let statusCode = null;
+        try {
+          statusCode = (await response.clone().json()).statusCode;
+        } catch {
+          // 非 JSON 响应，原样返回
+        }
+        if (statusCode === 425) {
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            return send({ ...params, token: newToken });
+          }
+        }
+      }
+      return response;
     });
   }
 }
