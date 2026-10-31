@@ -1,12 +1,14 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useCollegeEnum } from "#/collegeMapping";
 import { useEventEnum } from "#/eventMapping";
 import { sportApi, competitionApi } from "@/api/serve.js";
 
 // --- 1. 初始化 ---
 const route = useRoute();
 const router = useRouter();
+const { collegeMap } = useCollegeEnum();
 const { eventMap } = useEventEnum();
 
 // 场次枚举 -> 中文（后端未提供查询接口，与 manage-schedule.vue 文案一致）
@@ -18,9 +20,19 @@ const groupOptions = [
   { label: "乙组", value: "B" },
 ];
 
+const queryModeOptions = [
+  { label: "学院团体积分", value: "college" },
+  { label: "单项成绩", value: "event" },
+];
+
 // --- 2. 状态定义 ---
 const gameId = ref("");
 const gameName = ref("");
+const queryMode = ref("event");
+
+const collegePoints = ref([]);
+const isCollegePointsLoading = ref(false);
+const collegePointsError = ref(null);
 
 // 比赛日程：[{ date, time, total: [{ marked, program, totalGroup }] }]
 const schedule = ref([]);
@@ -29,6 +41,14 @@ const selectedGroup = ref("A");
 
 const isLoading = ref(false);
 const error = ref(null);
+
+const rankedCollegePoints = computed(() =>
+  collegePoints.value.map((item, index) => ({
+    ...item,
+    rank: index + 1,
+    collegeName: collegeMap[item.college] || item.college,
+  })),
+);
 
 // 场次选项：日期 + 上午/下午/晚上
 const sessionOptions = computed(() =>
@@ -119,6 +139,29 @@ const fetchGameInfo = async () => {
   }
 };
 
+const fetchCollegePoints = async () => {
+  isCollegePointsLoading.value = true;
+  collegePointsError.value = null;
+  try {
+    const res = await competitionApi.getTotalCollegePoints({
+      competitionId: gameId.value,
+    });
+    const result = await res.json();
+    if (result.statusCode === 200) {
+      collegePoints.value = Array.isArray(result.data) ? result.data : [];
+    } else {
+      collegePoints.value = [];
+      collegePointsError.value = result.message || "查询学院团体积分失败";
+    }
+  } catch (e) {
+    console.error("查询学院团体积分失败:", e);
+    collegePoints.value = [];
+    collegePointsError.value = "网络错误，查询学院团体积分失败";
+  } finally {
+    isCollegePointsLoading.value = false;
+  }
+};
+
 // 获取比赛日程并初始化场次选择（优先恢复路由 query 中保存的选择）
 const fetchSchedule = async () => {
   isLoading.value = true;
@@ -176,9 +219,11 @@ onMounted(() => {
   gameId.value = route.params.gameid || "";
   if (!gameId.value) {
     error.value = "缺少比赛ID参数";
+    collegePointsError.value = "缺少比赛ID参数";
     return;
   }
   fetchGameInfo();
+  fetchCollegePoints();
   fetchSchedule();
 });
 </script>
@@ -198,87 +243,136 @@ onMounted(() => {
             </p>
           </div>
 
-          <Message v-if="error" severity="error" :closable="false" class="mb-3">
-            {{ error }}
-          </Message>
-
-          <div v-else-if="isLoading" class="text-center p-5">
-            <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="6" />
-            <p class="text-color-secondary">正在加载赛程...</p>
+          <div class="flex justify-content-center mb-4">
+            <SelectButton
+              v-model="queryMode"
+              :options="queryModeOptions"
+              optionLabel="label"
+              optionValue="value"
+              :allowEmpty="false"
+              aria-label="成绩查询类型"
+            />
           </div>
 
-          <Message
-            v-else-if="schedule.length === 0"
-            severity="info"
-            :closable="false"
-            class="mb-3"
-          >
-            该比赛暂无日程安排，成绩尚未发布。
-          </Message>
+          <template v-if="queryMode === 'college'">
+            <Message
+              v-if="collegePointsError"
+              severity="error"
+              :closable="false"
+              class="mb-3"
+            >
+              {{ collegePointsError }}
+            </Message>
+
+            <div v-else-if="isCollegePointsLoading" class="text-center p-5">
+              <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="6" />
+              <p class="text-color-secondary">正在加载学院团体积分...</p>
+            </div>
+
+            <Message
+              v-else-if="rankedCollegePoints.length === 0"
+              severity="info"
+              :closable="false"
+              class="mb-3"
+            >
+              暂无学院团体积分数据。
+            </Message>
+
+            <DataTable
+              v-else
+              :value="rankedCollegePoints"
+              responsiveLayout="scroll"
+              stripedRows
+            >
+              <Column field="rank" header="排名" style="width: 5rem"></Column>
+              <Column field="collegeName" header="学院"></Column>
+              <Column field="totalPoints" header="团体积分" style="width: 7rem"></Column>
+            </DataTable>
+          </template>
 
           <template v-else>
-            <!-- 筛选条件：场次 + 组别 -->
-            <div class="grid mb-3">
-              <div class="col-7 md:col-8 flex flex-column gap-1">
-                <label for="session">场次</label>
-                <Select
-                  id="session"
-                  v-model="selectedSessionIdx"
-                  :options="sessionOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="请选择场次"
-                  fluid
-                />
-              </div>
-              <div class="col-5 md:col-4 flex flex-column gap-1">
-                <label for="group">组别</label>
-                <Select
-                  id="group"
-                  v-model="selectedGroup"
-                  :options="groupSelectOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="请选择组别"
-                  fluid
-                />
-              </div>
+            <Message v-if="error" severity="error" :closable="false" class="mb-3">
+              {{ error }}
+            </Message>
+
+            <div v-else-if="isLoading" class="text-center p-5">
+              <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="6" />
+              <p class="text-color-secondary">正在加载赛程...</p>
             </div>
 
-            <!-- 项目卡片列表（点击跳转一大组成绩详情） -->
-            <div class="flex flex-column gap-2">
-              <div
-                v-for="item in itemCards"
-                :key="`${item.marked}-${item.program}`"
-                class="schedule-card surface-card border-round shadow-1 p-3 flex align-items-center gap-3"
-                role="button"
-                tabindex="0"
-                @click="goToDetail(item)"
-                @keydown.enter="goToDetail(item)"
-              >
-                <Tag
-                  :value="item.gender.label"
-                  :severity="item.gender.severity"
-                  class="schedule-gender"
-                />
-                <div class="flex-1 min-w-0">
-                  <div class="schedule-title">
-                    第{{ item.marked }}项 · {{ item.groupLabel }}
-                    {{ item.eventName }}
-                  </div>
-                  <div class="schedule-sub">共 {{ item.totalGroup }} 组</div>
+            <Message
+              v-else-if="schedule.length === 0"
+              severity="info"
+              :closable="false"
+              class="mb-3"
+            >
+              该比赛暂无日程安排，成绩尚未发布。
+            </Message>
+
+            <template v-else>
+              <!-- 筛选条件：场次 + 组别 -->
+              <div class="grid mb-3">
+                <div class="col-7 md:col-8 flex flex-column gap-1">
+                  <label for="session">场次</label>
+                  <Select
+                    id="session"
+                    v-model="selectedSessionIdx"
+                    :options="sessionOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="请选择场次"
+                    fluid
+                  />
                 </div>
-                <i class="pi pi-chevron-right text-color-secondary"></i>
+                <div class="col-5 md:col-4 flex flex-column gap-1">
+                  <label for="group">组别</label>
+                  <Select
+                    id="group"
+                    v-model="selectedGroup"
+                    :options="groupSelectOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="请选择组别"
+                    fluid
+                  />
+                </div>
               </div>
 
-              <div
-                v-if="itemCards.length === 0"
-                class="text-center p-5 text-color-secondary"
-              >
-                <i class="pi pi-inbox" style="font-size: 2rem"></i>
-                <p>该场次当前组别暂无项目安排</p>
+              <!-- 项目卡片列表（点击跳转一大组成绩详情） -->
+              <div class="flex flex-column gap-2">
+                <div
+                  v-for="item in itemCards"
+                  :key="`${item.marked}-${item.program}`"
+                  class="schedule-card surface-card border-round shadow-1 p-3 flex align-items-center gap-3"
+                  role="button"
+                  tabindex="0"
+                  @click="goToDetail(item)"
+                  @keydown.enter="goToDetail(item)"
+                >
+                  <Tag
+                    :value="item.gender.label"
+                    :severity="item.gender.severity"
+                    class="schedule-gender"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <div class="schedule-title">
+                      第{{ item.marked }}项 · {{ item.groupLabel }}
+                      {{ item.eventName }}
+                    </div>
+                    <div class="schedule-sub">共 {{ item.totalGroup }} 组</div>
+                  </div>
+                  <i class="pi pi-chevron-right text-color-secondary"></i>
+                </div>
+
+                <div
+                  v-if="itemCards.length === 0"
+                  class="text-center p-5 text-color-secondary"
+                >
+                  <i class="pi pi-inbox" style="font-size: 2rem"></i>
+                  <p>该场次当前组别暂无项目安排</p>
+                </div>
               </div>
-            </div>
+            </template>
           </template>
         </div>
       </div>

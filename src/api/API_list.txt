@@ -88,6 +88,7 @@
 /api/competition/list
 /api/competition/getGameSchedule
 /api/competition/getCompetitionList
+/api/competition/getTotalCollegePoints
 /alumnus/getDiscussionList
 /alumnus/getAlumnusList
 /alumnus/getAlumnusDetail
