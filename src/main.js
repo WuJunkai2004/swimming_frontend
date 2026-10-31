@@ -10,6 +10,7 @@ import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 
 import ConfirmationService from 'primevue/confirmationservice'
+import { installFingerprintFetch } from './utils/fingerprint.js'
 
 import { definePreset } from '@primeuix/themes';
 const Blue = definePreset(Aura, {
@@ -29,6 +30,8 @@ const Blue = definePreset(Aura, {
         }
     }
 });
+
+installFingerprintFetch();
 
 const app = createApp(App)
 
