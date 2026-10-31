@@ -25,12 +25,19 @@ const queryModeOptions = [
   { label: "单项成绩", value: "event" },
 ];
 
+const collegeGroupOptions = [
+  { label: "总分", value: "" },
+  { label: "甲组", value: "A" },
+  { label: "乙组", value: "B" },
+];
+
 // --- 2. 状态定义 ---
 const gameId = ref("");
 const gameName = ref("");
 const queryMode = ref("event");
 
 const collegePoints = ref([]);
+const selectedCollegeGroup = ref("B");
 const isCollegePointsLoading = ref(false);
 const collegePointsError = ref(null);
 
@@ -145,6 +152,7 @@ const fetchCollegePoints = async () => {
   try {
     const res = await competitionApi.getTotalCollegePoints({
       competitionId: gameId.value,
+      competitionGroup: selectedCollegeGroup.value,
     });
     const result = await res.json();
     if (result.statusCode === 200) {
@@ -255,6 +263,20 @@ onMounted(() => {
           </div>
 
           <template v-if="queryMode === 'college'">
+            <div class="field mb-3">
+              <label for="college-group" class="block mb-2">组别</label>
+              <Select
+                id="college-group"
+                v-model="selectedCollegeGroup"
+                :options="collegeGroupOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="请选择组别"
+                fluid
+                @change="fetchCollegePoints"
+              />
+            </div>
+
             <Message
               v-if="collegePointsError"
               severity="error"

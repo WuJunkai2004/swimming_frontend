@@ -140,6 +140,6 @@ competitionApi._add_endpoint("queryCompetition", "/api/competition/queryCompetit
 competitionApi._add_endpoint("list", "/api/competition/list", [], ["page","size"], "GET"); // 分页获取比赛列表
 competitionApi._add_endpoint("getGameSchedule", "/api/competition/getGameSchedule", ["id"], [], "GET"); // 获取比赛日程
 competitionApi._add_endpoint("getCompetitionList", "/api/competition/getCompetitionList", [], [], "GET"); // 获取全部比赛列表
-competitionApi._add_endpoint("getTotalCollegePoints", "/api/competition/getTotalCollegePoints", ["competitionId"], [], "GET"); // 查询学院总积分
+competitionApi._add_endpoint("getTotalCollegePoints", "/api/competition/getTotalCollegePoints", ["competitionId"], ["competitionGroup"], "GET"); // 查询学院总积分
 
 export { sportApi, volunteerApi, funVolunteerApi, contractApi, alumnusApi, adminApi, adminFunApi, activityApi, registerApi, leaderApi, athleteApi, funGameApi, competitionApi };
