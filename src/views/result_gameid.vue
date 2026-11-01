@@ -51,22 +51,20 @@ const error = ref(null);
 
 const rankedCollegePoints = computed(() => {
   let points = [...collegePoints.value];
-  if (gameId.value === "33a77c9afc6a42708c46ad91ca1e9c88") {
-    const combinedColleges = new Set([
-      "SCHOOL_OF_CHEMICAL_ENGINEERING",
-      "FUTURE_MEMBRANE_TECHNOLOGY_INSTITUTE",
-    ]);
-    const combined = points.filter((item) => combinedColleges.has(item.college));
-    if (combined.length > 0) {
-      points = points.filter((item) => !combinedColleges.has(item.college));
-      points.push({
-        collegeName: "化工学院、未来技术学院",
-        totalPoints: combined.reduce(
-          (total, item) => total + (Number(item.totalPoints) || 0),
-          0,
-        ),
-      });
-    }
+  const combinedColleges = new Set([
+    "SCHOOL_OF_CHEMICAL_ENGINEERING",
+    "FUTURE_MEMBRANE_TECHNOLOGY_INSTITUTE",
+  ]);
+  const combined = points.filter((item) => combinedColleges.has(item.college));
+  if (combined.length > 0) {
+    points = points.filter((item) => !combinedColleges.has(item.college));
+    points.push({
+      collegeName: "化工学院、未来技术学院",
+      totalPoints: combined.reduce(
+        (total, item) => total + (Number(item.totalPoints) || 0),
+        0,
+      ),
+    });
   }
   return points
     .sort((a, b) => Number(b.totalPoints) - Number(a.totalPoints))
